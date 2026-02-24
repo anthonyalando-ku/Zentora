@@ -1,0 +1,29 @@
+:root {
+  /* Brand Background */
+  --color-background: 30 14% 97%; /* #f9f8f7 */
+
+  /* Main text */
+  --color-foreground: 222 47% 11%;
+
+  /* Primary = BRAND BLUE */
+  --color-primary: 209 100% 28%; /* #004b8f */
+
+  /* Secondary = BRAND ORANGE */
+  --color-secondary: 29 85% 47%; /* #df7412 */
+
+  --color-destructive: 0 84% 60%; /* Red */
+
+  --color-border: 214 32% 91%;
+}
+[data-theme="dark"] {
+  --color-background: 222 47% 11%;
+  --color-foreground: 210 40% 98%;
+
+  /* keep brand identity */
+  --color-primary: 209 100% 45%; 
+  --color-secondary: 29 85% 55%;
+
+  --color-destructive: 0 72% 51%;
+
+  --color-border: 217 33% 17%;
+}
