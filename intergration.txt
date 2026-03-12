@@ -1,0 +1,468 @@
+This repository contains two submodules:
+
+backend → Go Gin API
+ui → React frontend
+
+Goal:
+Integrate frontend with backend APIs.
+
+Focus only on:
+product catalog
+discovery feeds
+cart
+wishlist
+orders
+search
+
+Ignore admin routes.
+You are a senior full-stack engineer specializing in **large production e-commerce systems**.
+
+You will analyze **both backend and frontend repositories** for a project called **Zentora**.
+
+Your goal is to **prepare a structured integration plan** that connects the frontend UI to the backend APIs.
+
+Do NOT immediately start modifying code.
+
+Instead:
+
+1. First analyze the backend routes and services.
+2. Analyze the frontend React structure.
+3. Identify which endpoints will power each page/component.
+4. Produce a **step-by-step integration plan**.
+
+The plan will then be used to guide the actual code changes.
+
+---
+
+# Project Context
+
+Zentora is a **Jumia/Amazon-style e-commerce platform**.
+
+Backend:
+
+* Go (Gin)
+* PostgreSQL
+* Redis
+* Discovery engine for product feeds
+
+Frontend:
+
+* React
+* Most pages already exist but use **mock data**
+
+The goal is to:
+
+* Replace mock data with real backend APIs
+* Adjust UI where necessary
+* Ensure frontend and backend contracts match
+* Add any missing UI pieces
+
+---
+
+# Important Constraints
+
+### Slug-based routing
+
+Frontend must **never use product IDs**.
+
+Always use:
+
+/products/:slug
+
+Example backend endpoint:
+
+GET /catalog/products/slug/:slug
+
+IDs remain backend-only.
+
+---
+
+### Support both users
+
+The system supports:
+
+1. Guest users
+2. Logged-in users
+
+Guest flows:
+
+* cart stored locally
+* checkout uses guest order endpoint
+
+Logged-in flows:
+
+* cart synced with backend
+* wishlist available
+* addresses saved
+* orders saved
+
+---
+
+# Pages That Must Be Integrated
+
+The frontend contains the following pages.
+
+You must analyze them and determine **which backend APIs power each page**.
+
+Pages:
+
+1. Homepage
+2. Products Page
+3. Product Detail Page
+4. Cart Page
+5. Checkout Page
+6. Account Page
+7. Search Bar
+
+---
+
+# Homepage Requirements
+
+Navigation Menu
+
+Catalog dropdown with categories.
+
+Categories must be loaded dynamically from backend:
+
+GET /catalog/categories
+
+Do NOT hardcode categories.
+
+Categories should be grouped horizontally if there are many (20+).
+
+---
+
+Hero Section
+
+Carousel banners.
+
+Data will come from backend in the future.
+
+For now it uses placeholder data.
+
+Do not change this yet.
+
+---
+
+Shop by Categories
+
+Display categories from:
+
+GET /catalog/categories
+
+---
+
+Homepage Product Sections
+
+Sections are powered by the **Discovery Engine**.
+
+Available feed types:
+
+Trending
+Best Sellers
+Recommended
+Deals
+New Arrivals
+Highly Rated
+Most Wishlisted
+Also Viewed
+Featured
+Editorial
+Category
+
+Endpoint:
+
+GET /discovery/feed
+
+Each section should request at least **8 products**.
+
+If a section returns **no products**, it should not be rendered.
+
+Sections should show **4–5 products per row**.
+
+Each section header should include:
+
+* title
+* "show more" button
+
+Clicking "show more" navigates to the **Products Page**, populated with that feed type.
+
+---
+
+Homepage Product Cards
+
+Each product card should include:
+
+* image
+* name
+* price
+* discount
+* wishlist icon
+* order via WhatsApp button
+
+Add-to-cart should **not appear here** because variants are unknown.
+
+---
+
+# Products Page
+
+Layout:
+
+Left side:
+Filters
+
+Right side:
+Product cards
+
+Filters should reflect backend filtering capabilities.
+
+Products can be loaded from:
+
+GET /discovery/feed
+or
+GET /catalog/products
+
+Pagination required.
+
+Bottom navigation:
+
+1 2 3 Next
+
+Do NOT allow add-to-cart here.
+
+Users must open **Product Detail Page**.
+
+---
+
+# Product Detail Page
+
+Route:
+
+/products/:slug
+
+Data loaded from:
+
+GET /catalog/products/slug/:slug
+
+Variants must also be loaded.
+
+Products always have at least **one variant**.
+
+Variant must be **selected by default**.
+
+Page must support:
+
+Add to Cart
+Buy Now
+Buy via WhatsApp
+
+If product already exists in cart:
+
+Replace "Add to Cart" with:
+
+* quantity controls (+ / -)
+
+---
+
+# Cart Page
+
+Cart works differently depending on user.
+
+Guest users:
+
+cart stored locally.
+
+Logged-in users:
+
+GET /me/cart
+POST /me/cart/items
+DELETE /me/cart/items/:id
+
+Cart page must allow:
+
+place order
+buy via WhatsApp
+
+---
+
+# Checkout Page
+
+Flow:
+
+Cart Summary
+Shipping Address
+Payment
+Place Order
+
+Guest checkout:
+
+POST /orders/guest
+
+Logged-in checkout:
+
+POST /orders
+
+Shipping info rules:
+
+Guest → provide shipping info.
+
+Logged-in → choose from saved addresses.
+
+Address endpoints:
+
+GET /me/addresses
+POST /me/addresses
+PUT /me/addresses/:id
+
+Payment options:
+
+Cash on delivery (enabled)
+
+Mpesa (future feature, disabled)
+
+---
+
+# Account Page
+
+Account features:
+
+Profile
+Orders
+Wishlist
+Addresses
+
+Relevant APIs:
+
+GET /orders
+GET /orders/details
+GET /me/wishlist
+POST /me/wishlist/items
+DELETE /me/wishlist/items
+
+---
+
+# Search Bar
+
+Search must use discovery APIs:
+
+GET /discovery/search
+GET /discovery/suggest
+
+Tracking:
+
+POST /discovery/search/events
+POST /discovery/search/clicks
+
+Search suggestions should appear while typing.
+
+---
+
+# Backend Routes
+
+You will be provided the backend router file.
+
+From it, extract ONLY:
+
+* catalog
+* discovery
+* cart
+* wishlist
+* orders
+* reviews
+* user address routes
+
+Ignore:
+
+admin routes
+notification routes
+websocket routes
+auth flows (for now)
+
+---
+
+# What You Must Produce
+
+Step 1
+
+Extract all **user-side product-related endpoints** from the router.
+
+Group them into:
+
+Catalog
+Discovery
+Cart
+Wishlist
+Orders
+User
+Search
+
+---
+
+Step 2
+
+Analyze the frontend repository.
+
+Identify:
+
+pages
+components
+data hooks
+mock data usage
+
+---
+
+Step 3
+
+Create a **page-to-API mapping**.
+
+Example:
+
+Homepage
+→ categories endpoint
+→ discovery feed endpoints
+
+Product page
+→ discovery feed with filters
+
+Product detail
+→ product slug endpoint
+
+---
+
+Step 4
+
+Create a **step-by-step integration plan**.
+
+Order should be:
+
+1. API client layer
+2. Global data hooks
+3. Homepage
+4. Product page
+5. Product detail
+6. Cart
+7. Checkout
+8. Account pages
+9. Search system
+
+Each step should list:
+
+* components to modify
+* APIs to integrate
+* UI changes needed
+* state management requirements
+
+---
+
+# Important
+
+Do NOT generate implementation code yet.
+
+Only produce:
+
+* architecture understanding
+* endpoint extraction
+* page-API mapping
+* integration roadmap
+
+After this plan is reviewed, we will proceed with implementation.
