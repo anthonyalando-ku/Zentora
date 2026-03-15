@@ -1,68 +1,95 @@
 import { Link } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
-import { Button, Badge, Rating } from "@/shared/components/ui";
-import { mockProducts, mockCategories } from "@/shared/constants/mockProducts";
-import { useCartStore } from "@/features/cart/store/cartStore";
+import { Badge } from "@/shared/components/ui";
+import { ProductCard } from "@/features/products/components/ProductCard";
+import { useCategories } from "@/features/catalog/hooks/useCategories";
+import { useDiscoveryFeed } from "@/features/discovery/hooks/useDiscoveryFeed";
 import type { Product } from "@/shared/types/product";
+import type { DiscoveryFeedItem, DiscoveryFeedType } from "@/core/api/services/discovery";
 
-const ProductCard = ({ product }: { product: Product }) => {
-  const addItem = useCartStore((state) => state.addItem);
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
+const feedTitle: Record<DiscoveryFeedType, string> = {
+  trending: "Trending",
+  best_sellers: "Best Sellers",
+  recommended: "Recommended",
+  deals: "Deals",
+  new_arrivals: "New Arrivals",
+  highly_rated: "Highly Rated",
+  most_wishlisted: "Most Wishlisted",
+  also_viewed: "Also Viewed",
+  featured: "Featured",
+  editorial: "Editorial",
+  category: "Category",
+};
+
+const inventoryStatusToInStock = (s: string | undefined) => s === "in_stock" || s === "low_stock";
+
+const mapDiscoveryItemToProduct = (item: DiscoveryFeedItem): Product => {
+  const discount = Number(item.discount ?? 0);
+  const originalPrice = discount > 0 ? item.price / (1 - discount / 100) : undefined;
+
+  return {
+    id: String(item.product_id),
+    name: item.name,
+    slug: item.slug,
+    description: "",
+    price: item.price,
+    originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
+    discount: discount || undefined,
+    category: "electronics", // placeholder only; homepage card doesn't use category label
+    images: [],
+    thumbnail: item.primary_image ?? "https://picsum.photos/seed/zentora-fallback/600/600",
+    rating: item.rating ?? 0,
+    reviewCount: item.review_count ?? 0,
+    inStock: inventoryStatusToInStock(item.inventory_status),
+    tags: [],
+  };
+};
+
+const FeedSection = ({
+  feedType,
+  items,
+}: {
+  feedType: DiscoveryFeedType;
+  items: DiscoveryFeedItem[] | undefined;
+}) => {
+  if (!items || items.length === 0) return null;
 
   return (
-    <div className="group relative bg-background rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
-      {product.badge && (
-        <div className="absolute top-3 left-3 z-10">
-          <Badge variant={product.badge}>{product.badge}</Badge>
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{feedTitle[feedType]}</h2>
+          <p className="text-foreground/50 mt-1">Handpicked products just for you</p>
         </div>
-      )}
-      {discount > 0 && (
-        <div className="absolute top-3 right-3 z-10">
-          <Badge variant="sale">-{discount}%</Badge>
-        </div>
-      )}
-
-      <Link to={`/products/${product.slug}`} className="block overflow-hidden aspect-square bg-gray-50">
-        <img
-          src={product.thumbnail}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-      </Link>
-
-      <div className="p-4">
-        <Link to={`/products/${product.slug}`}>
-          <h3 className="font-medium text-sm text-foreground line-clamp-2 hover:text-primary transition-colors mb-1">
-            {product.name}
-          </h3>
-        </Link>
-        <Rating value={product.rating} showCount reviewCount={product.reviewCount} className="mb-2" />
-        <div className="flex items-center gap-2 mb-3">
-          <span className="font-bold text-base text-primary">
-            KSh {product.price.toLocaleString()}
-          </span>
-          {product.originalPrice && (
-            <span className="text-sm text-foreground/40 line-through">
-              KSh {product.originalPrice.toLocaleString()}
-            </span>
-          )}
-        </div>
-        <Button
-          className="w-full text-xs h-9"
-          onClick={() => addItem(product)}
-          disabled={!product.inStock}
+        <Link
+          to={`/products?feed_type=${feedType}`}
+          className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline"
         >
-          {product.inStock ? "Add to Cart" : "Out of Stock"}
-        </Button>
+          Show More
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
       </div>
-    </div>
+
+      {/* Keep existing grid layout */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {items.map((item) => {
+          const product = mapDiscoveryItemToProduct(item);
+          return <ProductCard key={product.slug} product={product} hideAddToCart showWishlist />;
+        })}
+      </div>
+    </section>
   );
 };
 
 const HomePage = () => {
-  const featuredProducts = mockProducts.slice(0, 8);
+  const { data: categories } = useCategories();
+
+  const trending = useDiscoveryFeed("trending", 8);
+  const bestSellers = useDiscoveryFeed("best_sellers", 8);
+  const newArrivals = useDiscoveryFeed("new_arrivals", 8);
+  const deals = useDiscoveryFeed("deals", 8);
 
   return (
     <MainLayout>
@@ -76,8 +103,7 @@ const HomePage = () => {
                 New arrivals every week
               </div>
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-foreground mb-6">
-                Shop Smarter,{" "}
-                <span className="text-primary">Live Better</span>
+                Shop Smarter, <span className="text-primary">Live Better</span>
               </h1>
               <p className="text-lg text-foreground/60 leading-relaxed mb-8 max-w-lg">
                 Discover thousands of quality products at unbeatable prices. Free delivery on orders over KSh 5,000.
@@ -122,7 +148,12 @@ const HomePage = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center">
                     <svg className="w-5 h-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                      />
                     </svg>
                   </div>
                   <div>
@@ -143,41 +174,46 @@ const HomePage = () => {
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Shop by Category</h2>
             <p className="text-foreground/50 mt-1">Find exactly what you're looking for</p>
           </div>
-          <Link to="/products" className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+          <Link
+            to="/products"
+            className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          >
             View all
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {mockCategories.map((category) => (
+
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {(categories ?? []).map((category) => (
             <Link
-              key={category.id}
-              to={`/products?category=${category.slug}`}
-              className="group flex flex-col items-center gap-3 p-4 rounded-2xl border border-border bg-background hover:border-primary/30 hover:shadow-md transition-all duration-300"
+              key={String(category.id)}
+              to={`/products?category_id=${category.id}`}
+              className="group flex flex-col items-center gap-3 p-4 rounded-2xl border border-border bg-background hover:border-primary/30 hover:shadow-md transition-all duration-300 min-w-[140px]"
             >
               <div className="w-16 h-16 rounded-full overflow-hidden bg-primary/5 group-hover:bg-primary/10 transition-colors">
                 <img
-                  src={category.image}
+                  src={category.image_url ?? "https://picsum.photos/seed/zentora-category/400/300"}
                   alt={category.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
               </div>
               <div className="text-center">
-                <div className="text-sm font-medium text-foreground">{category.name}</div>
-                <div className="text-xs text-foreground/40">{category.productCount} items</div>
+                <div className="text-sm font-medium text-foreground whitespace-nowrap">{category.name}</div>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Promotional Banner */}
+      {/* Promotional Banner (unchanged) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-primary to-primary/80 p-8 md:p-12">
           <div className="relative z-10 max-w-xl">
-            <Badge variant="sale" className="mb-4">Limited Time Offer</Badge>
+            <Badge variant="sale" className="mb-4">
+              Limited Time Offer
+            </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
               Up to 50% Off Electronics
             </h2>
@@ -203,36 +239,13 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Featured Products</h2>
-            <p className="text-foreground/50 mt-1">Handpicked products just for you</p>
-          </div>
-          <Link to="/products" className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-            View all
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-        <div className="mt-10 text-center">
-          <Link
-            to="/products"
-            className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition h-12 px-6 text-base border border-border bg-transparent text-foreground hover:bg-secondary/10"
-          >
-            Browse All Products
-          </Link>
-        </div>
-      </section>
+      {/* Discovery feeds (Stage 1) */}
+      <FeedSection feedType="trending" items={trending.data?.items} />
+      <FeedSection feedType="best_sellers" items={bestSellers.data?.items} />
+      <FeedSection feedType="new_arrivals" items={newArrivals.data?.items} />
+      <FeedSection feedType="deals" items={deals.data?.items} />
 
-      {/* Trust Badges */}
+      {/* Trust Badges (unchanged) */}
       <section className="border-t border-border bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

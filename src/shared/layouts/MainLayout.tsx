@@ -1,8 +1,8 @@
 import { type ReactNode, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useCartStore } from "@/features/cart/store/cartStore";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { useCart } from "@/features/cart/hooks/useCart";
 
 type MainLayoutProps = {
   children: ReactNode;
@@ -17,23 +17,21 @@ const navLinks = [
 export const MainLayout = ({ children }: MainLayoutProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-  const cartCount = useCartStore((state) => state.items.reduce((acc, i) => acc + i.quantity, 0));
+
+  const cart = useCart();
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Header
         navLinks={navLinks}
-        cartCount={cartCount}
+        cartCount={cart.itemCount}
         menuOpen={menuOpen}
         onMenuToggle={() => setMenuOpen((v) => !v)}
         onMenuClose={() => setMenuOpen(false)}
         pathname={location.pathname}
       />
 
-      {/* Main content */}
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       <Footer />
     </div>

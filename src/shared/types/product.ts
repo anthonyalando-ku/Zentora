@@ -1,4 +1,4 @@
-export type ProductCategory = 'electronics' | 'clothing' | 'home' | 'beauty' | 'sports' | 'books';
+export type ProductCategory = string;
 
 export type Product = {
   id: string;
@@ -8,13 +8,16 @@ export type Product = {
   price: number;
   originalPrice?: number;
   discount?: number;
+
+  // DB-driven category (e.g. "Electronics", "Phones", etc.)
   category: ProductCategory;
+
   images: string[];
   thumbnail: string;
   rating: number;
   reviewCount: number;
   inStock: boolean;
-  badge?: 'new' | 'hot' | 'sale';
+  badge?: "new" | "hot" | "sale";
   tags: string[];
 };
 

@@ -10,6 +10,11 @@ type NavLink = {
   href: string;
 };
 
+type CatalogCategoryLink = {
+  id: string | number;
+  name: string;
+};
+
 type HeaderProps = {
   navLinks: NavLink[];
   cartCount: number;
@@ -17,9 +22,18 @@ type HeaderProps = {
   onMenuToggle: () => void;
   onMenuClose: () => void;
   pathname: string;
+  catalogCategories?: CatalogCategoryLink[];
 };
 
-export const Header = ({ navLinks, cartCount, menuOpen, onMenuToggle, onMenuClose, pathname }: HeaderProps) => (
+export const Header = ({
+  navLinks,
+  cartCount,
+  menuOpen,
+  onMenuToggle,
+  onMenuClose,
+  pathname,
+  catalogCategories,
+}: HeaderProps) => (
   <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex h-16 items-center justify-between gap-4">
@@ -29,12 +43,18 @@ export const Header = ({ navLinks, cartCount, menuOpen, onMenuToggle, onMenuClos
           <span className="font-bold text-xl text-primary hidden sm:block">Zentora</span>
         </Link>
 
-        <HeaderNav navLinks={navLinks} pathname={pathname} />
+        <HeaderNav navLinks={navLinks} pathname={pathname} catalogCategories={catalogCategories} />
         <HeaderSearch />
         <HeaderActions cartCount={cartCount} menuOpen={menuOpen} onMenuToggle={onMenuToggle} />
       </div>
     </div>
 
-    <MobileMenu open={menuOpen} navLinks={navLinks} pathname={pathname} onClose={onMenuClose} />
+    <MobileMenu
+      open={menuOpen}
+      navLinks={navLinks}
+      pathname={pathname}
+      onClose={onMenuClose}
+      catalogCategories={catalogCategories}
+    />
   </header>
 );
