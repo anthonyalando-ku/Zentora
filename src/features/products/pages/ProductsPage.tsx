@@ -89,7 +89,9 @@ const mapSearchItemToProduct = (item: DiscoverySearchItem): Product => {
     price: item.price,
     originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
     discount: discount || undefined,
-    category: item.category ?? "electronics",
+    // NOTE: keep union compatible without changing business logic.
+    // If you later change ProductCategory to be DB-driven (string), you can switch to: item.category ?? "electronics"
+    category: "electronics",
     images: [],
     thumbnail: item.primary_image ?? "https://picsum.photos/seed/zentora-fallback/600/600",
     rating: item.rating ?? 0,
@@ -141,14 +143,18 @@ const FilterSidebar = ({
   onChange,
 }: FilterSidebarProps) => {
   return (
-    <div className={cn("space-y-6", disabled && "opacity-60 pointer-events-none")}>
-      {/* Categories */}
-      <div>
-        <h3 className="font-semibold text-sm mb-3">Category</h3>
-        <div className="space-y-2">
+    <div className={cn("space-y-5", disabled && "opacity-60 pointer-events-none")}>
+      {/* Category */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-sm text-foreground">Category</h3>
+          <span className="text-[11px] text-foreground/50">{categories.length}</span>
+        </div>
+
+        <div className="max-h-60 overflow-y-auto pr-1 space-y-1">
           <button
             className={cn(
-              "w-full text-left text-sm px-3 py-1.5 rounded-lg transition-colors",
+              "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
               !selectedCategoryId
                 ? "bg-primary/10 text-primary font-medium"
                 : "hover:bg-secondary/10 text-foreground/70"
@@ -163,30 +169,35 @@ const FilterSidebar = ({
             <button
               key={String(cat.id)}
               className={cn(
-                "w-full text-left text-sm px-3 py-1.5 rounded-lg transition-colors",
+                "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
                 String(selectedCategoryId) === String(cat.id)
                   ? "bg-primary/10 text-primary font-medium"
                   : "hover:bg-secondary/10 text-foreground/70"
               )}
               onClick={() => onChange({ category_id: String(cat.id) })}
               disabled={disabled}
+              title={cat.name}
             >
-              {cat.name}
+              <span className="line-clamp-1">{cat.name}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Brands */}
-      <div>
-        <h3 className="font-semibold text-sm mb-3">Brand</h3>
-        <div className="space-y-2">
+      <div className="h-px bg-border" />
+
+      {/* Brand */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-sm text-foreground">Brand</h3>
+          <span className="text-[11px] text-foreground/50">{brands.length}</span>
+        </div>
+
+        <div className="max-h-60 overflow-y-auto pr-1 space-y-1">
           <button
             className={cn(
-              "w-full text-left text-sm px-3 py-1.5 rounded-lg transition-colors",
-              !selectedBrandId
-                ? "bg-primary/10 text-primary font-medium"
-                : "hover:bg-secondary/10 text-foreground/70"
+              "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
+              !selectedBrandId ? "bg-primary/10 text-primary font-medium" : "hover:bg-secondary/10 text-foreground/70"
             )}
             onClick={() => onChange({ brand_id: null })}
             disabled={disabled}
@@ -198,54 +209,64 @@ const FilterSidebar = ({
             <button
               key={String(b.id)}
               className={cn(
-                "w-full text-left text-sm px-3 py-1.5 rounded-lg transition-colors",
+                "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
                 String(selectedBrandId) === String(b.id)
                   ? "bg-primary/10 text-primary font-medium"
                   : "hover:bg-secondary/10 text-foreground/70"
               )}
               onClick={() => onChange({ brand_id: String(b.id) })}
               disabled={disabled}
+              title={b.name}
             >
-              {b.name}
+              <span className="line-clamp-1">{b.name}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Price Range */}
-      <div>
-        <h3 className="font-semibold text-sm mb-3">Price Range</h3>
-        <div className="space-y-3">
-          <div className="flex gap-2">
+      <div className="h-px bg-border" />
+
+      {/* Price */}
+      <div className="space-y-3">
+        <h3 className="font-semibold text-sm text-foreground">Price Range</h3>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <label className="text-[11px] text-foreground/60">Min</label>
             <input
               type="number"
               value={priceMin ?? ""}
               onChange={(e) => onChange({ price_min: e.target.value ? String(e.target.value) : null })}
-              className="w-full text-xs border border-border rounded px-2 py-1 bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="Min"
+              className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="0"
               disabled={disabled}
             />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] text-foreground/60">Max</label>
             <input
               type="number"
               value={priceMax ?? ""}
               onChange={(e) => onChange({ price_max: e.target.value ? String(e.target.value) : null })}
-              className="w-full text-xs border border-border rounded px-2 py-1 bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="Max"
+              className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="Any"
               disabled={disabled}
             />
           </div>
         </div>
       </div>
 
+      <div className="h-px bg-border" />
+
       {/* Rating */}
-      <div>
-        <h3 className="font-semibold text-sm mb-3">Minimum Rating</h3>
-        <div className="space-y-2">
+      <div className="space-y-3">
+        <h3 className="font-semibold text-sm text-foreground">Minimum Rating</h3>
+        <div className="space-y-1">
           {[null, 3, 3.5, 4, 4.5].map((rating) => (
             <button
               key={String(rating)}
               className={cn(
-                "w-full flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg transition-colors",
+                "w-full flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors",
                 (minRating ?? null) === rating
                   ? "bg-primary/10 text-primary font-medium"
                   : "hover:bg-secondary/10 text-foreground/70"
@@ -257,8 +278,8 @@ const FilterSidebar = ({
                 "Any Rating"
               ) : (
                 <>
-                  <span className="text-yellow-400">{"★".repeat(Math.floor(rating))}</span>
-                  <span>& up</span>
+                  <span className="text-yellow-500">{"★".repeat(Math.floor(rating))}</span>
+                  <span className="text-foreground/70">& up</span>
                 </>
               )}
             </button>
@@ -266,8 +287,12 @@ const FilterSidebar = ({
         </div>
       </div>
 
-      {/* Flags */}
+      <div className="h-px bg-border" />
+
+      {/* Other filters */}
       <div className="space-y-2">
+        <h3 className="font-semibold text-sm text-foreground">Other Filters</h3>
+
         <label className="flex items-center gap-2 text-sm text-foreground/70">
           <input
             type="checkbox"
@@ -447,6 +472,7 @@ const ProductsPage = () => {
     if (value === undefined || value === "") next.delete(key);
     else next.set(key, value);
 
+    // Reset paging on filter changes (but not when changing page itself)
     if (key !== "page") next.set("page", "1");
 
     setSearchParams(next);
@@ -468,122 +494,306 @@ const ProductsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Modern totals/subtitles (UI only)
+  const headerTitle = isSearchMode
+    ? "Search results"
+    : isFeedMode
+      ? `${feedType?.replaceAll("_", " ")} products`
+      : "All Products";
+
+  const headerSubtitle = isLoading
+    ? "Loading products…"
+    : isSearchMode
+      ? `${searchItems.length} results for “${queryTerm}”`
+      : isFeedMode
+        ? `${feedProductsAll.length} products loaded`
+        : `${catalogQuery.data?.total ?? 0} products found`;
+
   return (
     <MainLayout>
-      {/* Page header */}
-      <div className="border-b border-border bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <nav className="flex items-center gap-2 text-sm text-foreground/50 mb-2">
-            <Link to="/" className="hover:text-primary">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-foreground">Products</span>
-          </nav>
+      {/* Page background band */}
+      <div className="bg-background">
+        {/* Header */}
+        <div className="border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <nav className="flex items-center gap-2 text-xs sm:text-sm text-foreground/50 mb-2">
+              <Link to="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <span className="text-foreground">Products</span>
+            </nav>
 
-          <h1 className="text-2xl font-bold text-foreground">
-            {isSearchMode ? "Search results" : isFeedMode ? `${feedType?.replaceAll("_", " ")} products` : "All Products"}
-          </h1>
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">{headerTitle}</h1>
+                <p className="text-sm text-foreground/60 mt-1">{headerSubtitle}</p>
 
-          <p className="text-foreground/50 text-sm mt-1">
-            {isLoading
-              ? "Loading..."
-              : isSearchMode
-                ? `${searchItems.length} results for "${queryTerm}"`
-                : isFeedMode
-                  ? `${feedProductsAll.length} products loaded`
-                  : `${catalogQuery.data?.total ?? 0} products found`}
-          </p>
+                {isSearchMode && (
+                  <button
+                    className="mt-2 inline-flex items-center gap-2 text-sm text-primary hover:text-secondary transition-colors"
+                    onClick={() => {
+                      const next = new URLSearchParams(searchParams);
+                      next.delete("query");
+                      next.set("page", "1");
+                      setSearchParams(next);
+                    }}
+                  >
+                    <span className="underline-offset-4 hover:underline">Clear search</span>
+                    <span className="text-foreground/40">×</span>
+                  </button>
+                )}
+              </div>
 
-          {isSearchMode && (
-            <button
-              className="mt-2 text-sm text-primary hover:underline"
-              onClick={() => {
-                const next = new URLSearchParams(searchParams);
-                next.delete("query");
-                next.set("page", "1");
-                setSearchParams(next);
-              }}
-            >
-              Clear search
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
-          {/* Sidebar Filters - Desktop */}
-          <aside className="hidden lg:block w-64 shrink-0">
-            <FilterSidebar
-              disabled={isFeedMode || isSearchMode}
-              categories={(categoriesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name }))}
-              brands={(brandsQuery.data ?? []).map((b) => ({ id: b.id, name: b.name }))}
-              selectedCategoryId={category_id ?? null}
-              selectedBrandId={brand_id ?? null}
-              priceMin={price_min ?? null}
-              priceMax={price_max ?? null}
-              minRating={min_rating ?? null}
-              discountOnly={discount_only}
-              inStockOnly={in_stock_only}
-              onChange={(patch) => {
-                if (patch.category_id !== undefined) setParam("category_id", patch.category_id ?? undefined);
-                if (patch.brand_id !== undefined) setParam("brand_id", patch.brand_id ?? undefined);
-                if (patch.price_min !== undefined) setParam("price_min", patch.price_min ?? undefined);
-                if (patch.price_max !== undefined) setParam("price_max", patch.price_max ?? undefined);
-                if (patch.min_rating !== undefined) setParam("min_rating", patch.min_rating ?? undefined);
-                if (patch.discount_only !== undefined)
-                  setParam("discount_only", patch.discount_only ? "true" : undefined);
-                if (patch.in_stock_only !== undefined)
-                  setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
-              }}
-            />
-          </aside>
-
-          {/* Main content */}
-          <div className="flex-1 min-w-0">
-            {/* Toolbar */}
-            <div className="flex items-center justify-between mb-6 gap-4">
-              <button
-                className="lg:hidden inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-secondary/10 transition-colors"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 4a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 4a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z"
-                  />
-                </svg>
-                Filters
-              </button>
-
-              <div className="flex items-center gap-3 ml-auto">
-                <span className="text-sm text-foreground/50 hidden sm:block">Sort by:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => {
-                    const next = new URLSearchParams(searchParams);
-                    next.set("sort", e.target.value);
-                    next.set("page", "1");
-                    setSearchParams(next);
-                  }}
-                  className="text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  disabled={isFeedMode || isSearchMode}
+              {/* Mobile-only quick actions */}
+              <div className="flex items-center gap-2 sm:justify-end">
+                <button
+                  className="lg:hidden inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-background shadow-sm text-sm font-medium hover:bg-secondary/10 transition-colors"
+                  onClick={() => setShowFilters(true)}
                 >
-                  <option value="featured">Featured</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="rating">Top Rated</option>
-                  <option value="newest">Newest</option>
-                </select>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 4a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 4a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z"
+                    />
+                  </svg>
+                  Filters
+                </button>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Mobile filters */}
-            {showFilters && (
-              <div className="lg:hidden mb-6 p-4 border border-border rounded-2xl">
+        {/* Main layout */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
+            {/* LEFT: Filter Card (desktop) */}
+            <aside className="hidden lg:block">
+              <div className="rounded-2xl border border-border bg-background shadow-sm">
+                <div className="p-5 border-b border-border">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-semibold tracking-wide text-foreground">Filters</h2>
+                    <span
+                      className={cn(
+                        "text-[11px] px-2 py-0.5 rounded-full border border-border text-foreground/60",
+                        (isFeedMode || isSearchMode) && "opacity-70"
+                      )}
+                      title={(isFeedMode || isSearchMode) ? "Filters disabled in feed/search mode" : "Filters enabled"}
+                    >
+                      {isFeedMode || isSearchMode ? "Disabled" : "Enabled"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground/50 mt-1">Refine results by category, brand and more</p>
+                </div>
+
+                <div className="p-5">
+                  <FilterSidebar
+                    disabled={isFeedMode || isSearchMode}
+                    categories={(categoriesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name }))}
+                    brands={(brandsQuery.data ?? []).map((b) => ({ id: b.id, name: b.name }))}
+                    selectedCategoryId={category_id ?? null}
+                    selectedBrandId={brand_id ?? null}
+                    priceMin={price_min ?? null}
+                    priceMax={price_max ?? null}
+                    minRating={min_rating ?? null}
+                    discountOnly={discount_only}
+                    inStockOnly={in_stock_only}
+                    onChange={(patch) => {
+                      if (patch.category_id !== undefined) setParam("category_id", patch.category_id ?? undefined);
+                      if (patch.brand_id !== undefined) setParam("brand_id", patch.brand_id ?? undefined);
+                      if (patch.price_min !== undefined) setParam("price_min", patch.price_min ?? undefined);
+                      if (patch.price_max !== undefined) setParam("price_max", patch.price_max ?? undefined);
+                      if (patch.min_rating !== undefined) setParam("min_rating", patch.min_rating ?? undefined);
+                      if (patch.discount_only !== undefined)
+                        setParam("discount_only", patch.discount_only ? "true" : undefined);
+                      if (patch.in_stock_only !== undefined)
+                        setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
+                    }}
+                  />
+                </div>
+              </div>
+            </aside>
+
+            {/* RIGHT: Product Grid Card */}
+            <section className="min-w-0">
+              <div className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
+                {/* Toolbar */}
+                <div className="p-4 sm:p-5 border-b border-border bg-background">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-foreground/60">Sort</span>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => {
+                          const next = new URLSearchParams(searchParams);
+                          next.set("sort", e.target.value);
+                          next.set("page", "1");
+                          setSearchParams(next);
+                        }}
+                        className="text-sm border border-border rounded-xl px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        disabled={isFeedMode || isSearchMode}
+                      >
+                        <option value="featured">Featured</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="rating">Top Rated</option>
+                        <option value="newest">Newest</option>
+                      </select>
+                    </div>
+
+                    <div className="sm:ml-auto flex items-center justify-between sm:justify-end gap-3">
+                      {!isLoading && (
+                        <span className="text-xs text-foreground/50">
+                          Showing <span className="font-medium text-foreground">{activeItems.length}</span> items
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-4 sm:p-6">
+                  {activeItems.length === 0 ? (
+                    <div className="rounded-2xl border border-border bg-background shadow-sm p-10 sm:p-14 text-center">
+                      <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">No products found</h3>
+                      <p className="text-sm text-foreground/60 max-w-md mx-auto">
+                        {isSearchMode
+                          ? "Try a different search term."
+                          : isFeedMode
+                            ? "This feed returned no products."
+                            : "Try adjusting your filters to broaden the results."}
+                      </p>
+
+                      {!isFeedMode && !isSearchMode && (
+                        <button
+                          className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl font-medium transition h-10 px-5 text-sm bg-primary text-white hover:opacity-90"
+                          onClick={() => setSearchParams(new URLSearchParams({ page: "1" }))}
+                        >
+                          Clear Filters
+                        </button>
+                      )}
+                    </div>
+                  ) : isSearchMode ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {searchItems.map((item, idx) => {
+                        const product = mapSearchItemToProduct(item);
+                        return (
+                          <div
+                            key={product.slug}
+                            role="button"
+                            tabIndex={0}
+                            className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl"
+                            onClick={() => onSearchResultClick(item, idx + 1)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") onSearchResultClick(item, idx + 1);
+                            }}
+                          >
+                            <ProductCard product={product} hideAddToCart />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {activeItems.map((product) => (
+                        <div
+                          key={product.slug}
+                          className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl"
+                        >
+                          <ProductCard product={product} hideAddToCart />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Pagination */}
+                {!isSearchMode && totalPages > 1 && (
+                  <div className="p-4 sm:p-5 border-t border-border bg-background">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                        onClick={() => setPage(page - 1)}
+                        disabled={page === 1}
+                        aria-label="Previous page"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+
+                      {Array.from({ length: totalPages }).slice(0, 20).map((_, i) => (
+                        <button
+                          key={i}
+                          className={cn(
+                            "h-10 w-10 rounded-xl text-sm font-semibold transition-colors",
+                            page === i + 1
+                              ? "bg-primary text-white shadow-sm"
+                              : "border border-border hover:bg-secondary/10 text-foreground/80"
+                          )}
+                          onClick={() => setPage(i + 1)}
+                          aria-current={page === i + 1 ? "page" : undefined}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+
+                      <button
+                        className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                        onClick={() => setPage(page + 1)}
+                        disabled={isFeedMode ? !feedHasMore : page === totalPages}
+                        aria-label="Next page"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
+        </div>
+
+        {/* Mobile Filters Drawer (UI only; logic unchanged) */}
+        {showFilters && (
+          <div className="lg:hidden fixed inset-0 z-50">
+            <div
+              className="absolute inset-0 bg-foreground/30 backdrop-blur-[1px]"
+              onClick={() => setShowFilters(false)}
+              aria-hidden="true"
+            />
+
+            <div className="absolute right-0 top-0 h-full w-[92%] max-w-sm bg-background border-l border-border shadow-xl">
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <div>
+                  <div className="text-sm font-semibold">Filters</div>
+                  <div className="text-xs text-foreground/50">Refine your results</div>
+                </div>
+                <button
+                  type="button"
+                  className="h-9 w-9 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10"
+                  onClick={() => setShowFilters(false)}
+                  aria-label="Close filters"
+                >
+                  <span className="text-lg leading-none">×</span>
+                </button>
+              </div>
+
+              <div className="p-4 overflow-auto h-[calc(100%-64px)]">
                 <FilterSidebar
                   disabled={isFeedMode || isSearchMode}
                   categories={(categoriesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name }))}
@@ -601,102 +811,14 @@ const ProductsPage = () => {
                     if (patch.price_min !== undefined) setParam("price_min", patch.price_min ?? undefined);
                     if (patch.price_max !== undefined) setParam("price_max", patch.price_max ?? undefined);
                     if (patch.min_rating !== undefined) setParam("min_rating", patch.min_rating ?? undefined);
-                    if (patch.discount_only !== undefined)
-                      setParam("discount_only", patch.discount_only ? "true" : undefined);
-                    if (patch.in_stock_only !== undefined)
-                      setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
+                    if (patch.discount_only !== undefined) setParam("discount_only", patch.discount_only ? "true" : undefined);
+                    if (patch.in_stock_only !== undefined) setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
                   }}
                 />
               </div>
-            )}
-
-            {/* Product Grid */}
-            {activeItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-24 text-center">
-                <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-lg font-semibold mb-2">No products found</h3>
-                <p className="text-foreground/50 text-sm mb-6">
-                  {isSearchMode
-                    ? "Try a different search term."
-                    : isFeedMode
-                      ? "This feed returned no products."
-                      : "Try adjusting your filters"}
-                </p>
-                {!isFeedMode && !isSearchMode && (
-                  <button
-                    className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition h-10 px-4 text-sm bg-primary text-white hover:opacity-90"
-                    onClick={() => setSearchParams(new URLSearchParams({ page: "1" }))}
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </div>
-            ) : isSearchMode ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {searchItems.map((item, idx) => {
-                  const product = mapSearchItemToProduct(item);
-                  return (
-                    <div
-                      key={product.slug}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => onSearchResultClick(item, idx + 1)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") onSearchResultClick(item, idx + 1);
-                      }}
-                    >
-                      <ProductCard product={product} hideAddToCart />
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {activeItems.map((product) => (
-                  <ProductCard key={product.slug} product={product} hideAddToCart />
-                ))}
-              </div>
-            )}
-
-            {/* Pagination (disabled for search mode) */}
-            {!isSearchMode && totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
-                <button
-                  className="p-2 rounded-lg border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-                  onClick={() => setPage(page - 1)}
-                  disabled={page === 1}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-
-                {Array.from({ length: totalPages }).slice(0, 20).map((_, i) => (
-                  <button
-                    key={i}
-                    className={cn(
-                      "w-9 h-9 rounded-lg text-sm font-medium transition-colors",
-                      page === i + 1 ? "bg-primary text-white" : "border border-border hover:bg-secondary/10"
-                    )}
-                    onClick={() => setPage(i + 1)}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-
-                <button
-                  className="p-2 rounded-lg border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-                  onClick={() => setPage(page + 1)}
-                  disabled={isFeedMode ? !feedHasMore : page === totalPages}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </MainLayout>
   );

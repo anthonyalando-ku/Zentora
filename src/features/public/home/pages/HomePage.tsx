@@ -45,39 +45,59 @@ const mapDiscoveryItemToProduct = (item: DiscoveryFeedItem): Product => {
   };
 };
 
-const FeedSection = ({
-  feedType,
-  items,
-}: {
-  feedType: DiscoveryFeedType;
-  items: DiscoveryFeedItem[] | undefined;
-}) => {
+const FeedSection = ({ feedType, items }: { feedType: DiscoveryFeedType; items: DiscoveryFeedItem[] | undefined }) => {
   if (!items || items.length === 0) return null;
 
-  return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{feedTitle[feedType]}</h2>
-          <p className="text-foreground/50 mt-1">Handpicked products just for you</p>
-        </div>
-        <Link
-          to={`/products?feed_type=${feedType}`}
-          className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-        >
-          Show More
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
+  const subtitle =
+    feedType === "trending"
+      ? "Popular items customers are buying"
+      : feedType === "deals"
+        ? "Limited-time discounts & hot offers"
+        : feedType === "best_sellers"
+          ? "Top-selling picks across the store"
+          : feedType === "new_arrivals"
+            ? "Freshly added products you’ll love"
+            : "Handpicked products just for you";
 
-      {/* Keep existing grid layout */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        {items.map((item) => {
-          const product = mapDiscoveryItemToProduct(item);
-          return <ProductCard key={product.slug} product={product} hideAddToCart showWishlist />;
-        })}
+  return (
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="rounded-2xl border border-border bg-background shadow-sm">
+        {/* Header */}
+        <div className="p-4 sm:p-6 border-b border-border">
+          <div className="flex items-end justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">{feedTitle[feedType]}</h2>
+              <p className="text-sm text-foreground/60 mt-1">{subtitle}</p>
+            </div>
+
+            <Link
+              to={`/products?feed_type=${feedType}`}
+              className="shrink-0 inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-secondary transition-colors"
+            >
+              Show More
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* Dense marketplace grid */}
+        <div className="p-4 sm:p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            {items.map((item) => {
+              const product = mapDiscoveryItemToProduct(item);
+              return (
+                <div
+                  key={product.slug}
+                  className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl"
+                >
+                  <ProductCard product={product} hideAddToCart showWishlist />
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -93,179 +113,142 @@ const HomePage = () => {
 
   return (
     <MainLayout>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* Page base */}
+      <div className="bg-background">
+        {/* Promotional Banner (top of page) */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="relative overflow-hidden rounded-2xl shadow-sm border border-border bg-gradient-to-r from-primary to-primary/80">
+            <div className="grid grid-cols-1 md:grid-cols-2 items-center min-h-[280px] md:min-h-[320px]">
+              {/* Left content */}
+              <div className="p-6 sm:p-8 md:p-12">
+                <Badge variant="sale" className="mb-4">
+                  Limited Time Offer
+                </Badge>
+
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white tracking-tight mb-3">
+                  Up to 50% Off Electronics
+                </h2>
+
+                <p className="text-white/85 text-sm sm:text-base leading-relaxed mb-6 max-w-xl">
+                  Grab the latest gadgets at half the price. Offer ends this weekend!
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
+                    to="/products?category=electronics"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl font-medium transition h-11 px-5 text-sm bg-white text-primary hover:bg-white/95"
+                  >
+                    Shop Electronics
+                  </Link>
+
+                  <Link
+                    to="/products?feed_type=deals"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl font-medium transition h-11 px-5 text-sm border border-white/30 text-white hover:bg-white/10"
+                  >
+                    View Deals
+                  </Link>
+                </div>
+              </div>
+
+              {/* Right decorative image */}
+              <div className="relative hidden md:block h-full">
+                <div className="absolute inset-0 opacity-20">
+                  <img
+                    src="https://picsum.photos/seed/banner-promo/900/700"
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-primary/10 to-primary/60" />
+                <div className="absolute -right-24 -bottom-24 w-80 h-80 rounded-full bg-white/10" />
+                <div className="absolute -right-12 -top-16 w-56 h-56 rounded-full bg-white/10" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Shop By Category (grid, not horizontal scroll) */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex items-end justify-between gap-4 mb-5">
             <div>
-              <div className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium mb-6">
-                <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-                New arrivals every week
-              </div>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-foreground mb-6">
-                Shop Smarter, <span className="text-primary">Live Better</span>
-              </h1>
-              <p className="text-lg text-foreground/60 leading-relaxed mb-8 max-w-lg">
-                Discover thousands of quality products at unbeatable prices. Free delivery on orders over KSh 5,000.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  to="/products"
-                  className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition h-12 px-6 text-base bg-primary text-white hover:opacity-90"
-                >
-                  Shop Now
-                </Link>
-                <Link
-                  to="/products?badge=sale"
-                  className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition h-12 px-6 text-base border border-border bg-transparent text-foreground hover:bg-secondary/10"
-                >
-                  View Deals
-                </Link>
-              </div>
-              <div className="mt-10 flex items-center gap-8">
-                {[
-                  { value: "10K+", label: "Products" },
-                  { value: "50K+", label: "Customers" },
-                  { value: "4.8★", label: "Rating" },
-                ].map((stat, i) => (
-                  <div key={i}>
-                    <div className="text-2xl font-bold text-primary">{stat.value}</div>
-                    <div className="text-sm text-foreground/50">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">Shop by Category</h2>
+              <p className="text-sm text-foreground/60 mt-1">Browse popular departments</p>
             </div>
-            <div className="relative hidden lg:block">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <img
-                  src="https://picsum.photos/seed/hero-zentora/600/500"
-                  alt="Shop hero"
-                  className="w-full h-[500px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
-              </div>
-              <div className="absolute -bottom-4 -left-6 bg-background rounded-2xl shadow-xl p-4 border border-border">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            <Link
+              to="/products"
+              className="text-sm font-medium text-primary hover:text-secondary transition-colors"
+            >
+              View all
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-background shadow-sm p-4 sm:p-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {(categories ?? []).map((category) => (
+                <Link
+                  key={String(category.id)}
+                  to={`/products?category_id=${category.id}`}
+                  className="group rounded-xl border border-border bg-background hover:shadow-md hover:-translate-y-1 transition-all p-4"
+                >
+                  <div className="flex flex-col items-center text-center gap-3">
+                    <div className="w-14 h-14 rounded-full overflow-hidden bg-primary/5 group-hover:bg-primary/10 transition-colors flex items-center justify-center">
+                      <img
+                        src={category.image_url ?? "https://picsum.photos/seed/zentora-category/400/300"}
+                        alt={category.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
-                    </svg>
+                    </div>
+
+                    <div className="text-sm font-medium text-foreground line-clamp-2">{category.name}</div>
                   </div>
-                  <div>
-                    <div className="text-xs text-foreground/50">Free Shipping</div>
-                    <div className="text-sm font-semibold">On orders over KSh 5,000</div>
-                  </div>
-                </div>
-              </div>
+                </Link>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Categories Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Shop by Category</h2>
-            <p className="text-foreground/50 mt-1">Find exactly what you're looking for</p>
-          </div>
-          <Link
-            to="/products"
-            className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-          >
-            View all
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
+        {/* Product feeds in desired order */}
+        <FeedSection feedType="trending" items={trending.data?.items} />
+        <FeedSection feedType="deals" items={deals.data?.items} />
+        <FeedSection feedType="best_sellers" items={bestSellers.data?.items} />
+        <FeedSection feedType="new_arrivals" items={newArrivals.data?.items} />
 
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {(categories ?? []).map((category) => (
-            <Link
-              key={String(category.id)}
-              to={`/products?category_id=${category.id}`}
-              className="group flex flex-col items-center gap-3 p-4 rounded-2xl border border-border bg-background hover:border-primary/30 hover:shadow-md transition-all duration-300 min-w-[140px]"
-            >
-              <div className="w-16 h-16 rounded-full overflow-hidden bg-primary/5 group-hover:bg-primary/10 transition-colors">
-                <img
-                  src={category.image_url ?? "https://picsum.photos/seed/zentora-category/400/300"}
-                  alt={category.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                />
+        {/* Trust badges */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="rounded-2xl border border-border bg-background shadow-sm p-6">
+            <div className="flex items-end justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">Why shop with us</h2>
+                <p className="text-sm text-foreground/60 mt-1">Fast delivery, secure payments, and easy returns</p>
               </div>
-              <div className="text-center">
-                <div className="text-sm font-medium text-foreground whitespace-nowrap">{category.name}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+            </div>
 
-      {/* Promotional Banner (unchanged) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-primary to-primary/80 p-8 md:p-12">
-          <div className="relative z-10 max-w-xl">
-            <Badge variant="sale" className="mb-4">
-              Limited Time Offer
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Up to 50% Off Electronics
-            </h2>
-            <p className="text-white/80 mb-6 text-lg">
-              Grab the latest gadgets at half the price. Offer ends this weekend!
-            </p>
-            <Link
-              to="/products?category=electronics"
-              className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition h-12 px-6 text-base bg-white text-primary hover:bg-white/90"
-            >
-              Shop Electronics
-            </Link>
-          </div>
-          <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-20">
-            <img
-              src="https://picsum.photos/seed/banner-promo/400/400"
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-white/10" />
-          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10" />
-        </div>
-      </section>
-
-      {/* Discovery feeds (Stage 1) */}
-      <FeedSection feedType="trending" items={trending.data?.items} />
-      <FeedSection feedType="best_sellers" items={bestSellers.data?.items} />
-      <FeedSection feedType="new_arrivals" items={newArrivals.data?.items} />
-      <FeedSection feedType="deals" items={deals.data?.items} />
-
-      {/* Trust Badges (unchanged) */}
-      <section className="border-t border-border bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { icon: "🚚", title: "Free Delivery", desc: "On orders over KSh 5,000" },
-              { icon: "🔄", title: "Easy Returns", desc: "30-day return policy" },
-              { icon: "🔒", title: "Secure Payment", desc: "100% secure checkout" },
-              { icon: "💬", title: "24/7 Support", desc: "Always here to help" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <span className="text-2xl">{item.icon}</span>
-                <div>
-                  <div className="font-semibold text-sm">{item.title}</div>
-                  <div className="text-xs text-foreground/50">{item.desc}</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { icon: "🚚", title: "Free Delivery", desc: "On orders over KSh 5,000" },
+                { icon: "🔄", title: "Easy Returns", desc: "30-day return policy" },
+                { icon: "🔒", title: "Secure Payment", desc: "100% secure checkout" },
+                { icon: "💬", title: "24/7 Support", desc: "Always here to help" },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-border bg-background p-4 hover:shadow-sm transition-shadow"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-xl">
+                      {item.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm text-foreground">{item.title}</div>
+                      <div className="text-xs text-foreground/60 mt-1">{item.desc}</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </MainLayout>
   );
 };
