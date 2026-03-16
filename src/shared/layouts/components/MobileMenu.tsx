@@ -36,9 +36,10 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
   const suggestions = suggestionsQuery.data?.suggestions ?? [];
   const searchBoxRef = useRef<HTMLDivElement | null>(null);
 
-  const hasCatalog = (catalogCategories?.length ?? 0) > 0;
+  //const hasCatalog = (catalogCategories?.length ?? 0) > 0;
 
   const visibleCategories = useMemo(() => {
+    // Prevent super long menus; keep it safe for now.
     const MAX = 12;
     return (catalogCategories ?? []).slice(0, MAX);
   }, [catalogCategories]);
@@ -122,6 +123,7 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -141,24 +143,24 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
             }}
             onFocus={() => searchValue.trim() && setSearchOpen(true)}
             onKeyDown={onSearchKeyDown}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-full border border-border bg-secondary/10 focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </form>
 
         {searchOpen && searchValue.trim() !== "" && (
-          <div className="absolute mt-2 w-full rounded-xl border border-border bg-background shadow-lg overflow-hidden z-50">
+          <div className="absolute mt-2 w-full rounded-2xl border border-border bg-background shadow-xl overflow-hidden z-50">
             {suggestionsQuery.isLoading ? (
-              <div className="p-3 text-sm text-foreground/60">Searching…</div>
+              <div className="p-4 text-sm text-foreground/60">Searching…</div>
             ) : suggestions.length === 0 ? (
-              <div className="p-3 text-sm text-foreground/60">No suggestions</div>
+              <div className="p-4 text-sm text-foreground/60">No suggestions</div>
             ) : (
-              <ul className="max-h-72 overflow-auto">
+              <ul className="max-h-72 overflow-auto p-2">
                 {suggestions.map((s, idx) => (
                   <li key={`${s.Type}:${s.ReferenceID}:${s.Text}`}>
                     <button
                       type="button"
                       className={cn(
-                        "w-full text-left px-3 py-2 text-sm hover:bg-secondary/10",
+                        "w-full text-left px-3 py-2.5 rounded-xl text-sm hover:bg-secondary/10",
                         idx === activeIndex && "bg-secondary/10"
                       )}
                       onMouseEnter={() => setActiveIndex(idx)}
@@ -183,8 +185,8 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
           key={`${link.href}::${link.label}`}
           to={link.href}
           className={cn(
-            "block text-sm font-medium py-1 transition-colors hover:text-primary",
-            pathname === link.href ? "text-primary" : "text-foreground/70"
+            "block text-sm font-medium py-2 rounded-xl px-2 transition-colors hover:bg-secondary/10 hover:text-primary",
+            pathname === link.href ? "text-primary bg-primary/5" : "text-foreground/80"
           )}
           onClick={onClose}
         >
@@ -193,19 +195,20 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
       ))}
 
       {/* Catalog expandable */}
-      {hasCatalog && (
+      {(catalogCategories?.length ?? 0) > 0 && (
         <div className="pt-2 border-t border-border">
           <button
             type="button"
-            className="w-full flex items-center justify-between text-sm font-medium py-1 transition-colors hover:text-primary text-foreground/70"
+            className="w-full flex items-center justify-between text-sm font-semibold py-2 rounded-xl px-2 transition-colors hover:bg-secondary/10 text-foreground/80"
             onClick={() => setCatalogOpen((v) => !v)}
           >
-            <span>Catalog</span>
+            <span>All Categories</span>
             <svg
               className={cn("w-4 h-4 transition-transform", catalogOpen && "rotate-180")}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
@@ -217,7 +220,7 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
                 <Link
                   key={String(c.id)}
                   to={`/products?category_id=${c.id}`}
-                  className="block text-sm py-1 pl-3 text-foreground/70 hover:text-primary transition-colors"
+                  className="block text-sm py-2 pl-3 pr-2 rounded-xl text-foreground/80 hover:bg-secondary/10 hover:text-primary transition-colors"
                   onClick={onClose}
                 >
                   {c.name}
@@ -225,7 +228,11 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
               ))}
 
               {(catalogCategories?.length ?? 0) > visibleCategories.length && (
-                <Link to="/products" className="block text-sm py-1 pl-3 text-primary hover:underline" onClick={onClose}>
+                <Link
+                  to="/products"
+                  className="block text-sm py-2 pl-3 pr-2 rounded-xl text-primary hover:bg-primary/5 transition-colors"
+                  onClick={onClose}
+                >
                   View all categories
                 </Link>
               )}

@@ -39,11 +39,6 @@ export const HeaderSearch = () => {
     const q = term.trim();
     if (!q) return;
 
-    // If user clicked a suggestion and it’s a product suggestion, we can track it as click.
-    // We don’t have search_event_id yet for suggestions (since results not loaded),
-    // so use a sentinel 0? Better: skip click endpoint for suggestion until results event exists.
-    // BUT your requirements say track suggestion click too. So we will send click with search_event_id=0 only if backend allows it.
-    // If backend rejects 0, remove this block and only track clicks on results.
     if (typeof clickedPosition === "number") {
       try {
         await trackClick.mutateAsync({
@@ -96,8 +91,23 @@ export const HeaderSearch = () => {
   };
 
   return (
-    <div ref={boxRef} className="relative hidden md:block w-full max-w-md">
-      <form onSubmit={onSubmit}>
+    <div ref={boxRef} className="relative w-full max-w-2xl">
+      <form onSubmit={onSubmit} className="relative">
+        <svg
+          className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/40"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+
         <input
           value={value}
           onChange={(e) => {
@@ -107,29 +117,37 @@ export const HeaderSearch = () => {
           onFocus={() => value.trim() && setOpen(true)}
           onKeyDown={onKeyDown}
           placeholder="Search products…"
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+          className="w-full rounded-full border border-border bg-secondary/10 px-12 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
+
+        <button
+          type="submit"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 h-10 px-4 rounded-full bg-primary text-white text-sm font-semibold hover:opacity-90 transition"
+          aria-label="Search"
+        >
+          Search
+        </button>
       </form>
 
       {open && value.trim() !== "" && (
-        <div className="absolute mt-2 w-full rounded-xl border border-border bg-background shadow-lg overflow-hidden z-50">
+        <div className="absolute mt-2 w-full rounded-2xl border border-border bg-background shadow-xl overflow-hidden z-50">
           {suggestionsQuery.isLoading ? (
-            <div className="p-3 text-sm text-foreground/60">Searching…</div>
+            <div className="p-4 text-sm text-foreground/60">Searching…</div>
           ) : suggestions.length === 0 ? (
-            <div className="p-3 text-sm text-foreground/60">No suggestions</div>
+            <div className="p-4 text-sm text-foreground/60">No suggestions</div>
           ) : (
-            <ul className="max-h-72 overflow-auto">
+            <ul className="max-h-72 overflow-auto p-2">
               {suggestions.map((s, idx) => (
                 <li key={`${s.Type}:${s.ReferenceID}:${s.Text}`}>
                   <button
                     type="button"
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-secondary/10 ${
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-sm hover:bg-secondary/10 ${
                       idx === activeIndex ? "bg-secondary/10" : ""
                     }`}
                     onMouseEnter={() => setActiveIndex(idx)}
                     onClick={() => goToSearch(s.Text, idx + 1)}
                   >
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center justify-between gap-3">
                       <span className="font-medium">{s.Text}</span>
                       <span className="text-xs text-foreground/50">{s.Type}</span>
                     </div>

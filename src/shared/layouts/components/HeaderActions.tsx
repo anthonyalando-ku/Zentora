@@ -11,14 +11,19 @@ export const HeaderActions = ({ cartCount, menuOpen, onMenuToggle }: HeaderActio
     {/* Cart */}
     <Link
       to="/cart"
-      className="relative p-2 rounded-full hover:bg-secondary/10 transition-colors"
+      className="relative w-11 h-11 inline-flex items-center justify-center rounded-full border border-border bg-background hover:bg-secondary/10 transition-colors"
       aria-label="Cart"
     >
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+      <svg className="h-5 w-5 text-foreground/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+        />
       </svg>
       {cartCount > 0 && (
-        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-secondary text-white text-xs flex items-center justify-center font-bold">
+        <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-secondary text-white text-[11px] flex items-center justify-center font-bold shadow-sm">
           {cartCount > 99 ? "99+" : cartCount}
         </span>
       )}
@@ -27,26 +32,31 @@ export const HeaderActions = ({ cartCount, menuOpen, onMenuToggle }: HeaderActio
     {/* Account */}
     <Link
       to="/account"
-      className="p-2 rounded-full hover:bg-secondary/10 transition-colors"
+      className="w-11 h-11 inline-flex items-center justify-center rounded-full border border-border bg-background hover:bg-secondary/10 transition-colors"
       aria-label="Account"
     >
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      <svg className="h-5 w-5 text-foreground/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
       </svg>
     </Link>
 
-    {/* Mobile menu button */}
+    {/* Mobile menu button (unchanged logic) */}
     <button
-      className="md:hidden p-2 rounded-full hover:bg-secondary/10 transition-colors"
+      className="md:hidden w-11 h-11 inline-flex items-center justify-center rounded-full border border-border bg-background hover:bg-secondary/10 transition-colors"
       onClick={onMenuToggle}
       aria-label="Menu"
     >
       {menuOpen ? (
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="h-5 w-5 text-foreground/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       ) : (
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="h-5 w-5 text-foreground/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       )}

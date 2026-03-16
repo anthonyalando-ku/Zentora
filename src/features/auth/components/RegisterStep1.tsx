@@ -19,7 +19,6 @@ export const RegisterStepEmail = ({ onNext }: Props) => {
   });
 
   const { mutateAsync, isPending, error } = useRegisterEmailMutation();
-  
 
   const submit = async (values: FormValues) => {
     const result = await mutateAsync(values);
@@ -27,51 +26,57 @@ export const RegisterStepEmail = ({ onNext }: Props) => {
   };
 
   const errorMessage =
-  error instanceof AppError
-    ? `${error.message}${error.details ? ` - ${String(error.details)}` : ""}`
-    : "Unable to send email";
+    error instanceof AppError
+      ? `${error.message}${error.details ? ` - ${String(error.details)}` : ""}`
+      : "Unable to send email";
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
-      <Input
-        type="email"
-        placeholder="Enter your email"
-        {...register("email")}
-        error={formState.errors.email?.message}
-      />
+    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-6">
+      <div>
+        <label className="text-xs font-medium text-foreground/60">Email</label>
+        <Input
+          type="email"
+          placeholder="Enter your email"
+          {...register("email")}
+          error={formState.errors.email?.message}
+          className="mt-1 h-11 rounded-lg"
+        />
+      </div>
 
-      <Button type="submit" className="w-full" loading={isPending}>
+      <Button type="submit" className="w-full h-11 rounded-lg" loading={isPending}>
         Continue
       </Button>
 
-      {error && (
-        <p className="text-sm text-destructive text-center">
-          {errorMessage}
-        </p>
-      )}
+      {error && <p className="text-sm text-destructive text-center">{errorMessage}</p>}
 
       {/* Divider */}
-      <div className="flex items-center gap-4 my-2">
+      <div className="flex items-center gap-4">
         <div className="h-px flex-1 bg-border" />
-        <span className="text-xs text-foreground/50">OR</span>
+        <span className="text-xs text-foreground/50 tracking-widest">OR</span>
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <Button variant="outline" className="w-full">
+      {/* OAuth buttons (UI only) */}
+      <Button variant="outline" className="w-full h-11 rounded-lg justify-center gap-2">
+        <span className="w-5 h-5 rounded-full bg-foreground/10 flex items-center justify-center text-xs font-bold">
+          G
+        </span>
         Continue with Google
       </Button>
 
-      <Button variant="outline" className="w-full">
+      <Button variant="outline" className="w-full h-11 rounded-lg justify-center gap-2">
+        <span className="w-5 h-5 rounded-full bg-foreground/10 flex items-center justify-center text-xs font-bold">
+          f
+        </span>
         Continue with Facebook
       </Button>
 
-      <p className="text-sm text-center mt-2">
+      <p className="text-sm text-center">
         Already have an account?{" "}
-        <Link to="/auth/login" className="text-primary hover:underline">
+        <Link to="/auth/login" className="text-primary font-medium hover:underline">
           Login
         </Link>
       </p>
-
     </form>
   );
 };

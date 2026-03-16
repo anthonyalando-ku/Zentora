@@ -21,11 +21,7 @@ export const RegisterStepOtp = ({ email, token, onNext, onBack }: Props) => {
   });
 
   const { mutateAsync, isPending, error } = useVerifyOtpMutation();
-  const {
-    mutateAsync: resendOtp,
-    isPending: isResending,
-    error: resendError,
-  } = useResendOtpMutation();
+  const { mutateAsync: resendOtp, isPending: isResending, error: resendError } = useResendOtpMutation();
 
   const submit = async (values: FormValues) => {
     const result = await mutateAsync({
@@ -51,47 +47,41 @@ export const RegisterStepOtp = ({ email, token, onNext, onBack }: Props) => {
       : "Unable to resend OTP";
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
-      <p className="text-sm text-foreground/60 text-center">
-        We sent a code to <span className="font-medium">{email}</span>
-      </p>
+    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-6">
+      <div className="text-sm text-foreground/60 text-center">
+        We sent a code to <span className="font-medium text-foreground">{email}</span>
+      </div>
 
-      <Input
-        placeholder="Enter OTP"
-        {...register("otp")}
-        error={formState.errors.otp?.message}
-      />
+      <div>
+        <label className="text-xs font-medium text-foreground/60">Verification code</label>
+        <Input
+          placeholder="Enter OTP"
+          {...register("otp")}
+          error={formState.errors.otp?.message}
+          className="mt-1 h-12 rounded-lg text-center tracking-widest text-lg"
+          inputMode="numeric"
+        />
+        <p className="mt-2 text-xs text-foreground/50 text-center">
+          Enter the 6-digit code. If you didn’t receive it, resend below.
+        </p>
+      </div>
 
       <div className="flex gap-2">
-        <Button type="button" variant="ghost" className="w-full" onClick={onBack}>
+        <Button type="button" variant="ghost" className="w-full h-11 rounded-lg" onClick={onBack}>
           Back
         </Button>
-        <Button type="submit" className="w-full" loading={isPending}>
+        <Button type="submit" className="w-full h-11 rounded-lg" loading={isPending}>
           Verify OTP
         </Button>
       </div>
 
-      {error && (
-        <p className="text-sm text-destructive text-center">
-          {errorMessage}
-        </p>
-      )}
+      {error && <p className="text-sm text-destructive text-center">{errorMessage}</p>}
 
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        onClick={handleResend}
-        loading={isResending}
-      >
+      <Button type="button" variant="outline" className="w-full h-11 rounded-lg" onClick={handleResend} loading={isResending}>
         Resend OTP
       </Button>
 
-      {resendError && (
-        <p className="text-sm text-destructive text-center">
-          {resendErrorMessage}
-        </p>
-      )}
+      {resendError && <p className="text-sm text-destructive text-center">{resendErrorMessage}</p>}
     </form>
   );
 };

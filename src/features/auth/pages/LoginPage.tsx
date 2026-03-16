@@ -3,9 +3,7 @@ import { LoginForm } from "../components/LoginForm";
 
 const LoginPage = () => {
   return (
-    <AuthLayout 
-      title="Welcome Back"
-      subtitle="Sign in to your account">
+    <AuthLayout title="Welcome back" subtitle="Sign in to continue shopping on Zentora">
       <LoginForm />
     </AuthLayout>
   );
