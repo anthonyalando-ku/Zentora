@@ -1,0 +1,197 @@
+import { Link } from "react-router-dom";
+import { Badge, Rating } from "@/shared/components/ui";
+import { cn } from "@/shared/utils/cn";
+import type { Product } from "@/shared/types/product";
+
+type ProductCardProps = {
+  product: Product;
+  className?: string;
+  hideAddToCart?: boolean;
+  /** Visual-only wishlist button (no API calls yet) */
+  showWishlist?: boolean;
+};
+
+const buildWhatsAppUrl = (product: Product) => {
+  const text = `Hi Zentora, I'm interested in: ${product.name} (${product.price}) - ${window.location.origin}/products/${product.slug}`;
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+};
+
+export const ProductCard = ({
+  product,
+  className,
+  hideAddToCart = false,
+  showWishlist = false,
+}: ProductCardProps) => {
+  const discount = product.originalPrice
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
+
+  return (
+    <div
+      className={cn(
+        "group relative bg-background rounded-2xl border border-border overflow-hidden shadow-sm transition-all duration-300",
+        "hover:shadow-lg hover:-translate-y-1",
+        className
+      )}
+    >
+      {/* Badges */}
+      <div className="absolute top-3 left-3 right-3 z-10 flex items-start justify-between gap-2 pointer-events-none">
+        <div className="flex items-center gap-2">
+          {product.badge && (
+            <Badge variant={product.badge} className="rounded-full px-2.5 py-1 text-[11px]">
+              {product.badge}
+            </Badge>
+          )}
+        </div>
+
+        {discount > 0 && (
+          <Badge
+            variant="sale"
+            className="rounded-full px-2.5 py-1 text-[11px] font-bold shadow-sm"
+          >
+            -{discount}%
+          </Badge>
+        )}
+      </div>
+
+      {/* Wishlist (visual only) */}
+      {showWishlist && (
+        <button
+          type="button"
+          aria-label="Add to wishlist"
+          title="Wishlist (coming soon)"
+          className={cn(
+            "absolute bottom-3 right-3 z-10 inline-flex items-center justify-center w-10 h-10 rounded-full",
+            "border border-border bg-background/95 backdrop-blur",
+            "hover:bg-secondary/20 transition"
+          )}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          <svg
+            className="w-5 h-5 text-foreground/70"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"
+            />
+          </svg>
+        </button>
+      )}
+
+      {/* Image */}
+      <Link
+        to={`/products/${product.slug}`}
+        className="block overflow-hidden aspect-square bg-secondary/10"
+        aria-label={`View ${product.name}`}
+      >
+        <div className="w-full h-full p-3">
+          <img
+            src={product.thumbnail}
+            alt={product.name}
+            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+        </div>
+      </Link>
+
+      {/* Content */}
+      <div className="p-4">
+        <Link to={`/products/${product.slug}`} className="block">
+          <h3 className="font-medium text-sm text-foreground leading-snug line-clamp-2 hover:text-primary transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+
+        <div className="mt-2">
+          <Rating value={product.rating} showCount reviewCount={product.reviewCount} />
+        </div>
+
+        {/* Price */}
+        <div className="mt-3 flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-lg font-bold text-primary leading-tight">
+              KSh {product.price.toLocaleString()}
+            </div>
+
+            {product.originalPrice && (
+              <div className="mt-0.5 flex items-center gap-2">
+                <span className="text-xs text-foreground/50 line-through">
+                  KSh {product.originalPrice.toLocaleString()}
+                </span>
+                {discount > 0 && (
+                  <span className="text-[11px] font-semibold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">
+                    Save {discount}%
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Stock hint (pure UI; uses existing boolean) */}
+          <div className="text-right">
+            <span
+              className={cn(
+                "text-[11px] px-2 py-1 rounded-full border",
+                product.inStock
+                  ? "border-green-500/20 bg-green-500/10 text-green-700"
+                  : "border-destructive/20 bg-destructive/10 text-destructive"
+              )}
+            >
+              {product.inStock ? "In stock" : "Out of stock"}
+            </span>
+          </div>
+        </div>
+
+        {/* CTA Row */}
+        <div className="mt-4 flex gap-2">
+          {!hideAddToCart && (
+            <Link
+              to={`/products/${product.slug}`}
+              className={cn(
+                "flex-1 inline-flex items-center justify-center gap-2",
+                "h-10 px-4 rounded-xl text-sm font-semibold",
+                "bg-primary text-white shadow-sm hover:opacity-90 transition"
+              )}
+              aria-label="View product details"
+              title="Select a variant on the product page"
+            >
+              View
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          )}
+
+          <a
+            className={cn(
+              "inline-flex items-center justify-center gap-2",
+              "h-10 px-4 rounded-xl text-sm font-semibold transition",
+              "bg-[#25D366] text-white hover:bg-[#1ebe5d] shadow-sm",
+              hideAddToCart ? "w-full" : "shrink-0"
+            )}
+            href={buildWhatsAppUrl(product)}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Chat on WhatsApp"
+            title="Chat on WhatsApp"
+          >
+            {/* WhatsApp icon (inline SVG, no logic change) */}
+            <svg className="w-4 h-4" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+              <path d="M19.11 17.39c-.25-.12-1.47-.72-1.7-.8-.23-.08-.4-.12-.57.12-.17.25-.65.8-.8.97-.15.17-.3.19-.55.07-.25-.12-1.06-.39-2.02-1.25-.75-.67-1.25-1.5-1.4-1.76-.15-.25-.02-.39.11-.52.11-.11.25-.3.37-.45.12-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.12-.57-1.37-.78-1.88-.2-.48-.41-.42-.57-.43h-.49c-.17 0-.45.06-.68.32-.23.25-.9.88-.9 2.15s.92 2.49 1.04 2.66c.12.17 1.81 2.76 4.39 3.87.61.26 1.09.42 1.46.54.61.19 1.16.16 1.6.1.49-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z" />
+              <path d="M26.67 5.33A13.2 13.2 0 0 0 16.01 0C8.84 0 3.01 5.83 3.01 13c0 2.29.6 4.52 1.74 6.49L3 32l12.7-1.72A12.9 12.9 0 0 0 16.01 26c7.17 0 13-5.83 13-13 0-3.47-1.35-6.73-3.34-7.67zM16.01 23.9c-1.98 0-3.92-.53-5.62-1.53l-.4-.23-7.53 1.02 1.01-7.33-.26-.42A10.76 10.76 0 0 1 5.1 13c0-5.99 4.89-10.88 10.91-10.88 2.91 0 5.64 1.13 7.7 3.18 2.06 2.06 3.18 4.79 3.18 7.7 0 6-4.89 10.9-10.89 10.9z" />
+            </svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
