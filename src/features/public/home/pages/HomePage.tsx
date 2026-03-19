@@ -26,7 +26,6 @@ const HomePage = () => {
       <div className="bg-background">
         {/* HERO (marketplace) */}
         <HeroMarketplace categories={heroCategories} />
-
         {/* Product feeds */}
         <FeedSection feedType="trending" items={trending.data?.items} />
         <FeedSection feedType="deals" items={deals.data?.items} />
