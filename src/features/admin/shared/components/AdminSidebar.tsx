@@ -1,6 +1,7 @@
 import { NavLink, Link } from "react-router-dom";
 import { cn } from "@/shared/utils/cn";
 import { useAdminUiStore } from "@/features/admin/shared/store/adminUiStore";
+import logo from "@/assets/zentora_logo_clear.png";
 
 type NavItem = {
   label: string;
@@ -119,9 +120,11 @@ export const AdminSidebar = () => {
       <div className="flex flex-col w-full">
         <div className="h-16 px-4 flex items-center justify-between border-b border-border">
           <Link to="/admin" className="flex items-center gap-2 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+            {/* <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
               Z
-            </div>
+            </div> */}
+            <img src={logo} alt="Zentora" className="h-10 w-10 object-contain" />
+
             {!sidebarCollapsed && (
               <div className="min-w-0">
                 <div className="text-sm font-semibold leading-tight">Zentora</div>

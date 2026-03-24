@@ -23,7 +23,7 @@ export const LoginForm = () => {
 
   const { mutateAsync, isPending, error } = useLoginMutation(() => {
     console.log("Login successful!");
-    navigate("/user/home", { replace: true });
+    navigate("/", { replace: true });
   });
 
   const onSubmit = async (values: LoginFormValues) => {

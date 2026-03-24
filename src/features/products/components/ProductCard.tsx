@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Badge, Rating } from "@/shared/components/ui";
+import { Badge, Rating, Button } from "@/shared/components/ui";
 import { cn } from "@/shared/utils/cn";
 import type { Product } from "@/shared/types/product";
 
@@ -12,9 +12,31 @@ type ProductCardProps = {
 };
 
 const buildWhatsAppUrl = (product: Product) => {
-  const text = `Hi Zentora, I'm interested in: ${product.name} (${product.price}) - ${window.location.origin}/products/${product.slug}`;
-  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  const phone = "254795974591"; // your WhatsApp business number
+
+  const text = `Hi Zentora, I'm interested in: ${product.name} (KSh ${product.price}) - ${window.location.origin}/products/${product.slug}`;
+
+  return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 };
+
+const WhatsAppIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={cn("w-4 h-4", className)}
+    viewBox="0 0 32 32"
+    aria-hidden="true"
+    focusable="false"
+  >
+    {/* Simple WhatsApp logo (inline SVG, no external deps) */}
+    <path
+      fill="currentColor"
+      d="M19.11 17.59c-.27-.14-1.62-.8-1.87-.89-.25-.09-.44-.14-.62.14-.18.27-.71.89-.87 1.07-.16.18-.32.21-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.6-1.5-1.87-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.44.09-.18.05-.34-.02-.48-.07-.14-.62-1.5-.85-2.06-.22-.54-.45-.47-.62-.48l-.53-.01c-.18 0-.48.07-.73.34-.25.27-.96.94-.96 2.3s.98 2.68 1.12 2.87c.14.18 1.93 2.95 4.68 4.13.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.62-.66 1.85-1.3.23-.64.23-1.19.16-1.3-.07-.11-.25-.18-.52-.32Z"
+    />
+    <path
+      fill="currentColor"
+      d="M16.03 3C8.86 3 3.03 8.82 3.03 15.99c0 2.28.6 4.5 1.74 6.46L3 29l6.73-1.76a12.9 12.9 0 0 0 6.3 1.62h.01c7.17 0 13-5.82 13-12.99C29.04 8.82 23.2 3 16.03 3Zm0 23.62h-.01a10.77 10.77 0 0 1-5.5-1.52l-.39-.23-3.99 1.04 1.06-3.89-.25-.4a10.8 10.8 0 0 1-1.65-5.71c0-5.95 4.84-10.79 10.79-10.79 2.88 0 5.58 1.12 7.61 3.16a10.72 10.72 0 0 1 3.15 7.62c0 5.95-4.84 10.79-10.82 10.79Z"
+    />
+  </svg>
+);
 
 export const ProductCard = ({
   product,
@@ -99,26 +121,37 @@ export const ProductCard = ({
         {/* CTA Row */}
         <div className="flex gap-2">
           {!hideAddToCart && (
-            <Link
-              to={`/products/${product.slug}`}
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-md font-medium transition h-9 px-3 text-xs bg-primary text-white hover:opacity-90"
-              aria-label="View product details"
-              title="Select a variant on the product page"
-            >
-              View
+            <Link to={`/products/${product.slug}`} className="flex-1">
+              <Button
+                className="w-full"
+                size="sm"
+                variant="primary"
+                aria-label="View product details"
+                title="Select a variant on the product page"
+              >
+                View
+              </Button>
             </Link>
           )}
 
           <a
-            className={cn(
-              "inline-flex items-center justify-center rounded-md font-medium transition h-9 px-3 text-xs border border-border bg-transparent text-foreground hover:bg-secondary/10",
-              hideAddToCart ? "w-full" : "shrink-0"
-            )}
             href={buildWhatsAppUrl(product)}
             target="_blank"
             rel="noreferrer"
+            className={cn(hideAddToCart ? "w-full" : "shrink-0")}
           >
-            WhatsApp
+            <Button
+              size="sm"
+              variant="outline"
+              className={cn(
+                "border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/10 hover:border-[#25D366]/50"
+              )}
+              leftIcon={<WhatsAppIcon className="text-[#25D366]" />}
+              aria-label="Chat on WhatsApp"
+              title="Chat on WhatsApp"
+            >
+              WhatsApp
+            </Button>
           </a>
         </div>
       </div>

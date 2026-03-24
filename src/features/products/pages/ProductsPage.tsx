@@ -22,8 +22,15 @@ import type { DiscoverySearchItem } from "@/core/api/services/discoverySearch";
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating" | "newest";
 
-const PAGE_SIZE = 8;
-const FEED_LIMIT = 20;
+/**
+ * Pagination configuration
+ * - Controls how many products to request per page (catalog mode)
+ * - Controls how many products to show per page (feed mode slice)
+ *
+ * You can make this responsive later (e.g. 24 mobile, 40 desktop).
+ */
+const PAGE_SIZE = 40;
+const FEED_LIMIT = PAGE_SIZE;
 
 const toNumberOrUndefined = (v: string | null) => {
   if (!v) return undefined;
@@ -89,8 +96,6 @@ const mapSearchItemToProduct = (item: DiscoverySearchItem): Product => {
     price: item.price,
     originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
     discount: discount || undefined,
-    // NOTE: keep union compatible without changing business logic.
-    // If you later change ProductCategory to be DB-driven (string), you can switch to: item.category ?? "electronics"
     category: "electronics",
     images: [],
     thumbnail: item.primary_image ?? "https://picsum.photos/seed/zentora-fallback/600/600",
@@ -155,9 +160,7 @@ const FilterSidebar = ({
           <button
             className={cn(
               "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
-              !selectedCategoryId
-                ? "bg-primary/10 text-primary font-medium"
-                : "hover:bg-secondary/10 text-foreground/70"
+              !selectedCategoryId ? "bg-primary/10 text-primary font-medium" : "hover:bg-secondary/10 text-foreground/70"
             )}
             onClick={() => onChange({ category_id: null })}
             disabled={disabled}
@@ -267,9 +270,7 @@ const FilterSidebar = ({
               key={String(rating)}
               className={cn(
                 "w-full flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors",
-                (minRating ?? null) === rating
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-secondary/10 text-foreground/70"
+                (minRating ?? null) === rating ? "bg-primary/10 text-primary font-medium" : "hover:bg-secondary/10 text-foreground/70"
               )}
               onClick={() => onChange({ min_rating: rating === null ? null : String(rating) })}
               disabled={disabled}
@@ -318,6 +319,307 @@ const FilterSidebar = ({
     </div>
   );
 };
+
+function ProductsPageHeader({
+  title,
+  subtitle,
+  isSearchMode,
+  onClearSearch,
+  onOpenFilters,
+}: {
+  title: string;
+  subtitle: string;
+  isSearchMode: boolean;
+  onClearSearch: () => void;
+  onOpenFilters: () => void;
+}) {
+  return (
+    <div className="border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <nav className="flex items-center gap-2 text-xs sm:text-sm text-foreground/50 mb-2">
+          <Link to="/" className="hover:text-primary transition-colors">
+            Home
+          </Link>
+          <span>/</span>
+          <span className="text-foreground">Products</span>
+        </nav>
+
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">{title}</h1>
+            <p className="text-sm text-foreground/60 mt-1">{subtitle}</p>
+
+            {isSearchMode && (
+              <button
+                className="mt-2 inline-flex items-center gap-2 text-sm text-primary hover:text-secondary transition-colors"
+                onClick={onClearSearch}
+              >
+                <span className="underline-offset-4 hover:underline">Clear search</span>
+                <span className="text-foreground/40">×</span>
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 sm:justify-end">
+            <button
+              className="lg:hidden inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-background shadow-sm text-sm font-medium hover:bg-secondary/10 transition-colors"
+              onClick={onOpenFilters}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 4a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 4a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z"
+                />
+              </svg>
+              Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProductsToolbar({
+  sortBy,
+  onSortChange,
+  disabled,
+  isLoading,
+  showingCount,
+}: {
+  sortBy: SortOption;
+  onSortChange: (v: SortOption) => void;
+  disabled: boolean;
+  isLoading: boolean;
+  showingCount: number;
+}) {
+  return (
+    <div className="p-4 sm:p-5 border-b border-border bg-background">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-foreground/60">Sort</span>
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value as SortOption)}
+            className="text-sm border border-border rounded-xl px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+            disabled={disabled}
+          >
+            <option value="featured">Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+            <option value="newest">Newest</option>
+          </select>
+        </div>
+
+        <div className="sm:ml-auto flex items-center justify-between sm:justify-end gap-3">
+          {!isLoading && (
+            <span className="text-xs text-foreground/50">
+              Showing <span className="font-medium text-foreground">{showingCount}</span> items
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProductsGrid({
+  mode,
+  activeItems,
+  isSearchMode,
+  searchItems,
+  onSearchResultClick,
+}: {
+  mode: "empty" | "search" | "normal";
+  activeItems: Product[];
+  isSearchMode: boolean;
+  searchItems: DiscoverySearchItem[];
+  onSearchResultClick: (item: DiscoverySearchItem, position: number) => void;
+}) {
+  if (mode === "empty") {
+    return (
+      <div className="rounded-2xl border border-border bg-background shadow-sm p-10 sm:p-14 text-center">
+        <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold text-foreground mb-2">No products found</h3>
+        <p className="text-sm text-foreground/60 max-w-md mx-auto">
+          {isSearchMode ? "Try a different search term." : "Try adjusting your filters to broaden the results."}
+        </p>
+      </div>
+    );
+  }
+
+  if (mode === "search") {
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+        {searchItems.map((item, idx) => {
+          const product = mapSearchItemToProduct(item);
+          return (
+            <div
+              key={product.slug}
+              role="button"
+              tabIndex={0}
+              className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl"
+              onClick={() => onSearchResultClick(item, idx + 1)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onSearchResultClick(item, idx + 1);
+              }}
+            >
+              <ProductCard product={product} hideAddToCart />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+      {activeItems.map((product) => (
+        <div key={product.slug} className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl">
+          <ProductCard product={product} hideAddToCart />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ProductsPagination({
+  page,
+  totalPages,
+  canNext,
+  onPrev,
+  onNext,
+  onSetPage,
+}: {
+  page: number;
+  totalPages: number;
+  canNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+  onSetPage: (p: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="p-4 sm:p-5 border-t border-border bg-background">
+      <div className="flex items-center justify-center gap-2">
+        <button
+          className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+          onClick={onPrev}
+          disabled={page === 1}
+          aria-label="Previous page"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        {Array.from({ length: totalPages }).slice(0, 20).map((_, i) => (
+          <button
+            key={i}
+            className={cn(
+              "h-10 w-10 rounded-xl text-sm font-semibold transition-colors",
+              page === i + 1 ? "bg-primary text-white shadow-sm" : "border border-border hover:bg-secondary/10 text-foreground/80"
+            )}
+            onClick={() => onSetPage(i + 1)}
+            aria-current={page === i + 1 ? "page" : undefined}
+          >
+            {i + 1}
+          </button>
+        ))}
+
+        <button
+          className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+          onClick={onNext}
+          disabled={!canNext}
+          aria-label="Next page"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MobileFiltersDrawer({
+  open,
+  onClose,
+  disabled,
+  categories,
+  brands,
+  selectedCategoryId,
+  selectedBrandId,
+  priceMin,
+  priceMax,
+  minRating,
+  discountOnly,
+  inStockOnly,
+  onChange,
+}: {
+  open: boolean;
+  onClose: () => void;
+  disabled: boolean;
+  categories: { id: string | number; name: string }[];
+  brands: { id: string | number; name: string }[];
+  selectedCategoryId: string | null;
+  selectedBrandId: string | null;
+  priceMin: number | null;
+  priceMax: number | null;
+  minRating: number | null;
+  discountOnly: boolean;
+  inStockOnly: boolean;
+  onChange: FilterSidebarProps["onChange"];
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="lg:hidden fixed inset-0 z-50">
+      <div className="absolute inset-0 bg-foreground/30 backdrop-blur-[1px]" onClick={onClose} aria-hidden="true" />
+
+      <div className="absolute right-0 top-0 h-full w-[92%] max-w-sm bg-background border-l border-border shadow-xl">
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <div>
+            <div className="text-sm font-semibold">Filters</div>
+            <div className="text-xs text-foreground/50">Refine your results</div>
+          </div>
+          <button
+            type="button"
+            className="h-9 w-9 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10"
+            onClick={onClose}
+            aria-label="Close filters"
+          >
+            <span className="text-lg leading-none">×</span>
+          </button>
+        </div>
+
+        <div className="p-4 overflow-auto h-[calc(100%-64px)]">
+          <FilterSidebar
+            disabled={disabled}
+            categories={categories}
+            brands={brands}
+            selectedCategoryId={selectedCategoryId}
+            selectedBrandId={selectedBrandId}
+            priceMin={priceMin}
+            priceMax={priceMax}
+            minRating={minRating}
+            discountOnly={discountOnly}
+            inStockOnly={inStockOnly}
+            onChange={onChange}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -465,41 +767,7 @@ const ProductsPage = () => {
 
   const isLoading = isSearchMode ? searchQuery.isLoading : isFeedMode ? feedQuery.isLoading : catalogQuery.isLoading;
 
-  // URL helpers
-  const setParam = (key: string, value: string | undefined) => {
-    const next = new URLSearchParams(searchParams);
-
-    if (value === undefined || value === "") next.delete(key);
-    else next.set(key, value);
-
-    // Reset paging on filter changes (but not when changing page itself)
-    if (key !== "page") next.set("page", "1");
-
-    setSearchParams(next);
-  };
-
-  const setPage = (nextPage: number) => {
-    const next = new URLSearchParams(searchParams);
-    next.set("page", String(nextPage));
-    setSearchParams(next);
-  };
-
-  // Ensure page exists
-  useEffect(() => {
-    if (!searchParams.get("page")) {
-      const next = new URLSearchParams(searchParams);
-      next.set("page", "1");
-      setSearchParams(next);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Modern totals/subtitles (UI only)
-  const headerTitle = isSearchMode
-    ? "Search results"
-    : isFeedMode
-      ? `${feedType?.replaceAll("_", " ")} products`
-      : "All Products";
+  const headerTitle = isSearchMode ? "Search results" : isFeedMode ? `${feedType?.replaceAll("_", " ")} products` : "All Products";
 
   const headerSubtitle = isLoading
     ? "Loading products…"
@@ -509,67 +777,51 @@ const ProductsPage = () => {
         ? `${feedProductsAll.length} products loaded`
         : `${catalogQuery.data?.total ?? 0} products found`;
 
+  const setParam = (key: string, value: string | undefined) => {
+    const next = new URLSearchParams(searchParams);
+
+    if (value === undefined || value === "") next.delete(key);
+    else next.set(key, value);
+
+    if (key !== "page") next.set("page", "1");
+    setSearchParams(next);
+  };
+
+  const setPage = (nextPage: number) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", String(nextPage));
+    setSearchParams(next);
+  };
+
+  useEffect(() => {
+    if (!searchParams.get("page")) {
+      const next = new URLSearchParams(searchParams);
+      next.set("page", "1");
+      setSearchParams(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const emptyMode = activeItems.length === 0;
+
   return (
     <MainLayout>
-      {/* Page background band */}
       <div className="bg-background">
-        {/* Header */}
-        <div className="border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <nav className="flex items-center gap-2 text-xs sm:text-sm text-foreground/50 mb-2">
-              <Link to="/" className="hover:text-primary transition-colors">
-                Home
-              </Link>
-              <span>/</span>
-              <span className="text-foreground">Products</span>
-            </nav>
+        <ProductsPageHeader
+          title={headerTitle}
+          subtitle={headerSubtitle}
+          isSearchMode={isSearchMode}
+          onClearSearch={() => {
+            const next = new URLSearchParams(searchParams);
+            next.delete("query");
+            next.set("page", "1");
+            setSearchParams(next);
+          }}
+          onOpenFilters={() => setShowFilters(true)}
+        />
 
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">{headerTitle}</h1>
-                <p className="text-sm text-foreground/60 mt-1">{headerSubtitle}</p>
-
-                {isSearchMode && (
-                  <button
-                    className="mt-2 inline-flex items-center gap-2 text-sm text-primary hover:text-secondary transition-colors"
-                    onClick={() => {
-                      const next = new URLSearchParams(searchParams);
-                      next.delete("query");
-                      next.set("page", "1");
-                      setSearchParams(next);
-                    }}
-                  >
-                    <span className="underline-offset-4 hover:underline">Clear search</span>
-                    <span className="text-foreground/40">×</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Mobile-only quick actions */}
-              <div className="flex items-center gap-2 sm:justify-end">
-                <button
-                  className="lg:hidden inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-background shadow-sm text-sm font-medium hover:bg-secondary/10 transition-colors"
-                  onClick={() => setShowFilters(true)}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 4a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 4a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z"
-                    />
-                  </svg>
-                  Filters
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main layout */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
           <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
-            {/* LEFT: Filter Card (desktop) */}
             <aside className="hidden lg:block">
               <div className="rounded-2xl border border-border bg-background shadow-sm">
                 <div className="p-5 border-b border-border">
@@ -580,7 +832,7 @@ const ProductsPage = () => {
                         "text-[11px] px-2 py-0.5 rounded-full border border-border text-foreground/60",
                         (isFeedMode || isSearchMode) && "opacity-70"
                       )}
-                      title={(isFeedMode || isSearchMode) ? "Filters disabled in feed/search mode" : "Filters enabled"}
+                      title={isFeedMode || isSearchMode ? "Filters disabled in feed/search mode" : "Filters enabled"}
                     >
                       {isFeedMode || isSearchMode ? "Disabled" : "Enabled"}
                     </span>
@@ -606,219 +858,108 @@ const ProductsPage = () => {
                       if (patch.price_min !== undefined) setParam("price_min", patch.price_min ?? undefined);
                       if (patch.price_max !== undefined) setParam("price_max", patch.price_max ?? undefined);
                       if (patch.min_rating !== undefined) setParam("min_rating", patch.min_rating ?? undefined);
-                      if (patch.discount_only !== undefined)
-                        setParam("discount_only", patch.discount_only ? "true" : undefined);
-                      if (patch.in_stock_only !== undefined)
-                        setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
+                      if (patch.discount_only !== undefined) setParam("discount_only", patch.discount_only ? "true" : undefined);
+                      if (patch.in_stock_only !== undefined) setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
                     }}
                   />
                 </div>
               </div>
             </aside>
 
-            {/* RIGHT: Product Grid Card */}
             <section className="min-w-0">
               <div className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
-                {/* Toolbar */}
-                <div className="p-4 sm:p-5 border-b border-border bg-background">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="text-foreground/60">Sort</span>
-                      <select
-                        value={sortBy}
-                        onChange={(e) => {
-                          const next = new URLSearchParams(searchParams);
-                          next.set("sort", e.target.value);
-                          next.set("page", "1");
-                          setSearchParams(next);
-                        }}
-                        className="text-sm border border-border rounded-xl px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        disabled={isFeedMode || isSearchMode}
-                      >
-                        <option value="featured">Featured</option>
-                        <option value="price-asc">Price: Low to High</option>
-                        <option value="price-desc">Price: High to Low</option>
-                        <option value="rating">Top Rated</option>
-                        <option value="newest">Newest</option>
-                      </select>
-                    </div>
+                <ProductsToolbar
+                  sortBy={sortBy}
+                  disabled={isFeedMode || isSearchMode}
+                  isLoading={isLoading}
+                  showingCount={activeItems.length}
+                  onSortChange={(v) => {
+                    const next = new URLSearchParams(searchParams);
+                    next.set("sort", v);
+                    next.set("page", "1");
+                    setSearchParams(next);
+                  }}
+                />
 
-                    <div className="sm:ml-auto flex items-center justify-between sm:justify-end gap-3">
-                      {!isLoading && (
-                        <span className="text-xs text-foreground/50">
-                          Showing <span className="font-medium text-foreground">{activeItems.length}</span> items
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content */}
                 <div className="p-4 sm:p-6">
-                  {activeItems.length === 0 ? (
-                    <div className="rounded-2xl border border-border bg-background shadow-sm p-10 sm:p-14 text-center">
-                      <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-                        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                          />
-                        </svg>
-                      </div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">No products found</h3>
-                      <p className="text-sm text-foreground/60 max-w-md mx-auto">
-                        {isSearchMode
-                          ? "Try a different search term."
-                          : isFeedMode
-                            ? "This feed returned no products."
-                            : "Try adjusting your filters to broaden the results."}
-                      </p>
+                  {emptyMode ? (
+                    <div className="space-y-6">
+                      <ProductsGrid
+                        mode="empty"
+                        activeItems={activeItems}
+                        isSearchMode={isSearchMode}
+                        searchItems={searchItems}
+                        onSearchResultClick={onSearchResultClick}
+                      />
 
                       {!isFeedMode && !isSearchMode && (
-                        <button
-                          className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl font-medium transition h-10 px-5 text-sm bg-primary text-white hover:opacity-90"
-                          onClick={() => setSearchParams(new URLSearchParams({ page: "1" }))}
-                        >
-                          Clear Filters
-                        </button>
+                        <div className="flex justify-center">
+                          <button
+                            className="inline-flex items-center justify-center gap-2 rounded-xl font-medium transition h-10 px-5 text-sm bg-primary text-white hover:opacity-90"
+                            onClick={() => setSearchParams(new URLSearchParams({ page: "1" }))}
+                          >
+                            Clear Filters
+                          </button>
+                        </div>
                       )}
                     </div>
                   ) : isSearchMode ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {searchItems.map((item, idx) => {
-                        const product = mapSearchItemToProduct(item);
-                        return (
-                          <div
-                            key={product.slug}
-                            role="button"
-                            tabIndex={0}
-                            className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl"
-                            onClick={() => onSearchResultClick(item, idx + 1)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") onSearchResultClick(item, idx + 1);
-                            }}
-                          >
-                            <ProductCard product={product} hideAddToCart />
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <ProductsGrid
+                      mode="search"
+                      activeItems={activeItems}
+                      isSearchMode={isSearchMode}
+                      searchItems={searchItems}
+                      onSearchResultClick={onSearchResultClick}
+                    />
                   ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {activeItems.map((product) => (
-                        <div
-                          key={product.slug}
-                          className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl"
-                        >
-                          <ProductCard product={product} hideAddToCart />
-                        </div>
-                      ))}
-                    </div>
+                    <ProductsGrid
+                      mode="normal"
+                      activeItems={activeItems}
+                      isSearchMode={isSearchMode}
+                      searchItems={searchItems}
+                      onSearchResultClick={onSearchResultClick}
+                    />
                   )}
                 </div>
 
-                {/* Pagination */}
-                {!isSearchMode && totalPages > 1 && (
-                  <div className="p-4 sm:p-5 border-t border-border bg-background">
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-                        onClick={() => setPage(page - 1)}
-                        disabled={page === 1}
-                        aria-label="Previous page"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                      </button>
-
-                      {Array.from({ length: totalPages }).slice(0, 20).map((_, i) => (
-                        <button
-                          key={i}
-                          className={cn(
-                            "h-10 w-10 rounded-xl text-sm font-semibold transition-colors",
-                            page === i + 1
-                              ? "bg-primary text-white shadow-sm"
-                              : "border border-border hover:bg-secondary/10 text-foreground/80"
-                          )}
-                          onClick={() => setPage(i + 1)}
-                          aria-current={page === i + 1 ? "page" : undefined}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-
-                      <button
-                        className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-                        onClick={() => setPage(page + 1)}
-                        disabled={isFeedMode ? !feedHasMore : page === totalPages}
-                        aria-label="Next page"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
+                {!isSearchMode && (
+                  <ProductsPagination
+                    page={page}
+                    totalPages={totalPages}
+                    canNext={isFeedMode ? feedHasMore : page !== totalPages}
+                    onPrev={() => setPage(page - 1)}
+                    onNext={() => setPage(page + 1)}
+                    onSetPage={(p) => setPage(p)}
+                  />
                 )}
               </div>
             </section>
           </div>
         </div>
 
-        {/* Mobile Filters Drawer (UI only; logic unchanged) */}
-        {showFilters && (
-          <div className="lg:hidden fixed inset-0 z-50">
-            <div
-              className="absolute inset-0 bg-foreground/30 backdrop-blur-[1px]"
-              onClick={() => setShowFilters(false)}
-              aria-hidden="true"
-            />
-
-            <div className="absolute right-0 top-0 h-full w-[92%] max-w-sm bg-background border-l border-border shadow-xl">
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <div>
-                  <div className="text-sm font-semibold">Filters</div>
-                  <div className="text-xs text-foreground/50">Refine your results</div>
-                </div>
-                <button
-                  type="button"
-                  className="h-9 w-9 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10"
-                  onClick={() => setShowFilters(false)}
-                  aria-label="Close filters"
-                >
-                  <span className="text-lg leading-none">×</span>
-                </button>
-              </div>
-
-              <div className="p-4 overflow-auto h-[calc(100%-64px)]">
-                <FilterSidebar
-                  disabled={isFeedMode || isSearchMode}
-                  categories={(categoriesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name }))}
-                  brands={(brandsQuery.data ?? []).map((b) => ({ id: b.id, name: b.name }))}
-                  selectedCategoryId={category_id ?? null}
-                  selectedBrandId={brand_id ?? null}
-                  priceMin={price_min ?? null}
-                  priceMax={price_max ?? null}
-                  minRating={min_rating ?? null}
-                  discountOnly={discount_only}
-                  inStockOnly={in_stock_only}
-                  onChange={(patch) => {
-                    if (patch.category_id !== undefined) setParam("category_id", patch.category_id ?? undefined);
-                    if (patch.brand_id !== undefined) setParam("brand_id", patch.brand_id ?? undefined);
-                    if (patch.price_min !== undefined) setParam("price_min", patch.price_min ?? undefined);
-                    if (patch.price_max !== undefined) setParam("price_max", patch.price_max ?? undefined);
-                    if (patch.min_rating !== undefined) setParam("min_rating", patch.min_rating ?? undefined);
-                    if (patch.discount_only !== undefined) setParam("discount_only", patch.discount_only ? "true" : undefined);
-                    if (patch.in_stock_only !== undefined) setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <MobileFiltersDrawer
+          open={showFilters}
+          onClose={() => setShowFilters(false)}
+          disabled={isFeedMode || isSearchMode}
+          categories={(categoriesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name }))}
+          brands={(brandsQuery.data ?? []).map((b) => ({ id: b.id, name: b.name }))}
+          selectedCategoryId={category_id ?? null}
+          selectedBrandId={brand_id ?? null}
+          priceMin={price_min ?? null}
+          priceMax={price_max ?? null}
+          minRating={min_rating ?? null}
+          discountOnly={discount_only}
+          inStockOnly={in_stock_only}
+          onChange={(patch) => {
+            if (patch.category_id !== undefined) setParam("category_id", patch.category_id ?? undefined);
+            if (patch.brand_id !== undefined) setParam("brand_id", patch.brand_id ?? undefined);
+            if (patch.price_min !== undefined) setParam("price_min", patch.price_min ?? undefined);
+            if (patch.price_max !== undefined) setParam("price_max", patch.price_max ?? undefined);
+            if (patch.min_rating !== undefined) setParam("min_rating", patch.min_rating ?? undefined);
+            if (patch.discount_only !== undefined) setParam("discount_only", patch.discount_only ? "true" : undefined);
+            if (patch.in_stock_only !== undefined) setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
+          }}
+        />
       </div>
     </MainLayout>
   );

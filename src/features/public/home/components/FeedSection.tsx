@@ -46,7 +46,7 @@ const FeedSection = ({ feedType, items }: { feedType: DiscoveryFeedType; items: 
               const product = mapDiscoveryItemToProduct(item);
               return (
                 <div key={product.slug} className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl">
-                  <ProductCard product={product} hideAddToCart showWishlist />
+                  <ProductCard product={product} hideAddToCart /*showWishlist*/ />
                 </div>
               );
             })}
