@@ -28,19 +28,30 @@ export type AdminOrderStats = {
 export type AdminOrderStatus = "pending" | "completed" | "cancelled" | "shipped" | "delivered";
 
 export type AdminOrder = {
-  id: number;
-  user_id?: number | null;
-  order_number: string;
-  status: AdminOrderStatus;
-  total_amount: number;
-  currency: string;
-  created_at: string;
-  shipping: {
+  ID: number;
+  UserID: number;
+  CartID: number | null;
+  OrderNumber: string;
+  Status: string;
+  Subtotal: number;
+  DiscountAmount: number;
+  TaxAmount: number;
+  ShippingFee: number;
+  TotalAmount: number;
+  Currency: string;
+  ShippingMethodID: number | null;
+  CreatedAt: string;
+  UpdatedAt: string;
+  Shipping: {
     full_name: string;
     phone: string;
     country: string;
+    county?: string;
     city: string;
+    area?: string;
+    postal_code?: string;
     address_line_1: string;
+    address_line_2?: string;
   };
 };
 

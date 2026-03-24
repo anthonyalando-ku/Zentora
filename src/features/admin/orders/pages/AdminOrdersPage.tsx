@@ -135,7 +135,7 @@ export default function AdminOrdersPage() {
                 setLookupLoading(true);
                 try {
                   const o = await adminOrdersApi.getByNumber(n);
-                  window.location.href = `/admin/orders/${o.id}`;
+                  window.location.href = `/admin/orders/${o.ID}`;
                 } catch (e: any) {
                   setLookupErr("Order not found.");
                 } finally {
@@ -270,22 +270,22 @@ export default function AdminOrdersPage() {
               </thead>
               <tbody>
                 {orders.map((o) => (
-                  <tr key={o.id} className="border-t border-border hover:bg-secondary/5 transition-colors">
+                  <tr key={o.ID} className="border-t border-border hover:bg-secondary/5 transition-colors">
                     <td className="px-4 py-3">
-                      <div className="text-sm font-semibold">{o.order_number}</div>
-                      <div className="text-xs text-foreground/50">#{o.id}</div>
+                      <div className="text-sm font-semibold">{o.OrderNumber}</div>
+                      <div className="text-xs text-foreground/50">#{o.ID}</div>
                     </td>
-                    <td className="px-4 py-3 text-sm">{o.user_id ?? "—"}</td>
+                    <td className="px-4 py-3 text-sm">{o.UserID ?? "—"}</td>
                     <td className="px-4 py-3 text-sm">
-                      <StatusPill status={o.status} />
+                      <StatusPill status={o.Status} />
                     </td>
                     <td className="px-4 py-3 text-sm">
-                      {o.total_amount} <span className="text-xs text-foreground/50">{o.currency}</span>
+                      {o.TotalAmount} <span className="text-xs text-foreground/50">{o.Currency}</span>
                     </td>
-                    <td className="px-4 py-3 text-sm">{new Date(o.created_at).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-sm">{new Date(o.CreatedAt).toLocaleString()}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex items-center gap-2">
-                        <Link to={`/admin/orders/${o.id}`} className="h-9 px-3 rounded-xl border border-border hover:bg-secondary/10 transition text-xs font-semibold inline-flex items-center">
+                        <Link to={`/admin/orders/${o.ID}`} className="h-9 px-3 rounded-xl border border-border hover:bg-secondary/10 transition text-xs font-semibold inline-flex items-center">
                           View
                         </Link>
                         <button
@@ -293,7 +293,7 @@ export default function AdminOrdersPage() {
                           className="h-9 px-3 rounded-xl border border-border hover:bg-secondary/10 transition text-xs font-semibold"
                           onClick={() => {
                             setSelectedOrder(o);
-                            setNextStatus(o.status);
+                            setNextStatus(o.Status);
                             setOpenStatus(true);
                           }}
                         >
@@ -350,13 +350,13 @@ export default function AdminOrdersPage() {
       <AdminModal
         open={openStatus}
         title="Update order status"
-        subtitle={selectedOrder ? `${selectedOrder.order_number} (#${selectedOrder.id})` : ""}
+        subtitle={selectedOrder ? `${selectedOrder.OrderNumber} (#${selectedOrder.ID})` : ""}
         onClose={() => setOpenStatus(false)}
       >
         {!selectedOrder ? null : (
           <div className="space-y-4">
             <div className="text-sm text-foreground/60">
-              Current status: <span className="font-semibold text-foreground">{selectedOrder.status}</span>
+              Current status: <span className="font-semibold text-foreground">{selectedOrder.Status}</span>
             </div>
 
             <div>
@@ -388,7 +388,7 @@ export default function AdminOrdersPage() {
                 onClick={async () => {
                   setSaving(true);
                   try {
-                    await adminOrdersApi.updateStatus(selectedOrder.id, nextStatus);
+                    await adminOrdersApi.updateStatus(selectedOrder.ID, nextStatus);
                     setOpenStatus(false);
                   } finally {
                     setSaving(false);

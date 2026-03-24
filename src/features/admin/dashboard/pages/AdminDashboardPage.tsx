@@ -48,6 +48,7 @@ export default function AdminDashboardPage() {
   const pendingQ = useAdminDashboardPendingOrders(pendingLimit, pendingOffset);
 
   const pendingOrders = pendingQ.data?.orders ?? [];
+  console.log("pendingOrders", pendingOrders);
 
   const updatedAt = useMemo(() => {
     const u = orderStatsQ.data?.updated_at;
@@ -127,25 +128,25 @@ export default function AdminDashboardPage() {
                   </thead>
                   <tbody>
                     {pendingOrders.map((o) => (
-                      <tr key={o.id} className="border-t border-border hover:bg-secondary/5 transition-colors">
+                      <tr key={o.ID} className="border-t border-border hover:bg-secondary/5 transition-colors">
                         <td className="px-4 py-3">
-                          <div className="text-sm font-semibold">{o.order_number}</div>
-                          <div className="text-xs text-foreground/50">#{o.id}</div>
+                          <div className="text-sm font-semibold">{o.OrderNumber}</div>
+                          <div className="text-xs text-foreground/50">#{o.ID}</div>
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          <div className="font-medium text-foreground/80">{o.shipping.full_name ?? ""}</div>
-                          <div className="text-xs text-foreground/50">{o.shipping.phone}</div>
+                          <div className="font-medium text-foreground/80">{o.Shipping?.full_name ?? "-"}</div>
+                          <div className="text-xs text-foreground/50">{o.Shipping?.phone ?? "-"}</div>
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          <StatusPill status={o.status} />
+                          <StatusPill status={o.Status} />
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          {o.total_amount} <span className="text-xs text-foreground/50">{o.currency}</span>
+                          {o.TotalAmount} <span className="text-xs text-foreground/50">{o.Currency}</span>
                         </td>
-                        <td className="px-4 py-3 text-sm">{new Date(o.created_at).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-sm">{new Date(o.CreatedAt).toLocaleString()}</td>
                         <td className="px-4 py-3 text-right">
                           <Link
-                            to={`/admin/orders/${o.id}`}
+                            to={`/admin/orders/${o.ID}`}
                             className="h-9 px-3 rounded-xl border border-border hover:bg-secondary/10 transition text-xs font-semibold inline-flex items-center"
                           >
                             View

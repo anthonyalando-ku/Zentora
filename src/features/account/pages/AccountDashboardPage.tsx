@@ -61,7 +61,7 @@ const AccountDashboardPage = () => {
     bio: "",
   });
 
-  // ✅ Set form values when profile loads (useEffect, not useMemo)
+  // Set form values when profile loads (useEffect, not useMemo)
   const profileLoadedKey = useMemo(
     () => `${fullNameValue}::${avatarValue}::${bioValue}`,
     [fullNameValue, avatarValue, bioValue]

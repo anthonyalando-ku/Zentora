@@ -34,7 +34,7 @@ export default function AdminOrderDetailPage() {
   const order = orderQ.data;
 
   useEffect(() => {
-    if (order) setNextStatus(order.status);
+    if (order) setNextStatus(order.Status);
   }, [order]);
 
   if (orderQ.isLoading) {
@@ -47,12 +47,12 @@ export default function AdminOrderDetailPage() {
   return (
     <div className="space-y-4">
       <AdminPageHeader
-        title={`Order ${order.order_number}`}
-        subtitle={`#${order.id}`}
+        title={`Order ${order.OrderNumber}`}
+        subtitle={`#${order.ID}`}
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Orders", href: "/admin/orders" },
-          { label: order.order_number, href: `/admin/orders/${order.id}` },
+          { label: order.OrderNumber, href: `/admin/orders/${order.ID}` },
         ]}
         action={
           <div className="inline-flex items-center gap-2">
@@ -66,7 +66,7 @@ export default function AdminOrderDetailPage() {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         <div className="xl:col-span-8 space-y-4">
           <ProductHubSection title="Items" description="Products included in this order.">
-            {order.items && order.items.length > 0 ? (
+            {order.Items && order.Items.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-[900px] w-full">
                   <thead className="bg-secondary/5">
@@ -79,13 +79,13 @@ export default function AdminOrderDetailPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {order.items.map((it) => (
-                      <tr key={it.id} className="border-t border-border">
-                        <td className="px-4 py-3 text-sm font-medium">{it.product_name}</td>
-                        <td className="px-4 py-3 text-sm">{it.variant_id ?? "—"}</td>
-                        <td className="px-4 py-3 text-sm">{it.quantity}</td>
-                        <td className="px-4 py-3 text-sm">{it.unit_price}</td>
-                        <td className="px-4 py-3 text-sm">{it.total_price}</td>
+                    {order.Items.map((it) => (
+                      <tr key={it.ID} className="border-t border-border">
+                        <td className="px-4 py-3 text-sm font-medium">{it.ProductName}</td>
+                        <td className="px-4 py-3 text-sm">{it.VariantID ?? "—"}</td>
+                        <td className="px-4 py-3 text-sm">{it.Quantity}</td>
+                        <td className="px-4 py-3 text-sm">{it.UnitPrice}</td>
+                        <td className="px-4 py-3 text-sm">{it.TotalPrice}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -99,20 +99,20 @@ export default function AdminOrderDetailPage() {
           <ProductHubSection title="Shipping" description="Customer shipping information.">
             <div className="text-sm text-foreground/70 space-y-1">
               <div>
-                <span className="text-foreground/50">Name:</span> {order.shipping.full_name}
+                <span className="text-foreground/50">Name:</span> {order.Shipping.full_name}
               </div>
               <div>
-                <span className="text-foreground/50">Phone:</span> {order.shipping.phone}
+                <span className="text-foreground/50">Phone:</span> {order.Shipping.phone}
               </div>
               <div>
-                <span className="text-foreground/50">Address:</span> {order.shipping.address_line_1}
-                {order.shipping.address_line_2 ? `, ${order.shipping.address_line_2}` : ""}
+                <span className="text-foreground/50">Address:</span> {order.Shipping.address_line_1}
+                {order.Shipping.address_line_2 ? `, ${order.Shipping.address_line_2}` : ""}
               </div>
               <div>
-                <span className="text-foreground/50">City:</span> {order.shipping.city} {order.shipping.area ? `(${order.shipping.area})` : ""}
+                <span className="text-foreground/50">City:</span> {order.Shipping.city} {order.Shipping.area ? `(${order.Shipping.area})` : ""}
               </div>
               <div>
-                <span className="text-foreground/50">Country:</span> {order.shipping.country}
+                <span className="text-foreground/50">Country:</span> {order.Shipping.country}
               </div>
             </div>
           </ProductHubSection>
@@ -124,26 +124,26 @@ export default function AdminOrderDetailPage() {
               <div className="flex items-center justify-between">
                 <span className="text-foreground/50">Status</span>
                 <div className="flex items-center gap-2">
-                  <StatusPill status={order.status} />
+                  <StatusPill status={order.Status} />
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-foreground/50">Subtotal</span>
-                <span className="font-semibold">{order.subtotal}</span>
+                <span className="font-semibold">{order.Subtotal}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-foreground/50">Shipping</span>
-                <span className="font-semibold">{order.shipping_fee}</span>
+                <span className="font-semibold">{order.ShippingFee}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-foreground/50">Discount</span>
-                <span className="font-semibold">{order.discount_amount}</span>
+                <span className="font-semibold">{order.DiscountAmount}</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
                 <span className="text-foreground/50">Total</span>
                 <span className="font-bold text-foreground">
-                  {order.total_amount} <span className="text-xs text-foreground/50">{order.currency}</span>
+                  {order.TotalAmount} <span className="text-xs text-foreground/50">{order.Currency}</span>
                 </span>
               </div>
 
@@ -169,7 +169,7 @@ export default function AdminOrderDetailPage() {
 
                 <button
                   type="button"
-                  disabled={update.isPending || nextStatus === order.status}
+                  disabled={update.isPending || nextStatus === order.Status}
                   className="mt-3 w-full h-11 rounded-xl bg-primary text-white font-semibold hover:opacity-90 disabled:opacity-50"
                   onClick={() => update.mutate({ status: nextStatus })}
                 >
