@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "user";
+export type UserRole = "admin" | "user" | "super_admin";
 
 export type AuthUser = {
   identity_id: number;

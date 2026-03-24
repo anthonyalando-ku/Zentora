@@ -6,3 +6,4 @@ export { LoaderFallback } from "./Loader";
 export { Heading } from "./Heading";
 export { Badge } from "./Badge";
 export { Rating } from "./Rating";
+export { Combobox, type ComboboxOption } from "./Combobox";

@@ -15,9 +15,10 @@ type HeaderNavProps = {
   navLinks: NavLink[];
   pathname: string;
   catalogCategories?: CatalogCategoryLink[];
+  isAdmin?: boolean; // ✅ add this
 };
 
-export const HeaderNav = ({ navLinks, pathname, catalogCategories }: HeaderNavProps) => (
+export const HeaderNav = ({ navLinks, pathname, catalogCategories, isAdmin }: HeaderNavProps) => (
   <nav className="hidden md:flex items-center gap-3">
     {/* All Categories dropdown (desktop) */}
     {catalogCategories && catalogCategories.length > 0 && (
@@ -85,6 +86,28 @@ export const HeaderNav = ({ navLinks, pathname, catalogCategories }: HeaderNavPr
           {link.label}
         </Link>
       ))}
+
+      {/* Admin link (only for admins) */}
+      {isAdmin && (
+        <Link
+          to="/admin/products"
+          className={cn(
+            "inline-flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold transition-colors",
+            "hover:bg-secondary/10 hover:border-primary/20",
+            pathname.startsWith("/admin") ? "text-primary" : "text-foreground/80"
+          )}
+        >
+          <svg className="w-4 h-4 text-foreground/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 3H6a2 2 0 00-2 2v4m6-6h8a2 2 0 012 2v4m-10 8H6a2 2 0 01-2-2v-4m6 6h8a2 2 0 002-2v-4M4 12h16"
+            />
+          </svg>
+          <span>Admin</span>
+        </Link>
+      )}
     </div>
   </nav>
 );
