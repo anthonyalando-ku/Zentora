@@ -4,7 +4,7 @@ import { cn } from "@/shared/utils/cn";
 export const AddressesTab = ({
   addressesQuery,
   createAddress,
-  updateAddress,
+  //updateAddress,
   deleteAddress,
   setDefault,
   newAddress,

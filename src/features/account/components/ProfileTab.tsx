@@ -29,7 +29,7 @@ export const ProfileTab = ({
   phone,
   fullNameValue,
   avatarValue,
-  bioValue,
+ // bioValue,
 }: ProfileTabProps) => {
   return (
     <div className="space-y-6">
