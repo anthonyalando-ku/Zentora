@@ -31,7 +31,7 @@ const HeroMarketplace = ({ categories }: { categories: Category[] }) => {
       {
         id: "s3",
         badge: "Trending Now",
-        title: "Top Picks Customers Love",
+        title: "Top Customers Picks",
         subtitle: "Browse trending items and popular deals.",
         cta1: { label: "Trending", href: "/products?feed_type=trending" },
         cta2: { label: "Shop All", href: "/products" },

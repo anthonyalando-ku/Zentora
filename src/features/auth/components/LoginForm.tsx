@@ -5,13 +5,17 @@ import { z } from "zod";
 import { Button, Input } from "@/shared/components/ui";
 import { useLoginMutation } from "../hooks/useAuthMutations";
 import { AppError } from "@/core/error/AppError";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { /*LucideGoogle,*/ LucideFacebook } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthSocialButtons } from "@/features/auth/components/AuthSocialButtons";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export const LoginForm = () => {
+type Props = {
+  /** Control if social auth buttons show */
+  showSocials?: boolean;
+};
+
+export const LoginForm = ({ showSocials = true }: Props) => {
   const navigate = useNavigate();
   const {
     register,
@@ -22,7 +26,6 @@ export const LoginForm = () => {
   });
 
   const { mutateAsync, isPending, error } = useLoginMutation(() => {
-    console.log("Login successful!");
     navigate("/", { replace: true });
   });
 
@@ -76,23 +79,14 @@ export const LoginForm = () => {
 
       {error && <p className="text-sm text-destructive text-center">{errorMessage}</p>}
 
-      <div className="flex items-center gap-4">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-xs text-foreground/50 tracking-widest">OR</span>
-        <div className="h-px flex-1 bg-border" />
-      </div>
-
-      <Button variant="outline" className="w-full h-11 rounded-lg justify-center gap-2">
-        <span className="w-5 h-5 rounded-full bg-foreground/10 flex items-center justify-center text-xs font-bold">
-          G
-        </span>
-        Continue with Google
-      </Button>
-
-     <Button variant="outline" className="w-full h-11 rounded-lg justify-center gap-2">
-      <LucideFacebook className="w-5 h-5" />
-      Continue with Facebook
-    </Button>
+      <AuthSocialButtons
+        show={showSocials}
+        verb="Continue with"
+        onClick={(provider) => {
+          // UI only for now
+          console.log("social login clicked:", provider);
+        }}
+      />
 
       <p className="text-sm text-center">
         Don’t have an account?{" "}

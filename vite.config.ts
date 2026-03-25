@@ -4,9 +4,25 @@ import path from "node:path";
 
 export default defineConfig({
   plugins: [react()],
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+
+  server: {
+    host: true,
+    allowedHosts: [".ngrok-free.app"],
+
+    proxy: {
+      "/api": {
+        target: "http://localhost:8002",
+        changeOrigin: true,
+        secure: false,
+
+        rewrite: (path) => path.replace(/^\/api/, "/api/v1"),
+      },
     },
   },
 });
