@@ -13,7 +13,7 @@ export default defineConfig({
 
   server: {
     host: true,
-    allowedHosts: [".ngrok-free.app"],
+    allowedHosts: [".ngrok-free.app", ".onrender.com"],
 
     proxy: {
       "/api": {
