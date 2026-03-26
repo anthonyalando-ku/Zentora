@@ -37,7 +37,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
 
       <main className="flex-1">{children}</main>
 
-      <Footer />
+      <Footer catalogCategories={categories} />
     </div>
   );
 };
