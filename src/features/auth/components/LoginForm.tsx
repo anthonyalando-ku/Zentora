@@ -15,7 +15,7 @@ type Props = {
   showSocials?: boolean;
 };
 
-export const LoginForm = ({ showSocials = true }: Props) => {
+export const LoginForm = ({ showSocials = false }: Props) => {
   const navigate = useNavigate();
   const {
     register,

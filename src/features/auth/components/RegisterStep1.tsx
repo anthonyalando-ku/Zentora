@@ -16,7 +16,7 @@ type Props = {
 
 type FormValues = z.infer<typeof registerEmailSchema>;
 
-export const RegisterStepEmail = ({ onNext, showSocials = true }: Props) => {
+export const RegisterStepEmail = ({ onNext, showSocials = false }: Props) => {
   const { register, handleSubmit, formState } = useForm<FormValues>({
     resolver: zodResolver(registerEmailSchema),
   });
