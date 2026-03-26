@@ -16,3 +16,7 @@
 [[edge_functions]]
   function = "product-og"
   path = "/products/*"
+
+[[edge_functions]]
+  function = "products-og"
+  path = "/products"
