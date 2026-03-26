@@ -8,6 +8,7 @@ type NavLink = {
 
 type CatalogCategoryLink = {
   id: string | number;
+  slug?: string;
   name: string;
 };
 
@@ -15,7 +16,7 @@ type HeaderNavProps = {
   navLinks: NavLink[];
   pathname: string;
   catalogCategories?: CatalogCategoryLink[];
-  isAdmin?: boolean; // ✅ add this
+  isAdmin?: boolean; // add this
 };
 
 export const HeaderNav = ({ navLinks, pathname, catalogCategories, isAdmin }: HeaderNavProps) => (

@@ -20,14 +20,15 @@ type MobileMenuProps = {
   pathname: string;
   onClose: () => void;
   catalogCategories?: CatalogCategoryLink[];
+  showSearch?: boolean;
 };
 
-export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategories }: MobileMenuProps) => {
+export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategories, showSearch = false }: MobileMenuProps) => {
   const navigate = useNavigate();
 
   const [catalogOpen, setCatalogOpen] = useState(false);
 
-  // ✅ Search state
+  // Search state
   const [searchValue, setSearchValue] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -115,8 +116,9 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
 
   return (
     <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-3">
-      {/* ✅ Search (with suggestions) */}
-      <div ref={searchBoxRef} className="relative">
+      {/* Search (with suggestions) */}
+      { showSearch && (
+        <div ref={searchBoxRef} className="relative">
         <form onSubmit={onSearchSubmit} className="relative">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40"
@@ -178,6 +180,8 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
           </div>
         )}
       </div>
+      )}
+      
 
       {/* Primary links */}
       {navLinks.map((link) => (

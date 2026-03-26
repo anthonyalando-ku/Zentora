@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-type Category = { id: string | number; name: string };
+type Category = { id: string | number; name: string; slug?: string };
 
 const CategorySidebar = ({ categories }: { categories: Category[] }) => {
   return (
