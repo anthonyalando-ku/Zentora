@@ -19,6 +19,7 @@ import { useSearchResults } from "@/features/search/hooks/useSearchResults";
 import { useTrackSearchClick } from "@/features/search/hooks/useTrackSearchClick";
 import { getDiscoverySessionId } from "@/features/search/utils/session";
 import type { DiscoverySearchItem } from "@/core/api/services/discoverySearch";
+import { Seo } from "@/shared/seo/Seo";
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating" | "newest";
 
@@ -827,8 +828,38 @@ const ProductsPage = () => {
 
   const isEmpty = !isLoading && activeItems.length === 0;
 
+
+    const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL ?? window.location.origin;
+
+  // canonical should include query params because this page is driven by them
+  const canonicalUrl = `${siteUrl}/products${window.location.search}`;
+
+  const seoTitle = isSearchMode
+    ? `Search: ${queryTerm} | Zentora`
+    : isFeedMode && feedType
+      ? `${feedType.replaceAll("_", " ")} Products | Zentora`
+      : "Products | Zentora";
+
+  const seoDescription = isSearchMode
+    ? `Browse search results for "${queryTerm}" on Zentora.`
+    : isFeedMode && feedType
+      ? `Browse ${feedType.replaceAll("_", " ")} products on Zentora.`
+      : "Browse products on Zentora. Filter by category, brand, price and rating.";
+
+  // For a listing page, pick a stable share image (or the first product thumbnail if loaded).
+  const shareImage =
+    (activeItems[0]?.thumbnail && activeItems[0].thumbnail.startsWith("http") ? activeItems[0].thumbnail : undefined) ??
+    `${siteUrl}/public/zentora_logo_clear.png`;
+
   return (
     <MainLayout>
+      <Seo
+        title={seoTitle}
+        description={seoDescription}
+        canonicalUrl={canonicalUrl}
+        imageUrl={shareImage}
+        type="website"
+      />
       <div className="bg-background">
         <ProductsPageHeader
           title={headerTitle}
