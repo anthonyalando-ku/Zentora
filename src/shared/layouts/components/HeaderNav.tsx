@@ -90,25 +90,13 @@ export const HeaderNav = ({ navLinks, pathname, catalogCategories, isAdmin }: He
 
       {/* Admin link (only for admins) */}
       {isAdmin && (
-        <Link
-          to="/admin/products"
-          className={cn(
-            "inline-flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold transition-colors",
-            "hover:bg-secondary/10 hover:border-primary/20",
-            pathname.startsWith("/admin") ? "text-primary" : "text-foreground/80"
-          )}
-        >
-          <svg className="w-4 h-4 text-foreground/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 3H6a2 2 0 00-2 2v4m6-6h8a2 2 0 012 2v4m-10 8H6a2 2 0 01-2-2v-4m6 6h8a2 2 0 002-2v-4M4 12h16"
-            />
-          </svg>
-          <span>Admin</span>
-        </Link>
-      )}
+  <Link
+    to="/admin/products"
+    className="ml-6 inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-3 py-2 text-sm font-semibold hover:opacity-90 transition"
+  >
+    Admin
+  </Link>
+)}
     </div>
   </nav>
 );
