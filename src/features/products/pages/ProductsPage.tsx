@@ -621,6 +621,27 @@ function MobileFiltersDrawer({
   );
 }
 
+function ProductsGridSkeleton({ count = 12 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden"
+          aria-hidden="true"
+        >
+          <div className="aspect-square bg-foreground/10 animate-pulse" />
+          <div className="p-4 space-y-3">
+            <div className="h-4 w-4/5 bg-foreground/10 rounded animate-pulse" />
+            <div className="h-4 w-2/3 bg-foreground/10 rounded animate-pulse" />
+            <div className="h-4 w-1/2 bg-foreground/10 rounded animate-pulse" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -765,7 +786,9 @@ const ProductsPage = () => {
     return Math.max(1, Math.ceil(catalogQuery.data.total / catalogQuery.data.size));
   }, [isSearchMode, isFeedMode, feedProductsAll.length, catalogQuery.data]);
 
-  const isLoading = isSearchMode ? searchQuery.isLoading : isFeedMode ? feedQuery.isLoading : catalogQuery.isLoading;
+  const isLoading = isSearchMode ? (searchQuery.isLoading || searchQuery.isFetching)
+  : isFeedMode ? (feedQuery.isLoading || feedQuery.isFetching)
+  : (catalogQuery.isLoading || catalogQuery.isFetching);
 
   const headerTitle = isSearchMode ? "Search results" : isFeedMode ? `${feedType?.replaceAll("_", " ")} products` : "All Products";
 
@@ -802,7 +825,7 @@ const ProductsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const emptyMode = activeItems.length === 0;
+  const isEmpty = !isLoading && activeItems.length === 0;
 
   return (
     <MainLayout>
@@ -881,8 +904,11 @@ const ProductsPage = () => {
                   }}
                 />
 
+               
                 <div className="p-4 sm:p-6">
-                  {emptyMode ? (
+                  {isLoading ? (
+                    <ProductsGridSkeleton count={12} />
+                  ) : isEmpty ? (
                     <div className="space-y-6">
                       <ProductsGrid
                         mode="empty"
@@ -920,6 +946,7 @@ const ProductsPage = () => {
                       onSearchResultClick={onSearchResultClick}
                     />
                   )}
+              
                 </div>
 
                 {!isSearchMode && (

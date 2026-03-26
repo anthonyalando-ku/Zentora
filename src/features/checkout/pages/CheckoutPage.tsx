@@ -11,6 +11,7 @@ import { usePlaceMeOrder } from "@/features/checkout/hooks/usePlaceMeOrder";
 import { useMeAddresses } from "@/features/checkout/hooks/useMeAddresses";
 import { useCreateAddress } from "@/features/checkout/hooks/useUpsertAddress";
 import { useSetDefaultAddress } from "@/features/checkout/hooks/useSetDefaultAddress";
+import { OrderSuccess } from "../components/OrderSuccess";
 
 type ShippingFormState = {
   full_name: string;
@@ -197,29 +198,7 @@ const CheckoutPage = () => {
   if (orderSuccess) {
     return (
       <MainLayout>
-        <div className="max-w-3xl mx-auto px-4 py-24 text-center">
-          <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold mb-2">Order created successfully</h2>
-          <p className="text-foreground/60 mb-8">
-            Thanks! Your order has been placed. We’ll contact you for delivery and payment confirmation.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              to="/products"
-              className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition h-11 px-6 text-sm bg-primary text-white hover:opacity-90"
-            >
-              Continue Shopping
-            </Link>
-
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition h-11 px-6 text-sm border border-border hover:bg-secondary/10"
-            >
-              Back Home
-            </Link>
-          </div>
-        </div>
+        <OrderSuccess /*orderId={orderId} */itemCount={cart.items.length} totalPrice={orderTotal} />
       </MainLayout>
     );
   }
