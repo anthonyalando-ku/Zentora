@@ -5,38 +5,30 @@ export default async (request: Request) => {
 
   const url = new URL(request.url);
 
-  // Only intercept product pages
+  // Only intercept product pages like /products/:slug
   const m = url.pathname.match(/^\/products\/([^/]+)$/);
   if (!m) return fetch(request);
 
+  // humans: always serve SPA shell so React Router can render the page
   if (!isBot) {
-    // For real users, serve the SPA as normal
-    return fetch(request);
+    const spaUrl = new URL("/index.html", url.origin);
+    return fetch(spaUrl.toString(), requestInitFrom(request));
   }
 
+  // Bots: return OG HTML
   const slug = decodeURIComponent(m[1]);
 
-  // Call your Go backend to fetch product details.
   const API_BASE = "https://zentora-api.onrender.com/api/v1";
-  //const API_BASE = Netlify.env.get("PUBLIC_API_BASE") ?? "https://zentora-api.onrender.com/api/v1";
   const apiUrl = `${API_BASE}/catalog/products/slug/${encodeURIComponent(slug)}`;
 
   try {
-    const apiRes = await fetch(apiUrl, {
-      headers: { Accept: "application/json" },
-    });
+    const apiRes = await fetch(apiUrl, { headers: { Accept: "application/json" } });
 
     if (!apiRes.ok) {
-      // fallback minimal
-      return new Response(minimalOgHtml(url.href), {
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+      return htmlResponse(minimalOgHtml(url.href));
     }
 
     const payload = await apiRes.json();
-
-    // Your backend responses are wrapped {success,message,data} but axios interceptor unwraps in browser.
-    // Here we must handle real server response. Adjust if needed.
     const product = payload?.data ?? payload;
 
     const name = product?.name ?? "Product";
@@ -50,28 +42,41 @@ export default async (request: Request) => {
       product?.images?.[0]?.image_url ??
       "https://picsum.photos/seed/zentora/1200/630";
 
-    const canonical = url.href;
-
     const html = ogHtml({
       title: `${name} | Zentora`,
       description,
       image,
-      url: canonical,
+      url: url.href,
     });
 
     return new Response(html, {
       headers: {
         "content-type": "text/html; charset=utf-8",
-        // cache bots a bit; tune as desired
         "cache-control": "public, max-age=300",
       },
     });
   } catch {
-    return new Response(minimalOgHtml(url.href), {
-      headers: { "content-type": "text/html; charset=utf-8" },
-    });
+    return htmlResponse(minimalOgHtml(url.href));
   }
 };
+
+function htmlResponse(html: string) {
+  return new Response(html, {
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
+/**
+ * Copy only safe request properties for fetch('/index.html').
+ * (Avoid passing through the original URL/method/body.)
+ */
+function requestInitFrom(req: Request): RequestInit {
+  return {
+    method: "GET",
+    headers: req.headers,
+    redirect: "follow",
+  };
+}
 
 const ogHtml = ({
   title,
@@ -88,18 +93,14 @@ const ogHtml = ({
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-
     <title>${escapeHtml(title)}</title>
     <meta name="description" content="${escapeHtml(description)}" />
-
     <link rel="canonical" href="${escapeHtml(url)}" />
-
     <meta property="og:type" content="product" />
     <meta property="og:title" content="${escapeHtml(title)}" />
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:url" content="${escapeHtml(url)}" />
     <meta property="og:image" content="${escapeHtml(image)}" />
-
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeHtml(title)}" />
     <meta name="twitter:description" content="${escapeHtml(description)}" />
