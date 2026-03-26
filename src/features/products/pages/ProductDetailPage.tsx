@@ -20,6 +20,7 @@ import { useToggleWishlist } from "@/features/wishlist/hooks/useToggleWishlist";
 import { useRelatedProducts } from "@/features/products/hooks/useRelatedProducts";
 import type { DiscoveryFeedItem } from "@/core/api/services/discovery";
 import type { Product } from "@/shared/types/product";
+import { ProductJsonLd } from "@/shared/seo/ProductJsonLd";
 
 const inventoryStatusToInStock = (s: string | undefined) => s === "in_stock" || s === "low_stock";
 
@@ -63,6 +64,9 @@ const ProductDetailPage = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariantId, setSelectedVariantId] = useState<number | undefined>(undefined);
 
+  
+ 
+
   useEffect(() => {
     if (!variants.length) return;
     if (selectedVariantId !== undefined) return;
@@ -73,6 +77,8 @@ const ProductDetailPage = () => {
     () => variants.find((v) => v.id === selectedVariantId),
     [variants, selectedVariantId]
   );
+
+   
 
   const stockQuery = useVariantStock(selectedVariantId);
   const availableQty = stockQuery.data?.available_qty ?? 0;
@@ -148,6 +154,21 @@ const ProductDetailPage = () => {
       setTimeout(() => setAdded(false), 2000);
       return;
     }
+
+    const canonicalUrl = `${window.location.origin}/products/${product.slug}`;
+    const ogImage = imageUrls[0] ?? "https://picsum.photos/seed/zentora-og/1200/630";
+      <ProductJsonLd
+      name={product?.name}
+      description={product?.description?.Valid ? product.description.String : undefined}
+      image={ogImage}
+      sku={selectedVariant?.sku}
+      price={effectivePrice}
+      currency="KES"
+      availability={inStock ? "InStock" : "OutOfStock"}
+      url={canonicalUrl}
+      ratingValue={product?.rating ?? undefined}
+      reviewCount={product?.review_count ?? undefined}
+    />
 
     const nextQty = qtyInCart + quantity;
 
@@ -230,7 +251,7 @@ const ProductDetailPage = () => {
       .map(mapDiscoveryItemToProduct);
   }, [relatedQuery.data, product?.slug]);
 
-  // ✅ IMPORTANT FIX: Never call hooks after conditional returns.
+  // IMPORTANT FIX: Never call hooks after conditional returns.
   // The previous version computed discountPercent with useMemo AFTER early returns.
   // When product is loading/not-found, that hook did not run -> hook order mismatch.
   // Compute it without a hook, and compute it only when product exists.
@@ -272,6 +293,7 @@ const ProductDetailPage = () => {
 
   const description = product?.description?.Valid ? product.description.String : "";
   const tags = (product?.tags ?? []).map((t) => t.name);
+
 
   return (
     <MainLayout>
