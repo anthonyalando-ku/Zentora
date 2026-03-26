@@ -133,7 +133,7 @@ export const useCart = () => {
 
   return {
     mode: isAuthenticated ? ("auth" as const) : ("guest" as const),
-    isLoading: isAuthenticated ? meCartQuery.isLoading : false,
+    isLoading: isAuthenticated ? meCartQuery.isLoading  || meCartQuery.isFetching : false,
     items,
     itemCount,
     subtotal,

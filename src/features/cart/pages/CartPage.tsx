@@ -10,6 +10,22 @@ const CartPage = () => {
   const shipping = subtotal > 5000 ? 0 : 500;
   const total = subtotal + shipping;
 
+  if (cart.isLoading) {
+    return (
+      <MainLayout>
+        <div className="bg-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div className="rounded-2xl border border-border bg-background shadow-sm p-6 sm:p-10">
+              <div className="flex items-center justify-center min-h-[240px]">
+                <div className="text-sm text-foreground/60">Loading your cart…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
   // Empty cart
   if (!cart.isLoading && cart.items.length === 0) {
     return (
