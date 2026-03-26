@@ -1,31 +1,137 @@
-# FoundationX
+I am building a modern ecommerce frontend platform called Zentora.
 
-A modern, scalable React application built with TypeScript, Vite, and TailwindCSS. Features a robust authentication system with role-based access control (RBAC) and a well-organized feature-based architecture.
+ 🎯 Project Goal
 
-## 🚀 Tech Stack
+Build a clean, scalable, production-ready ecommerce frontend with modern UI/UX and proper architecture. We are focusing strictly on frontend implementation first. Backend will be integrated later.
 
-- **Frontend Framework:** React 18
-- **Language:** TypeScript
-- **Build Tool:** Vite
-- **Styling:** TailwindCSS + PostCSS
-- **State Management:** Zustand
-- **HTTP Client:** Axios
-- **Routing:** React Router
-- **Form Validation:** Zod
-- **Code Quality:** ESLint + Stylelint
+---
 
-## 📋 Features
+ 🛠 Tech Stack
 
-- ✅ Role-based authentication (Admin, User, Public)
-- ✅ Multi-step registration flow
-- ✅ Protected routes with route guards
-- ✅ Theme support (Light/Dark mode)
-- ✅ Centralized error handling with error boundaries
-- ✅ HTTP interceptors for request/response handling
-- ✅ Reusable UI components library
-- ✅ Feature-based modular architecture
+ React + TypeScript
+ Vite
+ TailwindCSS
+ React Router
+ Context API (or Zustand if needed)
+ Reusable component architecture
+ Clean folder structure
+ Responsive (mobile-first)
+ No backend integration yet (use mock data)
 
-## 🏗️ Project Structure
+---
+
+  Core Features
+
+ 1️⃣ Homepage
+
+ Modern hero section
+ Featured products section
+ Categories section
+ Promotional banner
+ Product grid with:
+
+   Product image
+   Title
+   Price
+   Discount badge (if applicable)
+   Add to cart button
+ Responsive layout
+ Clean animations (subtle)
+
+---
+
+ 2️⃣ Product Listing Page
+
+ Grid layout
+ Filtering (UI only)
+
+   Price range
+   Category
+   Rating
+ Sorting dropdown
+ Pagination (UI only)
+ Product card reusable component
+
+---
+
+ 3️⃣ Product Details Page
+
+ Large product image
+ Thumbnail selector
+ Description
+ Rating display
+ Quantity selector
+ Add to cart button
+ Related products section
+
+---
+
+ 4️⃣ Cart System
+
+Users can:
+
+ Add to cart (even if not logged in)
+ Increase/decrease quantity
+ Remove item
+ View subtotal
+ View total
+ Persist cart in localStorage
+
+---
+
+ 5️⃣ Checkout Page
+
+ Shipping form
+ Order summary
+ Payment method:
+
+   Pay on Delivery (default & active)
+   M-Pesa button (visible but disabled)
+ Confirm order button
+
+---
+
+ 6️⃣ Account Management
+
+Authentication is partially built.
+
+Complete:
+
+ Login page (refactor if needed)
+ Registration page
+ Forgot password UI
+ Account dashboard
+
+   Profile info
+   Order history (mock)
+   Settings page
+
+⚠️ Important:
+
+ Users do NOT need an account to:
+
+   View products
+   Add to cart
+   Checkout
+
+---
+
+ 🎨 UI / UX Requirements
+
+ Modern ecommerce design (similar level polish as Shopify templates)
+ Soft shadows
+ Rounded corners
+ Clean typography
+ Consistent spacing scale
+ Proper loading skeletons
+ Empty states
+ Error states
+
+---
+
+ 🗂 Folder Structure Expectation
+
+Use scalable architecture as the project structure from repo
 
 ```
 Zentora/
@@ -56,24 +162,24 @@ Zentora/
 │   ├── assets/
 │   │   └── react.svg
 │   ├── core/
-│   │   ├── api/              # HTTP client & interceptors
+│   │   ├── api/               HTTP client & interceptors
 │   │   │   ├── http.ts
 │   │   │   ├── index.ts
 │   │   │   ├── interceptors.ts
 │   │   │   └── token.ts
-│   │   ├── config/           # Environment configuration
+│   │   ├── config/            Environment configuration
 │   │   │   └── env.ts
-│   │   ├── error/            # Error handling
+│   │   ├── error/             Error handling
 │   │   │   ├── AppError.ts
 │   │   │   ├── ErrorBoundary.tsx
 │   │   │   └── RouteError.tsx
-│   │   ├── guards/           # Route protection
+│   │   ├── guards/            Route protection
 │   │   │   ├── ProtectedRoute.tsx
 │   │   │   └── RoleRoute.tsx
-│   │   └── theme/            # Theme configuration
+│   │   └── theme/             Theme configuration
 │   │       ├── index.ts
 │   │       └── ThemeProvider.tsx
-│   ├── features/             # Feature modules
+│   ├── features/              Feature modules
 │   │   ├── admin/
 │   │   │   └── home/
 │   │   │       └── pages/
@@ -106,12 +212,12 @@ Zentora/
 │   │       └── home/
 │   │           └── pages/
 │   │               └── UserHomePage.tsx
-│   ├── shared/               # Shared resources
+│   ├── shared/                Shared resources
 │   │   ├── components/
 │   │   │   ├── ThemeToggle/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── ThemeToggle.tsx
-│   │   │   └── ui/          # UI component library
+│   │   │   └── ui/           UI component library
 │   │   │       ├── index.ts
 │   │   │       ├── Button/
 │   │   │       │   ├── Button.tsx
@@ -137,92 +243,59 @@ Zentora/
 │   │   ├── types/
 │   │   └── utils/
 │   │       └── cn.ts
-│   └── styles/               # Global styles
+│   └── styles/                Global styles
 │       ├── globals.css
 │       └── theme.css
 ```
 
-## 🛠️ Getting Started
+---
 
-### Prerequisites
+ 📦 State Management Rules
 
-- Node.js (v18 or higher)
-- npm or yarn
+ Cart: global state
+ Auth: global state
+ Products: local/mock
+ Use proper typing everywhere
 
-### Installation
+---
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd FoundationX
-```
+ 🚫 Constraints
 
-2. Install dependencies:
-```bash
-npm install
-```
+ No backend yet
+ Use mock data
+ Code must be clean & production structured
+ Avoid messy inline styles
+ Avoid hardcoded UI duplication
+ Components must be reusable
 
-3. Create environment file:
-```bash
-cp .env.example .env
-```
+---
 
-4. Configure your environment variables in `.env`
+ 📤 Output Format
 
-### Development
+When generating:
 
-Start the development server:
-```bash
-npm run dev
-```
+1. Always provide:
 
-The application will be available at `http://localhost:5173`
+    File name
+    Full code
+2. Explain architecture decisions briefly
+3. Keep components modular
+4. Do NOT generate entire project in one response
+5. Build step-by-step
 
-### Build
+---
 
-Create a production build:
-```bash
-npm run build
-```
+ 🚀 Development Strategy
 
-### Preview
+We will build in this order:
 
-Preview the production build:
-```bash
-npm run preview
-```
+1. Layout system
+2. UI design system (buttons, inputs, cards)
+3. Homepage
+4. Product listing
+5. Product details
+6. Cart system
+7. Checkout
+8. Account dashboard
 
-## 🗂️ Architecture Patterns
-
-### Feature-Based Structure
-Each feature is self-contained with its own components, hooks, services, and state management.
-
-### Core Layer
-Contains application-wide functionality:
-- **API:** HTTP client configuration and interceptors
-- **Config:** Environment and app configuration
-- **Error:** Global error handling
-- **Guards:** Route protection logic
-- **Theme:** Theme management
-
-### Shared Resources
-Reusable components, hooks, utilities, and layouts used across features.
-
-## 🔒 Authentication & Authorization
-
-- JWT-based authentication
-- Role-based access control (RBAC)
-- Protected routes with guards
-- Automatic token refresh
-- Secure token storage
-
-## 🎨 Styling
-
-- TailwindCSS for utility-first styling
-- Custom theme with CSS variables
-- Dark mode support
-- Responsive design
-
-## 📝 License
-
-MIT License
+Wait for my instruction before moving to next step.

@@ -1,0 +1,7 @@
+bLue: HEX  #004b8f RGB rgba(0, 75, 143) HSL hsl(209, 100, 28)
+
+Orange: HEX #df7412 RGB rgba(223, 116, 18)  HSL hsl(29, 85, 47)
+
+Black: HEX #f9f8f8  RGB rgba(249, 248, 248) HSL hsl(0, 8, 97)
+
+WHITE BG:  HEX #f9f8f7  RGB rgba(249, 248, 247) HSL hsl(30, 14, 97)	
