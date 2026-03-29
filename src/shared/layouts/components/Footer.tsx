@@ -122,13 +122,13 @@ export const Footer = ({ catalogCategories = [] }: FooterProps) => {
               </li>
 
               <li>
-                <Link to="/returns" className="text-sm text-foreground/60 hover:text-primary">
-                  Returns
+                <Link to="/about" className="text-sm text-foreground/60 hover:text-primary">
+                  About Us
                 </Link>
               </li>
 
               <li>
-                <Link to="/track-order" className="text-sm text-foreground/60 hover:text-primary">
+                <Link to="/account#orders" className="text-sm text-foreground/60 hover:text-primary">
                   Track Order
                 </Link>
               </li>
