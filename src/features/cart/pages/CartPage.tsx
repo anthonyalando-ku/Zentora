@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
 import { useCart } from "@/features/cart/hooks/useCart";
-//import { ProductCard } from "@/features/products/components/ProductCard";
 
 const CartPage = () => {
   const cart = useCart();
 
   const subtotal = cart.subtotal;
-  const shipping = subtotal > 5000 ? 0 : 500;
-  const total = subtotal + shipping;
+
+  // NOTE: Shipping is not calculated at cart stage anymore.
+  // Shipping/extra charges will be calculated at checkout based on address and delivery method.
+  const total = subtotal;
 
   if (cart.isLoading) {
     return (
@@ -59,7 +60,6 @@ const CartPage = () => {
                   </div>
                 </div>
 
-                {/* Illustration placeholder (no emoji) */}
                 <div className="flex justify-center lg:justify-end">
                   <div className="w-full max-w-md rounded-2xl border border-border bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-6 sm:p-8">
                     <div className="aspect-[4/3] rounded-xl bg-background border border-border flex items-center justify-center overflow-hidden">
@@ -77,7 +77,6 @@ const CartPage = () => {
                 </div>
               </div>
 
-              {/* Optional recommended section placeholder (keeps functionality intact, no extra hooks) */}
               <div className="mt-10 border-t border-border pt-6">
                 <div className="flex items-end justify-between gap-4 mb-4">
                   <div>
@@ -133,42 +132,51 @@ const CartPage = () => {
             </button>
           </div>
 
+          {/* Shipping note (replaces hard-coded shipping logic) */}
+          <div className="mb-6 rounded-2xl border border-border bg-secondary/5 px-4 sm:px-6 py-4">
+            <div className="flex items-start gap-3">
+              <span
+                className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-foreground/70 shrink-0"
+                aria-hidden="true"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h13v10H3V7Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 10h3l2 2v5h-5v-7Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
+                </svg>
+              </span>
+
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-foreground">Shipping & additional charges</div>
+                <p className="text-sm text-foreground/60 mt-1">
+                  Prices shown in cart are <span className="font-semibold text-foreground">exclusive of shipping</span>.
+                  Additional charges may apply at checkout depending on your delivery location and method.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* LEFT: Items */}
             <div className="lg:col-span-8 space-y-3">
-              {/* Items container card */}
               <div className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
                 <div className="px-4 sm:px-6 py-4 border-b border-border bg-background">
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-semibold text-foreground">Cart Items</div>
-                    {shipping === 0 ? (
-                      <span className="text-xs font-semibold text-green-600 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">
-                        FREE SHIPPING
-                      </span>
-                    ) : (
-                      <span className="text-xs text-foreground/60">
-                        Add{" "}
-                        <span className="font-semibold text-foreground">
-                          KSh {(5000 - subtotal).toLocaleString()}
-                        </span>{" "}
-                        for free shipping
-                      </span>
-                    )}
+                    <span className="text-xs text-foreground/60">Shipping calculated at checkout</span>
                   </div>
                 </div>
 
                 <div className="divide-y divide-border">
                   {cart.items.map((item) => {
                     const lineTotal = item.unit_price * item.quantity;
-
-                    // Optional sale badge (only if your cart item has these fields; safe access)
                     const hasDiscount =
                       typeof (item as any).discount === "number" ? (item as any).discount > 0 : false;
 
                     return (
                       <div key={item.key} className="p-4 sm:p-5">
                         <div className="flex gap-4">
-                          {/* Thumbnail */}
                           <Link
                             to={item.slug ? `/products/${item.slug}` : "/products"}
                             className="shrink-0 w-24 sm:w-28"
@@ -184,7 +192,6 @@ const CartPage = () => {
                             </div>
                           </Link>
 
-                          {/* Info + controls */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
@@ -218,18 +225,12 @@ const CartPage = () => {
                                 title="Remove"
                               >
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                               </button>
                             </div>
 
                             <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                              {/* Quantity controls (touch friendly) */}
                               <div className="flex items-center gap-3">
                                 <div className="inline-flex items-center rounded-xl border border-border overflow-hidden bg-background">
                                   <button
@@ -250,15 +251,16 @@ const CartPage = () => {
                                   </button>
                                 </div>
 
-                                {/* Unit price only if qty > 1 */}
                                 {item.quantity > 1 && (
                                   <div className="text-xs text-foreground/60">
-                                    Unit: <span className="font-medium text-foreground">KSh {item.unit_price.toLocaleString()}</span>
+                                    Unit:{" "}
+                                    <span className="font-medium text-foreground">
+                                      KSh {item.unit_price.toLocaleString()}
+                                    </span>
                                   </div>
                                 )}
                               </div>
 
-                              {/* Line total */}
                               <div className="text-right">
                                 <div className="text-xs text-foreground/50">Line total</div>
                                 <div className="text-base sm:text-lg font-bold text-primary">
@@ -273,7 +275,6 @@ const CartPage = () => {
                   })}
                 </div>
 
-                {/* Continue shopping link inside items card */}
                 <div className="px-4 sm:px-6 py-4 border-t border-border bg-background">
                   <Link
                     to="/products"
@@ -287,7 +288,6 @@ const CartPage = () => {
                 </div>
               </div>
 
-              {/* Upsell / related section (compact grid) */}
               <section className="rounded-2xl border border-border bg-background shadow-sm">
                 <div className="px-4 sm:px-6 py-4 border-b border-border">
                   <div className="flex items-end justify-between gap-4">
@@ -301,7 +301,6 @@ const CartPage = () => {
                   </div>
                 </div>
 
-                {/* No new hooks/data here; placeholder slots keep layout */}
                 <div className="p-4 sm:p-6">
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
                     {Array.from({ length: 6 }).map((_, i) => (
@@ -334,31 +333,20 @@ const CartPage = () => {
 
                   <div className="flex justify-between">
                     <span className="text-foreground/60">Shipping</span>
-                    <span className={shipping === 0 ? "text-green-600 font-semibold" : "font-medium"}>
-                      {shipping === 0 ? "FREE" : `KSh ${shipping.toLocaleString()}`}
-                    </span>
+                    <span className="font-medium text-foreground/70">Calculated at checkout</span>
                   </div>
 
-                  {subtotal < 5000 && (
-                    <div className="text-xs text-foreground/60">
-                      Add{" "}
-                      <span className="font-semibold text-foreground">KSh {(5000 - subtotal).toLocaleString()}</span>{" "}
-                      more for free shipping.
-                    </div>
-                  )}
+                  <div className="text-xs text-foreground/60">
+                    Additional charges may include shipping fees depending on delivery location and method.
+                  </div>
                 </div>
 
                 <div className="mt-5 pt-4 border-t border-border">
                   <div className="flex justify-between items-end">
                     <div>
-                      <div className="text-xs text-foreground/60">Total</div>
+                      <div className="text-xs text-foreground/60">Estimated total</div>
                       <div className="text-xl font-bold text-primary">KSh {total.toLocaleString()}</div>
                     </div>
-                    {shipping === 0 && (
-                      <div className="text-xs font-semibold text-green-600 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-full">
-                        FREE SHIPPING
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -400,11 +388,9 @@ const CartPage = () => {
           <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70 p-3">
             <div className="max-w-7xl mx-auto px-1 flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <div className="text-[11px] text-foreground/60">Total</div>
+                <div className="text-[11px] text-foreground/60">Estimated total</div>
                 <div className="text-base font-semibold text-primary leading-tight">KSh {total.toLocaleString()}</div>
-                <div className="text-[11px] text-foreground/60">
-                  {shipping === 0 ? "FREE SHIPPING" : `Shipping: KSh ${shipping.toLocaleString()}`}
-                </div>
+                <div className="text-[11px] text-foreground/60">Excludes shipping (calculated at checkout)</div>
               </div>
 
               <Link
@@ -416,7 +402,6 @@ const CartPage = () => {
             </div>
           </div>
 
-          {/* Spacer so content isn't hidden behind mobile bar */}
           <div className="h-20 lg:hidden" />
         </div>
       </div>
