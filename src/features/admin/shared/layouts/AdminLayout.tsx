@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { AdminSidebar } from "@/features/admin/shared/components/AdminSidebar";
 import { AdminTopbar } from "@/features/admin/shared/components/AdminTopbar";
