@@ -88,15 +88,40 @@ export const HeaderNav = ({ navLinks, pathname, catalogCategories, isAdmin }: He
         </Link>
       ))}
 
-      {/* Admin link (only for admins) */}
+            {/* Admin link (only for admins) */}
       {isAdmin && (
-  <Link
-    to="/admin/products"
-    className="ml-6 inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-3 py-2 text-sm font-semibold hover:opacity-90 transition"
-  >
-    Admin
-  </Link>
-)}
+        <Link
+          to="/admin"
+          className={cn(
+            "ml-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition",
+            "border border-border bg-background hover:bg-secondary/10",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/25",
+            pathname.startsWith("/admin") ? "text-primary border-primary/25 bg-primary/5" : "text-foreground/80"
+          )}
+          aria-label="Open Admin Console"
+          title="Admin Console"
+        >
+          <span
+            className={cn(
+              "w-8 h-8 rounded-lg inline-flex items-center justify-center",
+              pathname.startsWith("/admin") ? "bg-primary/10 text-primary" : "bg-secondary/10 text-foreground/70"
+            )}
+            aria-hidden="true"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V7l8-4Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+            </svg>
+          </span>
+
+          <span className="hidden lg:inline">Admin Console</span>
+          <span className="lg:hidden">Admin</span>
+
+          <svg className="w-4 h-4 text-foreground/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+          </svg>
+        </Link>
+      )}
     </div>
   </nav>
 );

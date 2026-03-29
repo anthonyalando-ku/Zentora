@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
 import { useAuthStore } from "@/features/auth/store/authStore";
 
@@ -20,18 +21,31 @@ import { OrdersTab } from "@/features/account/components/OrdersTab";
 import { AddressesTab } from "@/features/account/components/AddressesTab";
 import { SecurityTab } from "@/features/account/components/SecurityTab";
 
+const TAB_HASH: Record<AccountTabKey, string> = {
+  profile: "#profile",
+  orders: "#orders",
+  addresses: "#addresses",
+  security: "#security",
+};
+
+const HASH_TAB: Record<string, AccountTabKey> = {
+  "#profile": "profile",
+  "#orders": "orders",
+  "#addresses": "addresses",
+  "#security": "security",
+};
+
+const getTabFromHash = (hash: string | undefined | null): AccountTabKey => {
+  if (!hash) return "profile";
+  return HASH_TAB[String(hash).toLowerCase()] ?? "profile";
+};
+
 const AccountDashboardPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  //  Guard redirect as an effect (not during render)
-  useEffect(() => {
-    if (!isAuthenticated) navigate("/auth/login", { replace: true });
-  }, [isAuthenticated, navigate]);
-
-  // While redirecting, render nothing
-  if (!isAuthenticated) return null;
-
+  // IMPORTANT: All hooks must run unconditionally (no early return before hooks)
   const profileQuery = useProfile();
   const updateProfile = useUpdateProfile();
 
@@ -45,6 +59,13 @@ const AccountDashboardPage = () => {
   const updateAddress = useUpdateAddress();
   const deleteAddress = useDeleteAddress();
   const setDefault = useSetDefaultAddress();
+
+  // Redirect when unauthenticated (logout triggers this)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/auth/login", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const profile = profileQuery.data;
 
@@ -61,7 +82,6 @@ const AccountDashboardPage = () => {
     bio: "",
   });
 
-  // Set form values when profile loads (useEffect, not useMemo)
   const profileLoadedKey = useMemo(
     () => `${fullNameValue}::${avatarValue}::${bioValue}`,
     [fullNameValue, avatarValue, bioValue]
@@ -86,7 +106,85 @@ const AccountDashboardPage = () => {
     is_default: true,
   });
 
-  const [activeTab, setActiveTab] = useState<AccountTabKey>("profile");
+  const [activeTab, setActiveTab] = useState<AccountTabKey>(() => getTabFromHash(location.hash));
+
+  useEffect(() => {
+    if (!location.hash) {
+      navigate({ pathname: location.pathname, hash: "#profile" }, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const next = getTabFromHash(location.hash);
+    setActiveTab((cur) => (cur === next ? cur : next));
+  }, [location.hash]);
+
+  const onChangeTab = (tab: AccountTabKey) => {
+    setActiveTab(tab);
+
+    const nextHash = TAB_HASH[tab] ?? "#profile";
+    if (location.hash !== nextHash) {
+      navigate({ pathname: location.pathname, hash: nextHash }, { replace: true });
+    }
+  };
+
+  // Render a stable placeholder while redirecting (hooks already ran)
+  if (!isAuthenticated) {
+  return (
+    <MainLayout>
+      <div className="bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="rounded-2xl border border-border bg-background shadow-sm p-6 sm:p-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
+                  Sign in to view your account
+                </h1>
+                <p className="text-sm text-foreground/60 mt-2 max-w-xl">
+                  Access your profile, orders, addresses, and security settings by logging in or creating an account.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                <Link
+                  to="/auth/login"
+                  replace
+                  className="h-11 px-5 rounded-xl bg-primary text-white hover:opacity-90 transition text-sm font-semibold inline-flex items-center justify-center"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/auth/register"
+                  replace
+                  className="h-11 px-5 rounded-xl border border-border hover:bg-secondary/10 transition text-sm font-semibold inline-flex items-center justify-center"
+                >
+                  Create account
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="rounded-xl border border-border bg-secondary/5 p-4">
+                <div className="text-sm font-semibold">Track orders</div>
+                <div className="text-xs text-foreground/60 mt-1">See delivery status and order history.</div>
+              </div>
+              <div className="rounded-xl border border-border bg-secondary/5 p-4">
+                <div className="text-sm font-semibold">Manage addresses</div>
+                <div className="text-xs text-foreground/60 mt-1">Set defaults and edit shipping info.</div>
+              </div>
+              <div className="rounded-xl border border-border bg-secondary/5 p-4">
+                <div className="text-sm font-semibold">Secure account</div>
+                <div className="text-xs text-foreground/60 mt-1">Change password and protect access.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </MainLayout>
+  );
+}
 
   return (
     <MainLayout>
@@ -104,6 +202,7 @@ const AccountDashboardPage = () => {
               disabled={logout.isPending}
               onClick={async () => {
                 await logout.mutateAsync();
+                // navigate home (optional). Redirect effect will also kick in due to auth cleared.
                 navigate("/", { replace: true });
               }}
             >
@@ -116,7 +215,7 @@ const AccountDashboardPage = () => {
             <aside className="lg:col-span-3">
               <AccountSidebar
                 activeTab={activeTab}
-                onChangeTab={setActiveTab}
+                onChangeTab={onChangeTab}
                 email={email}
                 fullName={fullNameValue}
                 avatarUrl={avatarValue}
@@ -186,7 +285,6 @@ const AccountDashboardPage = () => {
             </section>
           </div>
 
-          {/* Mobile tab bar spacing */}
           <div className="h-2" />
         </div>
       </div>

@@ -13,28 +13,42 @@ const HomePage = () => {
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  const feeds = [
-    { type: "trending", query: useDiscoveryFeed("trending", 12) },
-    { type: "deals", query: useDiscoveryFeed("deals", 12) },
-    { type: "best_sellers", query: useDiscoveryFeed("best_sellers", 12) },
-    { type: "new_arrivals", query: useDiscoveryFeed("new_arrivals", 12) },
-    { type: "featured", query: useDiscoveryFeed("featured", 12) },
-    { type: "editorial", query: useDiscoveryFeed("editorial", 12) },
+  // Call hooks unconditionally in a fixed order
+  const trendingQ = useDiscoveryFeed("trending", 12);
+  const dealsQ = useDiscoveryFeed("deals", 12);
+  const bestSellersQ = useDiscoveryFeed("best_sellers", 12);
+  const newArrivalsQ = useDiscoveryFeed("new_arrivals", 12);
+  const featuredQ = useDiscoveryFeed("featured", 12);
+  const editorialQ = useDiscoveryFeed("editorial", 12);
+  const recommendedQ = useDiscoveryFeed("recommended", 12); // always call, but render only if authed
 
-    // Recommended should be only for logged in users
-    ...(isAuthenticated ? [{ type: "recommended", query: useDiscoveryFeed("recommended", 12) }] : []),
-  ];
+  const feeds = useMemo(
+    () =>
+      [
+        { type: "trending", query: trendingQ },
+        { type: "deals", query: dealsQ },
+        { type: "best_sellers", query: bestSellersQ },
+        { type: "new_arrivals", query: newArrivalsQ },
+        { type: "featured", query: featuredQ },
+        { type: "editorial", query: editorialQ },
+        { type: "recommended", query: recommendedQ },
+      ] as const,
+    [trendingQ, dealsQ, bestSellersQ, newArrivalsQ, featuredQ, editorialQ, recommendedQ]
+  );
 
-  // Hero sidebar categories
+  const visibleFeeds = useMemo(() => {
+    // Filter recommended at render time, not hook-call time
+    if (isAuthenticated) return feeds;
+    return feeds.filter((f) => f.type !== "recommended");
+  }, [feeds, isAuthenticated]);
+
   const heroCategories = useMemo(
     () => (categories ?? []).slice(0, 18).map((c) => ({ id: c.id, name: c.name })),
     [categories]
   );
 
-  // Sort feeds: those with < 6 items go to bottom.
-  // If still loading, keep order stable (don’t reorder while loading).
   const sortedFeeds = useMemo(() => {
-    return [...feeds].sort((a, b) => {
+    return [...visibleFeeds].sort((a, b) => {
       const aLoading = a.query.isLoading || a.query.isFetching;
       const bLoading = b.query.isLoading || b.query.isFetching;
       if (aLoading || bLoading) return 0;
@@ -48,7 +62,13 @@ const HomePage = () => {
       if (aSmall === bSmall) return 0;
       return aSmall ? 1 : -1;
     });
-  }, [isAuthenticated, ...feeds.map((f) => f.query.data?.items?.length), ...feeds.map((f) => f.query.isLoading)]);
+  }, [
+    visibleFeeds,
+    // keep sort stable while still updating when data changes
+    ...visibleFeeds.map((f) => f.query.data?.items?.length),
+    ...visibleFeeds.map((f) => f.query.isLoading),
+    ...visibleFeeds.map((f) => f.query.isFetching),
+  ]);
 
   return (
     <MainLayout>
@@ -61,6 +81,7 @@ const HomePage = () => {
             feedType={feed.type as DiscoveryFeedType}
             items={feed.query.data?.items}
             isLoading={feed.query.isLoading || feed.query.isFetching}
+            isError={feed.query.isError}
           />
         ))}
 

@@ -21,9 +21,10 @@ type MobileMenuProps = {
   onClose: () => void;
   catalogCategories?: CatalogCategoryLink[];
   showSearch?: boolean;
+  isAdmin?: boolean;
 };
 
-export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategories, showSearch = false }: MobileMenuProps) => {
+export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategories, showSearch = false, isAdmin = false }: MobileMenuProps) => {
   const navigate = useNavigate();
 
   const [catalogOpen, setCatalogOpen] = useState(false);
@@ -242,6 +243,45 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, catalogCategorie
               )}
             </div>
           )}
+        </div>
+      )}
+            {/* Admin section */}
+      {isAdmin && (
+        <div className="pt-3 border-t border-border">
+          <div className="text-[11px] font-semibold tracking-widest text-foreground/45 uppercase px-2 mb-2">
+            Admin
+          </div>
+
+          <Link
+            to="/admin"
+            className={cn(
+              "flex items-center justify-between gap-3 rounded-2xl px-3 py-3",
+              "border border-primary/20 bg-primary/10 text-primary",
+              "hover:bg-primary/15 transition-colors",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/25",
+              pathname.startsWith("/admin") && "ring-1 ring-primary/25"
+            )}
+            onClick={onClose}
+            aria-label="Open Admin Console"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="w-10 h-10 rounded-2xl bg-primary/15 flex items-center justify-center" aria-hidden="true">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V7l8-4Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                </svg>
+              </span>
+
+              <div className="min-w-0">
+                <div className="text-sm font-semibold leading-tight">Admin Console</div>
+                <div className="text-xs text-primary/80 -mt-0.5">Manage products, orders & inventory</div>
+              </div>
+            </div>
+
+            <svg className="w-5 h-5 text-primary/70 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m9 5 7 7-7 7" />
+            </svg>
+          </Link>
         </div>
       )}
     </div>

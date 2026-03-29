@@ -10,6 +10,7 @@ interface FeedSectionProps {
   feedType: DiscoveryFeedType;
   items?: DiscoveryFeedItem[];
   isLoading?: boolean;
+  isError?: boolean;
 }
 
 const feedStyles: Record<DiscoveryFeedType, string> = {
@@ -40,8 +41,26 @@ const subtitles: Record<DiscoveryFeedType, string> = {
   category: "Products in this category",
 };
 
-const FeedSection = ({ feedType, items, isLoading }: FeedSectionProps) => {
+const FeedSection = ({ feedType, items, isLoading, isError }: FeedSectionProps) => {
   // Loading skeleton (prevents blank UI)
+  if (isError) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="rounded-xl overflow-hidden bg-muted/20">
+          <div className={`px-4 sm:px-6 py-3 ${feedStyles[feedType]}`}>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2 min-w-0">
+                <h2 className="text-lg font-semibold tracking-tight">{feedTitle[feedType]}</h2>
+                <span className="text-xs opacity-80 whitespace-nowrap">Failed to load</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+
   if (isLoading) {
     return (
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

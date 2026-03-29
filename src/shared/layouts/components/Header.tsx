@@ -103,6 +103,7 @@ export const Header = ({
         pathname={pathname}
         onClose={onMenuClose}
         catalogCategories={catalogCategories}
+        isAdmin={isAdmin}
       />
     </header>
   );

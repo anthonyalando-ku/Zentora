@@ -40,7 +40,7 @@ const CategoryMarketplaceSection = ({
           <p className="text-sm text-muted-foreground mt-1">Explore departments and discover products faster</p>
         </div>
 
-        <Link to="/categories" className="text-sm font-medium text-primary hover:text-secondary transition">
+        <Link to="/products" className="text-sm font-medium text-primary hover:text-secondary transition">
           View all
         </Link>
       </div>
