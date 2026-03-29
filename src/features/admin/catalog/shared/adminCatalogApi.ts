@@ -24,6 +24,7 @@ export type AdminAttribute = {
   id: number;
   name: string;
   slug?: string | null;
+  is_variant_dimension?: boolean;
 };
 
 export type AdminAttributeValue = {
@@ -41,11 +42,11 @@ export const adminCatalogApi = {
     return data;
   },
   createCategory: async (body: { name: string; slug?: string; parent_id?: number }): Promise<AdminCategory> => {
-    const { data } = await http.post("/catalog/categories", body);
+    const { data } = await http.post("/admin/catalog/categories", body);
     return data;
   },
   deleteCategory: async (id: number): Promise<void> => {
-    const { data } = await http.delete(`/catalog/categories/${id}`);
+    const { data } = await http.delete(`/admin/catalog/categories/${id}`);
     return data;
   },
 
@@ -59,7 +60,7 @@ export const adminCatalogApi = {
     return data;
   },
   deleteBrand: async (id: number): Promise<void> => {
-    const { data } = await http.delete(`/catalog/brands/${id}`);
+    const { data } = await http.delete(`/admin/catalog/brands/${id}`);
     return data;
   },
 
@@ -69,11 +70,11 @@ export const adminCatalogApi = {
     return data;
   },
   createAttribute: async (body: { name: string; slug?: string }): Promise<AdminAttribute> => {
-    const { data } = await http.post("/catalog/attributes", body);
+    const { data } = await http.post("/admin/catalog/attributes", body);
     return data;
   },
   deleteAttribute: async (id: number): Promise<void> => {
-    const { data } = await http.delete(`/catalog/attributes/${id}`);
+    const { data } = await http.delete(`/admin/catalog/attributes/${id}`);
     return data;
   },
 
@@ -86,11 +87,11 @@ export const adminCatalogApi = {
     attributeId: number,
     body: { value: string; slug?: string; sort_order?: number }
   ): Promise<AdminAttributeValue> => {
-    const { data } = await http.post(`/catalog/attributes/${attributeId}/values`, body);
+    const { data } = await http.post(`/admin/catalog/attributes/${attributeId}/values`, body);
     return data;
   },
   deleteAttributeValue: async (id: number): Promise<void> => {
-    const { data } = await http.delete(`/catalog/attribute-values/${id}`);
+    const { data } = await http.delete(`/admin/catalog/attribute-values/${id}`);
     return data;
   },
 };

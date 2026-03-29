@@ -80,23 +80,23 @@ export const adminInventoryApi = {
     reserved_qty: number;
     incoming_qty: number;
   }): Promise<VariantInventoryRow> => {
-    const { data } = await http.post("/admin/catalog/inventory/items", body);
+    const { data } = await http.put("/admin/catalog/inventory/items", body);
     return data;
   },
 
   // Stock operations
   adjustStock: async (variantId: number, locationId: number, body: { delta: number }): Promise<any> => {
-    const { data } = await http.post(`/admin/catalog/inventory/${variantId}/${locationId}/adjust`, body);
+    const { data } = await http.put(`/admin/catalog/inventory/${variantId}/${locationId}/adjust`, body);
     return data;
   },
 
   reserveStock: async (variantId: number, locationId: number, qty: number): Promise<any> => {
-    const { data } = await http.post(`/admin/catalog/inventory/variants/${variantId}/locations/${locationId}/reserve?qty=${encodeURIComponent(String(qty))}`, {});
+    const { data } = await http.put(`/admin/catalog/inventory/variants/${variantId}/locations/${locationId}/reserve?qty=${encodeURIComponent(String(qty))}`, {});
     return data;
   },
 
   releaseStock: async (variantId: number, locationId: number, qty: number): Promise<any> => {
-    const { data } = await http.post(`/admin/catalog/inventory/variants/${variantId}/locations/${locationId}/release?qty=${encodeURIComponent(String(qty))}`, {});
+    const { data } = await http.put(`/admin/catalog/inventory/variants/${variantId}/locations/${locationId}/release?qty=${encodeURIComponent(String(qty))}`, {});
     return data;
   },
 
