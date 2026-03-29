@@ -7,37 +7,12 @@ import {
   useAdminDashboardPendingOrders,
   useAdminDashboardUserStats,
 } from "@/features/admin/dashboard/hooks/useAdminDashboard";
-
-const StatCard = ({
-  label,
-  value,
-  helper,
-}: {
-  label: string;
-  value: React.ReactNode;
-  helper?: React.ReactNode;
-}) => (
-  <div className="rounded-2xl border border-border bg-background shadow-sm p-4">
-    <div className="text-xs text-foreground/50">{label}</div>
-    <div className="mt-1 text-xl font-bold">{value}</div>
-    {helper ? <div className="mt-1 text-xs text-foreground/50">{helper}</div> : null}
-  </div>
-);
-
-const StatusPill = ({ status }: { status: string }) => {
-  const cls =
-    status === "pending"
-      ? "border-amber-500/20 bg-amber-500/10 text-amber-700"
-      : status === "shipped"
-        ? "border-blue-500/20 bg-blue-500/10 text-blue-700"
-        : status === "delivered"
-          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700"
-          : status === "completed"
-            ? "border-primary/20 bg-primary/10 text-primary"
-            : "border-destructive/20 bg-destructive/10 text-destructive";
-
-  return <span className={`inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-semibold ${cls}`}>{status}</span>;
-};
+import { AdminTable, AdminTableHead, AdminTh, AdminTd, AdminTr } from "@/features/admin/shared/components/AdminTable";
+import StatCard from "@/features/admin/dashboard/components/StatCard";
+import { IconBag, IconMoney, IconUsers } from "@/features/admin/dashboard/components/Icons";
+import StatusPill from "@/features/admin/dashboard/components/StatusPil";
+import TableSkeleton from "@/features/admin/dashboard/components/TableSkeleton";
+import EmptyState from "@/features/admin/dashboard/components/EmptySate";
 
 export default function AdminDashboardPage() {
   const userStatsQ = useAdminDashboardUserStats();
@@ -48,7 +23,6 @@ export default function AdminDashboardPage() {
   const pendingQ = useAdminDashboardPendingOrders(pendingLimit, pendingOffset);
 
   const pendingOrders = pendingQ.data?.orders ?? [];
-  console.log("pendingOrders", pendingOrders);
 
   const updatedAt = useMemo(() => {
     const u = orderStatsQ.data?.updated_at;
@@ -67,16 +41,16 @@ export default function AdminDashboardPage() {
         subtitle="Operational overview for orders, revenue, and users."
         breadcrumbs={[{ label: "Admin", href: "/admin" }]}
         action={
-          <div className="inline-flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <Link
               to="/admin/orders"
-              className="h-10 px-4 rounded-xl border border-border hover:bg-secondary/10 text-sm font-semibold inline-flex items-center"
+              className="h-10 px-4 rounded-xl border border-border hover:bg-secondary/10 text-sm font-semibold inline-flex items-center justify-center"
             >
               View orders
             </Link>
             <Link
               to="/admin/products"
-              className="h-10 px-4 rounded-xl bg-primary text-white hover:opacity-90 text-sm font-semibold inline-flex items-center"
+              className="h-10 px-4 rounded-xl bg-primary text-white hover:opacity-90 text-sm font-semibold inline-flex items-center justify-center"
             >
               Manage products
             </Link>
@@ -84,17 +58,41 @@ export default function AdminDashboardPage() {
         }
       />
 
-      {/* Primary KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard label="Revenue (today)" value={orderStatsQ.data ? orderStatsQ.data.revenue_today : "—"} helper={updatedAt ? `Updated: ${updatedAt}` : undefined} />
-        <StatCard label="Revenue (7 days)" value={orderStatsQ.data ? orderStatsQ.data.revenue_7_days : "—"} helper={orderStatsQ.data ? `${orderStatsQ.data.orders_7_days} orders` : undefined} />
-        <StatCard label="Pending orders" value={orderStatsQ.data ? orderStatsQ.data.pending_orders : "—"} helper="Needs attention" />
-        <StatCard label="Total users" value={userStatsQ.data ? userStatsQ.data.total_users : "—"} helper={userStatsQ.data ? `${userStatsQ.data.active_users} active` : undefined} />
+      {/* KPIs: 1 col mobile / 2 tablet / 4 desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <StatCard
+          label="Revenue (today)"
+          value={orderStatsQ.data ? orderStatsQ.data.revenue_today : "—"}
+          helper={updatedAt ? `Updated: ${updatedAt}` : "—"}
+          icon={<IconMoney />}
+          tone="info"
+        />
+        <StatCard
+          label="Revenue (last 7 days)"
+          value={orderStatsQ.data ? orderStatsQ.data.revenue_7_days : "—"}
+          helper={orderStatsQ.data ? `${orderStatsQ.data.orders_7_days} orders` : "—"}
+          icon={<IconMoney />}
+          tone="default"
+        />
+        <StatCard
+          label="Pending orders"
+          value={orderStatsQ.data ? orderStatsQ.data.pending_orders : "—"}
+          helper="Needs attention"
+          icon={<IconBag />}
+          tone="warning"
+        />
+        <StatCard
+          label="Total users"
+          value={userStatsQ.data ? userStatsQ.data.total_users : "—"}
+          helper={userStatsQ.data ? `${userStatsQ.data.active_users} active` : "—"}
+          icon={<IconUsers />}
+          tone="success"
+        />
       </div>
 
-      {/* Secondary stats */}
+      {/* Main layout: Pending orders (left) / panels (right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <div className="lg:col-span-7 space-y-4">
+        <div className="lg:col-span-7 space-y-4 min-w-0">
           <ProductHubSection
             title="Pending orders"
             description="Latest pending orders requiring fulfillment."
@@ -108,65 +106,88 @@ export default function AdminDashboardPage() {
             }
           >
             {pendingQ.isLoading ? (
-              <div className="text-sm text-foreground/60">Loading pending orders…</div>
+              <TableSkeleton rows={6} />
             ) : pendingQ.isError ? (
               <div className="text-sm text-destructive">Failed to load pending orders.</div>
             ) : pendingOrders.length === 0 ? (
-              <div className="text-sm text-foreground/60">No pending orders.</div>
+              <EmptyState
+                title="No pending orders"
+                message="You’re all caught up. New pending orders will appear here for fulfillment."
+                action={
+                  <Link
+                    to="/admin/orders"
+                    className="h-10 px-4 rounded-xl border border-border hover:bg-secondary/10 text-sm font-semibold inline-flex items-center justify-center"
+                  >
+                    View all orders
+                  </Link>
+                }
+              />
             ) : (
-              <div className="overflow-x-auto">
+              <AdminTable>
                 <table className="min-w-[880px] w-full">
-                  <thead className="bg-secondary/5">
-                    <tr className="text-left">
-                      <th className="px-4 py-3 text-xs font-semibold text-foreground/60">Order</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-foreground/60">Customer</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-foreground/60">Status</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-foreground/60">Total</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-foreground/60">Created</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-foreground/60 text-right">Actions</th>
+                  <AdminTableHead>
+                    <tr>
+                      <AdminTh>Order</AdminTh>
+                      <AdminTh>Customer</AdminTh>
+                      <AdminTh>Status</AdminTh>
+                      <AdminTh>Total</AdminTh>
+                      <AdminTh>Created</AdminTh>
+                      <AdminTh className="text-right">Actions</AdminTh>
                     </tr>
-                  </thead>
+                  </AdminTableHead>
+
                   <tbody>
                     {pendingOrders.map((o) => (
-                      <tr key={o.ID} className="border-t border-border hover:bg-secondary/5 transition-colors">
-                        <td className="px-4 py-3">
-                          <div className="text-sm font-semibold">{o.OrderNumber}</div>
+                      <AdminTr key={o.ID}>
+                        <AdminTd>
+                          <div className="text-sm font-semibold text-foreground">{o.OrderNumber}</div>
                           <div className="text-xs text-foreground/50">#{o.ID}</div>
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          <div className="font-medium text-foreground/80">{o.Shipping?.full_name ?? "-"}</div>
+                        </AdminTd>
+
+                        <AdminTd>
+                          <div className="font-medium text-foreground/85">{o.Shipping?.full_name ?? "-"}</div>
                           <div className="text-xs text-foreground/50">{o.Shipping?.phone ?? "-"}</div>
-                        </td>
-                        <td className="px-4 py-3 text-sm">
+                        </AdminTd>
+
+                        <AdminTd>
                           <StatusPill status={o.Status} />
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          {o.TotalAmount} <span className="text-xs text-foreground/50">{o.Currency}</span>
-                        </td>
-                        <td className="px-4 py-3 text-sm">{new Date(o.CreatedAt).toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right">
+                        </AdminTd>
+
+                        <AdminTd>
+                          <span className="font-semibold">{o.TotalAmount}</span>{" "}
+                          <span className="text-xs text-foreground/50">{o.Currency}</span>
+                        </AdminTd>
+
+                        <AdminTd className="text-foreground/80">
+                          {new Date(o.CreatedAt).toLocaleString()}
+                        </AdminTd>
+
+                        <AdminTd className="text-right">
                           <Link
                             to={`/admin/orders/${o.ID}`}
-                            className="h-9 px-3 rounded-xl border border-border hover:bg-secondary/10 transition text-xs font-semibold inline-flex items-center"
+                            className="h-9 px-3 rounded-xl border border-border hover:bg-secondary/10 transition text-xs font-semibold inline-flex items-center justify-center"
                           >
                             View
                           </Link>
-                        </td>
-                      </tr>
+                        </AdminTd>
+                      </AdminTr>
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </AdminTable>
             )}
 
             {/* pagination */}
-            <div className="mt-4 flex items-center justify-between">
-              <div className="text-xs text-foreground/50">Offset: {pendingOffset}</div>
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="text-xs text-foreground/50">
+                Showing offset <span className="font-medium text-foreground">{pendingOffset}</span>
+              </div>
+
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   className="h-9 px-3 rounded-xl border border-border hover:bg-secondary/10 text-xs font-semibold disabled:opacity-50"
-                  disabled={pendingOffset <= 0}
+                  disabled={pendingOffset <= 0 || pendingQ.isLoading}
                   onClick={() => setPendingOffset((v) => Math.max(0, v - pendingLimit))}
                 >
                   Prev
@@ -174,7 +195,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   className="h-9 px-3 rounded-xl border border-border hover:bg-secondary/10 text-xs font-semibold disabled:opacity-50"
-                  disabled={pendingOrders.length < pendingLimit}
+                  disabled={pendingOrders.length < pendingLimit || pendingQ.isLoading}
                   onClick={() => setPendingOffset((v) => v + pendingLimit)}
                 >
                   Next
@@ -187,57 +208,49 @@ export default function AdminDashboardPage() {
         <div className="lg:col-span-5 space-y-4">
           <ProductHubSection title="Users" description="Account totals and admin footprint.">
             {userStatsQ.isLoading ? (
-              <div className="text-sm text-foreground/60">Loading user stats…</div>
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-4 w-full bg-foreground/10 rounded animate-pulse" />
+                ))}
+              </div>
             ) : userStatsQ.isError ? (
               <div className="text-sm text-destructive">Failed to load user stats.</div>
             ) : !userStatsQ.data ? (
               <div className="text-sm text-foreground/60">No data.</div>
             ) : (
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-foreground/50">Active</span>
-                  <span className="font-semibold">{userStatsQ.data.active_users}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-foreground/50">Pending verification</span>
-                  <span className="font-semibold">{userStatsQ.data.pending_verification_users}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-foreground/50">Suspended</span>
-                  <span className="font-semibold">{userStatsQ.data.suspended_users}</span>
-                </div>
-                <div className="flex items-center justify-between pt-2 border-t border-border">
-                  <span className="text-foreground/50">Admins</span>
-                  <span className="font-semibold">
-                    {userStatsQ.data.admin_users}{" "}
-                    <span className="text-xs text-foreground/50">(super: {userStatsQ.data.super_admin_users})</span>
-                  </span>
-                </div>
+              <div className="divide-y divide-border text-sm">
+                <Row label="Active users" value={userStatsQ.data.active_users} />
+                <Row label="Pending verification" value={userStatsQ.data.pending_verification_users} />
+                <Row label="Suspended users" value={userStatsQ.data.suspended_users} />
+                <Row
+                  label="Admins"
+                  value={
+                    <span className="font-semibold">
+                      {userStatsQ.data.admin_users}{" "}
+                      <span className="text-xs text-foreground/50">(super: {userStatsQ.data.super_admin_users})</span>
+                    </span>
+                  }
+                />
               </div>
             )}
           </ProductHubSection>
 
           <ProductHubSection title="Order health" description="Fast snapshot to triage issues.">
             {orderStatsQ.isLoading ? (
-              <div className="text-sm text-foreground/60">Loading order stats…</div>
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-4 w-full bg-foreground/10 rounded animate-pulse" />
+                ))}
+              </div>
             ) : orderStatsQ.isError ? (
               <div className="text-sm text-destructive">Failed to load order stats.</div>
             ) : !orderStatsQ.data ? (
               <div className="text-sm text-foreground/60">No data.</div>
             ) : (
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-foreground/50">Completed</span>
-                  <span className="font-semibold">{orderStatsQ.data.completed_orders}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-foreground/50">Cancelled</span>
-                  <span className="font-semibold">{orderStatsQ.data.cancelled_orders}</span>
-                </div>
-                <div className="flex items-center justify-between pt-2 border-t border-border">
-                  <span className="text-foreground/50">Orders (today)</span>
-                  <span className="font-semibold">{orderStatsQ.data.orders_today}</span>
-                </div>
+              <div className="divide-y divide-border text-sm">
+                <Row label="Completed orders" value={orderStatsQ.data.completed_orders} />
+                <Row label="Cancelled orders" value={orderStatsQ.data.cancelled_orders} />
+                <Row label="Orders (today)" value={orderStatsQ.data.orders_today} />
               </div>
             )}
           </ProductHubSection>
@@ -246,3 +259,11 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
+/* small helper row component */
+const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
+  <div className="flex items-center justify-between py-3">
+    <span className="text-foreground/55">{label}</span>
+    <span className="font-semibold text-foreground">{value}</span>
+  </div>
+);
