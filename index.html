@@ -2,11 +2,96 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="src/assets/zentora_logo_clear.png" />
+
+    <!-- Basic -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zentora</title>
+    <title>Zentora | Shop Appliances, Deals & Best Sellers in Kenya</title>
+    <meta
+      name="description"
+      content="Zentora is a modern marketplace in Kenya. Shop trending appliances, best sellers and deals with fast delivery, secure payments and easy returns."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0ea5e9" />
+
+    <!-- Canonical (homepage). For SPA routes, you can also set canonical with Helmet per page. -->
+    <link rel="canonical" href="https://zentorashop.co.ke/" />
+
+    <!-- Icons (place these in /public) -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Open Graph (Social Previews) -->
+    <meta property="og:site_name" content="Zentora" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Zentora | Shop Appliances, Deals & Best Sellers in Kenya" />
+    <meta
+      property="og:description"
+      content="Shop trending appliances, best sellers and deals on Zentora. Fast delivery, secure payments and easy returns."
+    />
+    <meta property="og:url" content="https://zentorashop.co.ke/" />
+    <meta property="og:image" content="https://zentorashop.co.ke/og-default.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zentora | Shop Appliances, Deals & Best Sellers in Kenya" />
+    <meta
+      name="twitter:description"
+      content="Shop trending appliances, best sellers and deals on Zentora. Fast delivery, secure payments and easy returns."
+    />
+    <meta name="twitter:image" content="https://zentorashop.co.ke/og-default.png" />
+
+    <!-- Optional: Preconnect to API/CDN (only if you use them) -->
+    <link rel="preconnect" href="https://zentora-api.onrender.com" crossorigin />
+
+    <!-- Structured data (Organization + Website). Helps Google show rich results. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Zentora",
+        "url": "https://zentorashop.co.ke/",
+        "logo": "https://zentorashop.co.ke/og-default.png",
+        "sameAs": []
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Zentora",
+        "url": "https://zentorashop.co.ke/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://zentorashop.co.ke/products?query={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
+
   <body>
+    <!-- Static crawlable links fallback (helps some crawlers & provides internal linking) -->
+    <noscript>
+      <div style="max-width: 900px; margin: 40px auto; font-family: Arial, sans-serif; line-height: 1.6;">
+        <h1>Zentora</h1>
+        <p>
+          Shop trending appliances, best sellers and deals in Kenya. Fast delivery, secure payments and easy returns.
+        </p>
+        <ul>
+          <li><a href="/products">Products</a></li>
+          <li><a href="/products?feed_type=trending">Trending</a></li>
+          <li><a href="/products?feed_type=best_sellers">Best Sellers</a></li>
+          <li><a href="/products?feed_type=new_arrivals">New Arrivals</a></li>
+          <li><a href="/help">Help Center</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="/about">About Us</a></li>
+        </ul>
+      </div>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

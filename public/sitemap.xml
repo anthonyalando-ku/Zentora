@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://zentorashop.co.ke/</loc></url>
+  <url><loc>https://zentorashop.co.ke/products</loc></url>
+  <url><loc>https://zentorashop.co.ke/products?feed_type=trending</loc></url>
+  <url><loc>https://zentorashop.co.ke/products?feed_type=best_sellers</loc></url>
+  <url><loc>https://zentorashop.co.ke/products?feed_type=deals</loc></url>
+  <url><loc>https://zentorashop.co.ke/products?feed_type=new_arrivals</loc></url>
+  <url><loc>https://zentorashop.co.ke/about</loc></url>
+  <url><loc>https://zentorashop.co.ke/contact</loc></url>
+  <url><loc>https://zentorashop.co.ke/help</loc></url>
+</urlset>
