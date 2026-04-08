@@ -1,6 +1,6 @@
 import { cn } from '@/shared/utils/cn';
 
-type BadgeVariant = 'new' | 'hot' | 'sale' | 'default';
+type BadgeVariant = 'new' | 'hot' | 'sale' | 'default' | 'featured';
 
 type BadgeProps = {
   variant?: BadgeVariant;
@@ -13,6 +13,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   hot: 'bg-secondary text-white',
   sale: 'bg-destructive text-white',
   default: 'bg-primary text-white',
+  featured: 'bg-yellow-500 text-white',
 };
 
 export const Badge = ({ variant = 'default', children, className }: BadgeProps) => (
