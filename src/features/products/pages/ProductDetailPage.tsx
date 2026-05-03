@@ -713,7 +713,7 @@ const ProductDetailPage = () => {
                       type="button"
                       onClick={() => setActiveTab(tab)}
                       className={cn(
-                        "flex-1 min-w-max px-5 py-3.5 text-xs font-semibold uppercase tracking-wider transition-colors capitalize whitespace-nowrap relative",
+                        "flex-1 min-w-max px-5 py-3.5 text-xs font-semibold tracking-wider transition-colors capitalize whitespace-nowrap relative",
                         activeTab === tab
                           ? "text-primary"
                           : "text-foreground/50 hover:text-foreground"

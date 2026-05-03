@@ -702,13 +702,13 @@ const ProductsPage = () => {
   const totalCount = isSearchMode ? searchItems.length : isFeedMode ? feedProductsAll.length : (catalogQuery.data?.total ?? 0);
 
   // Filter helpers
-  const setParam = (key: string, value: string | undefined) => {
-    const next = new URLSearchParams(searchParams);
-    if (value === undefined || value === "") next.delete(key);
-    else next.set(key, value);
-    if (key !== "page") next.set("page", "1");
-    setSearchParams(next);
-  };
+  // const setParam = (key: string, value: string | undefined) => {
+  //   const next = new URLSearchParams(searchParams);
+  //   if (value === undefined || value === "") next.delete(key);
+  //   else next.set(key, value);
+  //   if (key !== "page") next.set("page", "1");
+  //   setSearchParams(next);
+  // };
 
   const setPage = (nextPage: number) => {
     const next = new URLSearchParams(searchParams);
