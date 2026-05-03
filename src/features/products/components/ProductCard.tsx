@@ -40,14 +40,14 @@ export const ProductCard = ({
     : 0;
 
   return (
-    // ─── Orange gradient border wrapper ───────────────────────────────────────
+    // ─── Subtle 1px amber gradient border ─────────────────────────────────────
     <div
-      className={cn("p-[2px] rounded-[18px]", className)}
+      className={cn("p-px rounded-2xl", className)}
       style={{
-        background: "linear-gradient(135deg, #df7412 0%, #f5a94e 50%, #df7412 100%)",
+        background: "linear-gradient(135deg, #d4a84b 0%, #f0cb6a 50%, #c8973a 100%)",
       }}
     >
-      <div className="group relative bg-background rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+      <div className="group relative bg-background rounded-2xl overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full">
 
         {/* ─── Badges ─────────────────────────────────────────────────────── */}
         {product.badge && (
@@ -62,20 +62,6 @@ export const ProductCard = ({
           </div>
         )}
 
-        {/* ─── Wishlist — bottom-right corner of image ─────────────────────── */}
-        {showWishlist && (
-          <button
-            type="button"
-            aria-label="Add to wishlist"
-            title="Wishlist (coming soon)"
-            className="absolute bottom-[calc(100%-theme(spacing.9)-8px)] right-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border bg-background/95 backdrop-blur hover:bg-secondary/10 transition"
-            style={{ bottom: "auto", top: "auto" }}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-          >
-            <HeartIcon />
-          </button>
-        )}
-
         {/* ─── Product image ───────────────────────────────────────────────── */}
         <Link
           to={`/products/${product.slug}`}
@@ -86,13 +72,12 @@ export const ProductCard = ({
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          {/* Wishlist pinned to bottom-right of image */}
           {showWishlist && (
             <button
               type="button"
               aria-label="Add to wishlist"
               title="Wishlist (coming soon)"
-              className="absolute bottom-2 right-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full border border-border bg-background/95 backdrop-blur hover:bg-secondary/10 transition"
+              className="absolute bottom-2 right-2 z-10 inline-flex items-center justify-center w-7 h-7 rounded-full border border-border bg-background/90 backdrop-blur hover:bg-secondary/10 transition"
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
             >
               <HeartIcon />
@@ -101,7 +86,7 @@ export const ProductCard = ({
         </Link>
 
         {/* ─── Card body ───────────────────────────────────────────────────── */}
-        <div className="flex flex-col flex-1 p-3 sm:p-4">
+        <div className="flex flex-col flex-1 p-3 sm:p-3.5">
           <Link to={`/products/${product.slug}`}>
             <h3 className="font-medium text-sm text-foreground line-clamp-2 hover:text-primary transition-colors mb-1 leading-snug">
               {product.name}
@@ -121,7 +106,6 @@ export const ProductCard = ({
             )}
           </div>
 
-          {/* ─── CTA row — always 2 columns, stacks to 1 on very small screens ─ */}
           <div className="mt-auto grid grid-cols-2 gap-2 min-[360px]:grid-cols-2 max-[359px]:grid-cols-1">
             {!hideAddToCart && (
               <Link to={`/products/${product.slug}`} className="contents">

@@ -14,25 +14,19 @@ import type { DiscoveryFeedType, DiscoveryFeedItem } from "@/core/api/services/d
 import { useDiscoveryFeedPaged } from "@/features/discovery/hooks/useDiscoveryFeedPaged";
 import type { CatalogProductListItem } from "@/core/api/services/catalogProducts";
 
-// Stage 7: search mode + analytics
 import { useSearchResults } from "@/features/search/hooks/useSearchResults";
 import { useTrackSearchClick } from "@/features/search/hooks/useTrackSearchClick";
 import { getDiscoverySessionId } from "@/features/search/utils/session";
 import type { DiscoverySearchItem } from "@/core/api/services/discoverySearch";
 import { Seo } from "@/shared/seo/Seo";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating" | "newest";
 
-/**
- * Pagination configuration
- * - Controls how many products to request per page (catalog mode)
- * - Controls how many products to show per page (feed mode slice)
- *
- * You can make this responsive later (e.g. 24 mobile, 40 desktop).
- */
 const PAGE_SIZE = 40;
 const FEED_LIMIT = PAGE_SIZE;
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 const toNumberOrUndefined = (v: string | null) => {
   if (!v) return undefined;
   const n = Number(v);
@@ -44,86 +38,117 @@ const inventoryStatusToInStock = (s: string | undefined) => s === "in_stock" || 
 const mapDiscoveryItemToProduct = (item: DiscoveryFeedItem): Product => {
   const discount = Number(item.discount ?? 0);
   const originalPrice = discount > 0 ? item.price / (1 - discount / 100) : undefined;
-
   return {
-    id: String(item.product_id),
-    name: item.name,
-    slug: item.slug,
-    description: "",
-    price: item.price,
-    originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
-    discount: discount || undefined,
-    category: "electronics",
-    images: [],
+    id: String(item.product_id), name: item.name, slug: item.slug, description: "",
+    price: item.price, originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
+    discount: discount || undefined, category: "electronics", images: [],
     thumbnail: item.primary_image ?? "https://picsum.photos/seed/zentora-fallback/600/600",
-    rating: item.rating ?? 0,
-    reviewCount: item.review_count ?? 0,
-    inStock: inventoryStatusToInStock(item.inventory_status),
-    tags: [],
+    rating: item.rating ?? 0, reviewCount: item.review_count ?? 0,
+    inStock: inventoryStatusToInStock(item.inventory_status), tags: [],
   };
 };
 
 const mapCatalogItemToProduct = (p: CatalogProductListItem): Product => {
   const discount = p.discount ?? 0;
   const originalPrice = discount > 0 ? p.price / (1 - discount / 100) : undefined;
-
   return {
-    id: String(p.product_id),
-    name: p.name,
-    slug: p.slug,
-    description: "",
-    price: p.price,
-    originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
-    discount: discount || undefined,
-    category: "electronics",
-    images: [],
+    id: String(p.product_id), name: p.name, slug: p.slug, description: "",
+    price: p.price, originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
+    discount: discount || undefined, category: "electronics", images: [],
     thumbnail: p.primary_image ?? "https://picsum.photos/seed/zentora-fallback/600/600",
-    rating: p.rating ?? 0,
-    reviewCount: p.review_count ?? 0,
-    inStock: inventoryStatusToInStock(p.inventory_status),
-    tags: [],
+    rating: p.rating ?? 0, reviewCount: p.review_count ?? 0,
+    inStock: inventoryStatusToInStock(p.inventory_status), tags: [],
   };
 };
 
 const mapSearchItemToProduct = (item: DiscoverySearchItem): Product => {
   const discount = Number(item.discount ?? 0);
   const originalPrice = discount > 0 ? item.price / (1 - discount / 100) : undefined;
-
   return {
-    id: String(item.product_id),
-    name: item.name,
-    slug: item.slug,
-    description: "",
-    price: item.price,
-    originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
-    discount: discount || undefined,
-    category: "electronics",
-    images: [],
+    id: String(item.product_id), name: item.name, slug: item.slug, description: "",
+    price: item.price, originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
+    discount: discount || undefined, category: "electronics", images: [],
     thumbnail: item.primary_image ?? "https://picsum.photos/seed/zentora-fallback/600/600",
-    rating: item.rating ?? 0,
-    reviewCount: item.review_count ?? 0,
-    inStock: inventoryStatusToInStock(item.inventory_status),
-    tags: [],
+    rating: item.rating ?? 0, reviewCount: item.review_count ?? 0,
+    inStock: inventoryStatusToInStock(item.inventory_status), tags: [],
   };
 };
 
+// ─── Icons ────────────────────────────────────────────────────────────────────
+const FilterIcon = () => (
+  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
+  </svg>
+);
+
+const ChevronDownIcon = ({ className }: { className?: string }) => (
+  <svg className={cn("w-3.5 h-3.5", className)} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+  </svg>
+);
+
+const XIcon = ({ className }: { className?: string }) => (
+  <svg className={cn("w-3 h-3", className)} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+);
+
+const ChevronLeftIcon = () => (
+  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+);
+
+const ChevronRightIcon = () => (
+  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+  </svg>
+);
+
+// ─── FilterSection — collapsible group ───────────────────────────────────────
+const FilterSection = ({
+  title,
+  children,
+  defaultOpen = true,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        type="button"
+        className="w-full flex items-center justify-between py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground/50 hover:text-foreground transition-colors"
+        onClick={() => setOpen((o) => !o)}
+      >
+        {title}
+        <ChevronDownIcon className={cn("transition-transform duration-200", open ? "rotate-180" : "")} />
+      </button>
+      {open && <div className="pb-3">{children}</div>}
+    </div>
+  );
+};
+
+// ─── FilterSidebar ────────────────────────────────────────────────────────────
 type FilterSidebarProps = {
   disabled: boolean;
-
   categories: { id: string | number; name: string }[];
   brands: { id: string | number; name: string }[];
-
   selectedCategoryId: string | null;
   selectedBrandId: string | null;
-
   priceMin: number | null;
   priceMax: number | null;
-
   minRating: number | null;
-
   discountOnly: boolean;
   inStockOnly: boolean;
-
   onChange: (patch: {
     category_id?: string | null;
     brand_id?: string | null;
@@ -149,129 +174,112 @@ const FilterSidebar = ({
   onChange,
 }: FilterSidebarProps) => {
   return (
-    <div className={cn("space-y-5", disabled && "opacity-60 pointer-events-none")}>
-      {/* Category */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-sm text-foreground">Category</h3>
-          <span className="text-[11px] text-foreground/50">{categories.length}</span>
-        </div>
+    <div className={cn("divide-y divide-border", disabled && "opacity-50 pointer-events-none select-none")}>
 
-        <div className="max-h-60 overflow-y-auto pr-1 space-y-1">
+      {/* Category */}
+      <FilterSection title="Category">
+        <div className="space-y-0.5 max-h-52 overflow-y-auto pr-0.5 scrollbar-thin">
           <button
             className={cn(
-              "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
-              !selectedCategoryId ? "bg-primary/10 text-primary font-medium" : "hover:bg-secondary/10 text-foreground/70"
+              "w-full text-left text-sm px-2.5 py-1.5 rounded-lg transition-colors",
+              !selectedCategoryId
+                ? "bg-primary text-white font-medium"
+                : "hover:bg-muted text-foreground/70 hover:text-foreground"
             )}
             onClick={() => onChange({ category_id: null })}
             disabled={disabled}
           >
             All Categories
           </button>
-
           {categories.map((cat) => (
             <button
               key={String(cat.id)}
               className={cn(
-                "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
+                "w-full text-left text-sm px-2.5 py-1.5 rounded-lg transition-colors",
                 String(selectedCategoryId) === String(cat.id)
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-secondary/10 text-foreground/70"
+                  ? "bg-primary text-white font-medium"
+                  : "hover:bg-muted text-foreground/70 hover:text-foreground"
               )}
               onClick={() => onChange({ category_id: String(cat.id) })}
               disabled={disabled}
               title={cat.name}
             >
-              <span className="line-clamp-1">{cat.name}</span>
+              <span className="line-clamp-1 text-xs">{cat.name}</span>
             </button>
           ))}
         </div>
-      </div>
-
-      <div className="h-px bg-border" />
+      </FilterSection>
 
       {/* Brand */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-sm text-foreground">Brand</h3>
-          <span className="text-[11px] text-foreground/50">{brands.length}</span>
-        </div>
-
-        <div className="max-h-60 overflow-y-auto pr-1 space-y-1">
-          <button
-            className={cn(
-              "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
-              !selectedBrandId ? "bg-primary/10 text-primary font-medium" : "hover:bg-secondary/10 text-foreground/70"
-            )}
-            onClick={() => onChange({ brand_id: null })}
-            disabled={disabled}
-          >
-            All Brands
-          </button>
-
-          {brands.map((b) => (
+      {brands.length > 0 && (
+        <FilterSection title="Brand" defaultOpen={false}>
+          <div className="space-y-0.5 max-h-52 overflow-y-auto pr-0.5 scrollbar-thin">
             <button
-              key={String(b.id)}
               className={cn(
-                "w-full text-left text-sm px-3 py-2 rounded-lg transition-colors",
-                String(selectedBrandId) === String(b.id)
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-secondary/10 text-foreground/70"
+                "w-full text-left text-sm px-2.5 py-1.5 rounded-lg transition-colors",
+                !selectedBrandId
+                  ? "bg-primary text-white font-medium"
+                  : "hover:bg-muted text-foreground/70 hover:text-foreground"
               )}
-              onClick={() => onChange({ brand_id: String(b.id) })}
+              onClick={() => onChange({ brand_id: null })}
               disabled={disabled}
-              title={b.name}
             >
-              <span className="line-clamp-1">{b.name}</span>
+              All Brands
             </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="h-px bg-border" />
-
-      {/* Price */}
-      <div className="space-y-3">
-        <h3 className="font-semibold text-sm text-foreground">Price Range</h3>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1">
-            <label className="text-[11px] text-foreground/60">Min</label>
-            <input
-              type="number"
-              value={priceMin ?? ""}
-              onChange={(e) => onChange({ price_min: e.target.value ? String(e.target.value) : null })}
-              className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-              placeholder="0"
-              disabled={disabled}
-            />
+            {brands.map((b) => (
+              <button
+                key={String(b.id)}
+                className={cn(
+                  "w-full text-left text-sm px-2.5 py-1.5 rounded-lg transition-colors",
+                  String(selectedBrandId) === String(b.id)
+                    ? "bg-primary text-white font-medium"
+                    : "hover:bg-muted text-foreground/70 hover:text-foreground"
+                )}
+                onClick={() => onChange({ brand_id: String(b.id) })}
+                disabled={disabled}
+                title={b.name}
+              >
+                <span className="line-clamp-1 text-xs">{b.name}</span>
+              </button>
+            ))}
           </div>
+        </FilterSection>
+      )}
 
-          <div className="space-y-1">
-            <label className="text-[11px] text-foreground/60">Max</label>
-            <input
-              type="number"
-              value={priceMax ?? ""}
-              onChange={(e) => onChange({ price_max: e.target.value ? String(e.target.value) : null })}
-              className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-              placeholder="Any"
-              disabled={disabled}
-            />
-          </div>
+      {/* Price Range */}
+      <FilterSection title="Price (KSh)">
+        <div className="flex gap-2 items-center">
+          <input
+            type="number"
+            value={priceMin ?? ""}
+            onChange={(e) => onChange({ price_min: e.target.value || null })}
+            className="w-full text-xs border border-border rounded-lg px-2.5 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-foreground/30"
+            placeholder="Min"
+            disabled={disabled}
+          />
+          <span className="text-foreground/30 text-xs flex-shrink-0">–</span>
+          <input
+            type="number"
+            value={priceMax ?? ""}
+            onChange={(e) => onChange({ price_max: e.target.value || null })}
+            className="w-full text-xs border border-border rounded-lg px-2.5 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-foreground/30"
+            placeholder="Max"
+            disabled={disabled}
+          />
         </div>
-      </div>
-
-      <div className="h-px bg-border" />
+      </FilterSection>
 
       {/* Rating */}
-      <div className="space-y-3">
-        <h3 className="font-semibold text-sm text-foreground">Minimum Rating</h3>
-        <div className="space-y-1">
-          {[null, 3, 3.5, 4, 4.5].map((rating) => (
+      <FilterSection title="Min Rating">
+        <div className="space-y-0.5">
+          {([null, 4.5, 4, 3.5, 3] as (number | null)[]).map((rating) => (
             <button
               key={String(rating)}
               className={cn(
-                "w-full flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors",
-                (minRating ?? null) === rating ? "bg-primary/10 text-primary font-medium" : "hover:bg-secondary/10 text-foreground/70"
+                "w-full flex items-center gap-2 text-xs px-2.5 py-1.5 rounded-lg transition-colors",
+                (minRating ?? null) === rating
+                  ? "bg-primary text-white font-medium"
+                  : "hover:bg-muted text-foreground/70 hover:text-foreground"
               )}
               onClick={() => onChange({ min_rating: rating === null ? null : String(rating) })}
               disabled={disabled}
@@ -279,219 +287,158 @@ const FilterSidebar = ({
               {rating === null ? (
                 "Any Rating"
               ) : (
-                <>
-                  <span className="text-yellow-500">{"★".repeat(Math.floor(rating))}</span>
-                  <span className="text-foreground/70">& up</span>
-                </>
+                <span className="flex items-center gap-1">
+                  <span className="text-amber-400">{"★".repeat(Math.floor(rating))}</span>
+                  {rating % 1 !== 0 && <span className="text-amber-400/50">½</span>}
+                  <span className="text-current opacity-60">& up</span>
+                </span>
               )}
             </button>
           ))}
         </div>
-      </div>
+      </FilterSection>
 
-      <div className="h-px bg-border" />
+      {/* Toggles */}
+      <FilterSection title="Availability">
+        <div className="space-y-2 pt-0.5">
+          {[
+            { label: "Discount only", checked: discountOnly, key: "discount_only" as const },
+            { label: "In stock only", checked: inStockOnly, key: "in_stock_only" as const },
+          ].map(({ label, checked, key }) => (
+            <label
+              key={key}
+              className="flex items-center gap-2.5 cursor-pointer group"
+            >
+              <div
+                className={cn(
+                  "w-9 h-5 rounded-full relative transition-colors duration-200 flex-shrink-0",
+                  checked ? "bg-primary" : "bg-border"
+                )}
+                onClick={() => onChange({ [key]: !checked })}
+              >
+                <div className={cn(
+                  "absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all duration-200",
+                  checked ? "left-[18px]" : "left-0.5"
+                )} />
+              </div>
+              <span className="text-xs text-foreground/70 group-hover:text-foreground transition-colors">{label}</span>
+            </label>
+          ))}
+        </div>
+      </FilterSection>
 
-      {/* Other filters */}
-      <div className="space-y-2">
-        <h3 className="font-semibold text-sm text-foreground">Other Filters</h3>
-
-        <label className="flex items-center gap-2 text-sm text-foreground/70">
-          <input
-            type="checkbox"
-            checked={discountOnly}
-            onChange={(e) => onChange({ discount_only: e.target.checked })}
-            className="accent-primary"
-            disabled={disabled}
-          />
-          Discount only
-        </label>
-
-        <label className="flex items-center gap-2 text-sm text-foreground/70">
-          <input
-            type="checkbox"
-            checked={inStockOnly}
-            onChange={(e) => onChange({ in_stock_only: e.target.checked })}
-            className="accent-primary"
-            disabled={disabled}
-          />
-          In stock only
-        </label>
-      </div>
     </div>
   );
 };
 
-function ProductsPageHeader({
-  title,
-  subtitle,
-  isSearchMode,
-  onClearSearch,
-  onOpenFilters,
+// ─── Active filter chips ──────────────────────────────────────────────────────
+const ActiveFilters = ({
+  categories,
+  brands,
+  selectedCategoryId,
+  selectedBrandId,
+  priceMin,
+  priceMax,
+  minRating,
+  discountOnly,
+  inStockOnly,
+  onClear,
+  onRemove,
 }: {
-  title: string;
-  subtitle: string;
-  isSearchMode: boolean;
-  onClearSearch: () => void;
-  onOpenFilters: () => void;
-}) {
-  return (
-    <div className="border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <nav className="flex items-center gap-2 text-xs sm:text-sm text-foreground/50 mb-2">
-          <Link to="/" className="hover:text-primary transition-colors">
-            Home
-          </Link>
-          <span>/</span>
-          <span className="text-foreground">Products</span>
-        </nav>
+  categories: { id: string | number; name: string }[];
+  brands: { id: string | number; name: string }[];
+  selectedCategoryId: string | null;
+  selectedBrandId: string | null;
+  priceMin: number | null;
+  priceMax: number | null;
+  minRating: number | null;
+  discountOnly: boolean;
+  inStockOnly: boolean;
+  onClear: () => void;
+  onRemove: (key: string) => void;
+}) => {
+  const chips: { key: string; label: string }[] = [];
 
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">{title}</h1>
-            <p className="text-sm text-foreground/60 mt-1">{subtitle}</p>
+  const cat = categories.find((c) => String(c.id) === selectedCategoryId);
+  if (cat) chips.push({ key: "category_id", label: cat.name });
 
-            {isSearchMode && (
-              <button
-                className="mt-2 inline-flex items-center gap-2 text-sm text-primary hover:text-secondary transition-colors"
-                onClick={onClearSearch}
-              >
-                <span className="underline-offset-4 hover:underline">Clear search</span>
-                <span className="text-foreground/40">×</span>
-              </button>
-            )}
-          </div>
+  const brand = brands.find((b) => String(b.id) === selectedBrandId);
+  if (brand) chips.push({ key: "brand_id", label: brand.name });
 
-          <div className="flex items-center gap-2 sm:justify-end">
-            <button
-              className="lg:hidden inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-background shadow-sm text-sm font-medium hover:bg-secondary/10 transition-colors"
-              onClick={onOpenFilters}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 4a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 4a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z"
-                />
-              </svg>
-              Filters
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+  if (priceMin != null) chips.push({ key: "price_min", label: `From KSh ${priceMin.toLocaleString()}` });
+  if (priceMax != null) chips.push({ key: "price_max", label: `Up to KSh ${priceMax.toLocaleString()}` });
+  if (minRating != null) chips.push({ key: "min_rating", label: `${minRating}★ & up` });
+  if (discountOnly) chips.push({ key: "discount_only", label: "On sale" });
+  if (inStockOnly) chips.push({ key: "in_stock_only", label: "In stock" });
 
-function ProductsToolbar({
-  sortBy,
-  onSortChange,
-  disabled,
-  isLoading,
-  showingCount,
-}: {
-  sortBy: SortOption;
-  onSortChange: (v: SortOption) => void;
-  disabled: boolean;
-  isLoading: boolean;
-  showingCount: number;
-}) {
-  return (
-    <div className="p-4 sm:p-5 border-b border-border bg-background">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-foreground/60">Sort</span>
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="text-sm border border-border rounded-xl px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-            disabled={disabled}
-          >
-            <option value="featured">Featured</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="rating">Top Rated</option>
-            <option value="newest">Newest</option>
-          </select>
-        </div>
-
-        <div className="sm:ml-auto flex items-center justify-between sm:justify-end gap-3">
-          {!isLoading && (
-            <span className="text-xs text-foreground/50">
-              Showing <span className="font-medium text-foreground">{showingCount}</span> items
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ProductsGrid({
-  mode,
-  activeItems,
-  isSearchMode,
-  searchItems,
-  onSearchResultClick,
-}: {
-  mode: "empty" | "search" | "normal";
-  activeItems: Product[];
-  isSearchMode: boolean;
-  searchItems: DiscoverySearchItem[];
-  onSearchResultClick: (item: DiscoverySearchItem, position: number) => void;
-}) {
-  if (mode === "empty") {
-    return (
-      <div className="rounded-2xl border border-border bg-background shadow-sm p-10 sm:p-14 text-center">
-        <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">No products found</h3>
-        <p className="text-sm text-foreground/60 max-w-md mx-auto">
-          {isSearchMode ? "Try a different search term." : "Try adjusting your filters to broaden the results."}
-        </p>
-      </div>
-    );
-  }
-
-  if (mode === "search") {
-    return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
-        {searchItems.map((item, idx) => {
-          const product = mapSearchItemToProduct(item);
-          return (
-            <div
-              key={product.slug}
-              role="button"
-              tabIndex={0}
-              className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl"
-              onClick={() => onSearchResultClick(item, idx + 1)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") onSearchResultClick(item, idx + 1);
-              }}
-            >
-              <ProductCard product={product} hideAddToCart />
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
+  if (!chips.length) return null;
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
-      {activeItems.map((product) => (
-        <div key={product.slug} className="transform transition-all hover:-translate-y-1 hover:shadow-lg rounded-2xl">
-          <ProductCard product={product} hideAddToCart />
-        </div>
+    <div className="flex items-center gap-2 flex-wrap">
+      <span className="text-[11px] text-foreground/40 font-medium uppercase tracking-wider shrink-0">Active:</span>
+      {chips.map((chip) => (
+        <button
+          key={chip.key}
+          type="button"
+          onClick={() => onRemove(chip.key)}
+          className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors font-medium"
+        >
+          {chip.label}
+          <XIcon />
+        </button>
       ))}
+      <button
+        type="button"
+        onClick={onClear}
+        className="text-[11px] text-foreground/40 hover:text-destructive transition-colors underline underline-offset-2"
+      >
+        Clear all
+      </button>
     </div>
   );
-}
+};
 
-function ProductsPagination({
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+const ProductsGridSkeleton = ({ count = 20 }: { count?: number }) => (
+  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+    {Array.from({ length: count }).map((_, i) => (
+      <div key={i} className="rounded-xl border border-border bg-background overflow-hidden" aria-hidden="true">
+        <div className="aspect-square bg-foreground/6 animate-pulse" />
+        <div className="p-3 space-y-2">
+          <div className="h-3 w-4/5 bg-foreground/8 rounded animate-pulse" />
+          <div className="h-3 w-2/3 bg-foreground/8 rounded animate-pulse" />
+          <div className="h-4 w-1/2 bg-foreground/10 rounded animate-pulse" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// ─── Empty state ──────────────────────────────────────────────────────────────
+const EmptyState = ({ isSearchMode, onClearFilters }: { isSearchMode: boolean; onClearFilters: () => void }) => (
+  <div className="flex flex-col items-center justify-center py-20 text-center">
+    <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4 text-foreground/30">
+      <SearchIcon />
+    </div>
+    <h3 className="text-base font-semibold text-foreground mb-1">No products found</h3>
+    <p className="text-sm text-foreground/50 max-w-xs mb-5">
+      {isSearchMode
+        ? "Try a different search term or browse all products."
+        : "Try removing some filters to see more results."}
+    </p>
+    {!isSearchMode && (
+      <button
+        onClick={onClearFilters}
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary border border-primary/30 rounded-xl px-4 py-2 hover:bg-primary/5 transition-colors"
+      >
+        Clear all filters
+      </button>
+    )}
+  </div>
+);
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+const Pagination = ({
   page,
   totalPages,
   canNext,
@@ -505,55 +452,69 @@ function ProductsPagination({
   onPrev: () => void;
   onNext: () => void;
   onSetPage: (p: number) => void;
-}) {
+}) => {
   if (totalPages <= 1) return null;
 
+  // Build smart page window
+  const pages: (number | "…")[] = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (page > 3) pages.push("…");
+    for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
+    if (page < totalPages - 2) pages.push("…");
+    pages.push(totalPages);
+  }
+
   return (
-    <div className="p-4 sm:p-5 border-t border-border bg-background">
-      <div className="flex items-center justify-center gap-2">
-        <button
-          className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-          onClick={onPrev}
-          disabled={page === 1}
-          aria-label="Previous page"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+    <div className="flex items-center justify-center gap-1.5 py-5 border-t border-border">
+      <button
+        className="h-9 w-9 inline-flex items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors disabled:opacity-30 disabled:pointer-events-none"
+        onClick={onPrev}
+        disabled={page === 1}
+        aria-label="Previous page"
+      >
+        <ChevronLeftIcon />
+      </button>
 
-        {Array.from({ length: totalPages }).slice(0, 20).map((_, i) => (
+      {pages.map((p, i) =>
+        p === "…" ? (
+          <span key={`ellipsis-${i}`} className="w-9 text-center text-sm text-foreground/30">…</span>
+        ) : (
           <button
-            key={i}
+            key={p}
             className={cn(
-              "h-10 w-10 rounded-xl text-sm font-semibold transition-colors",
-              page === i + 1 ? "bg-primary text-white shadow-sm" : "border border-border hover:bg-secondary/10 text-foreground/80"
+              "h-9 w-9 rounded-lg text-sm font-semibold transition-colors",
+              page === p
+                ? "bg-primary text-white shadow-sm"
+                : "border border-border hover:bg-muted text-foreground/70 hover:text-foreground"
             )}
-            onClick={() => onSetPage(i + 1)}
-            aria-current={page === i + 1 ? "page" : undefined}
+            onClick={() => onSetPage(p as number)}
+            aria-current={page === p ? "page" : undefined}
           >
-            {i + 1}
+            {p}
           </button>
-        ))}
+        )
+      )}
 
-        <button
-          className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors disabled:opacity-50 disabled:pointer-events-none"
-          onClick={onNext}
-          disabled={!canNext}
-          aria-label="Next page"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
+      <button
+        className="h-9 w-9 inline-flex items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors disabled:opacity-30 disabled:pointer-events-none"
+        onClick={onNext}
+        disabled={!canNext}
+        aria-label="Next page"
+      >
+        <ChevronRightIcon />
+      </button>
     </div>
   );
-}
+};
 
-function MobileFiltersDrawer({
+// ─── Mobile Filters Drawer ────────────────────────────────────────────────────
+const MobileFiltersDrawer = ({
   open,
   onClose,
+  activeFilterCount,
   disabled,
   categories,
   brands,
@@ -565,9 +526,11 @@ function MobileFiltersDrawer({
   discountOnly,
   inStockOnly,
   onChange,
+  onClearAll,
 }: {
   open: boolean;
   onClose: () => void;
+  activeFilterCount: number;
   disabled: boolean;
   categories: { id: string | number; name: string }[];
   brands: { id: string | number; name: string }[];
@@ -579,30 +542,47 @@ function MobileFiltersDrawer({
   discountOnly: boolean;
   inStockOnly: boolean;
   onChange: FilterSidebarProps["onChange"];
-}) {
+  onClearAll: () => void;
+}) => {
   if (!open) return null;
 
   return (
     <div className="lg:hidden fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-foreground/30 backdrop-blur-[1px]" onClick={onClose} aria-hidden="true" />
-
-      <div className="absolute right-0 top-0 h-full w-[92%] max-w-sm bg-background border-l border-border shadow-xl">
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div>
-            <div className="text-sm font-semibold">Filters</div>
-            <div className="text-xs text-foreground/50">Refine your results</div>
+      <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div className="absolute left-0 top-0 h-full w-[85%] max-w-xs bg-background border-r border-border shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
+          <div className="flex items-center gap-2">
+            <FilterIcon />
+            <span className="text-sm font-semibold">Filters</span>
+            {activeFilterCount > 0 && (
+              <span className="text-[10px] font-bold bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
           </div>
-          <button
-            type="button"
-            className="h-9 w-9 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10"
-            onClick={onClose}
-            aria-label="Close filters"
-          >
-            <span className="text-lg leading-none">×</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                onClick={onClearAll}
+                className="text-xs text-destructive hover:underline"
+              >
+                Clear all
+              </button>
+            )}
+            <button
+              type="button"
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors"
+              onClick={onClose}
+              aria-label="Close filters"
+            >
+              <XIcon className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-
-        <div className="p-4 overflow-auto h-[calc(100%-64px)]">
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-4 py-2">
           <FilterSidebar
             disabled={disabled}
             categories={categories}
@@ -617,69 +597,48 @@ function MobileFiltersDrawer({
             onChange={onChange}
           />
         </div>
+        {/* Footer */}
+        <div className="p-4 border-t border-border">
+          <button
+            onClick={onClose}
+            className="w-full h-10 rounded-xl bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
+            View results
+          </button>
+        </div>
       </div>
     </div>
   );
-}
+};
 
-function ProductsGridSkeleton({ count = 12 }: { count?: number }) {
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden"
-          aria-hidden="true"
-        >
-          <div className="aspect-square bg-foreground/10 animate-pulse" />
-          <div className="p-4 space-y-3">
-            <div className="h-4 w-4/5 bg-foreground/10 rounded animate-pulse" />
-            <div className="h-4 w-2/3 bg-foreground/10 rounded animate-pulse" />
-            <div className="h-4 w-1/2 bg-foreground/10 rounded animate-pulse" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
+// ─── Page ─────────────────────────────────────────────────────────────────────
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [showFilters, setShowFilters] = useState(false);
 
-  // Stage 7: Search mode selection (query param)
   const queryTerm = (searchParams.get("query") ?? "").trim();
   const isSearchMode = queryTerm.length > 0;
 
-  // Feed mode selection (disabled when search mode)
   const feedType = (searchParams.get("feed_type") as DiscoveryFeedType | null) ?? null;
   const isFeedMode = !isSearchMode && Boolean(feedType);
 
-  // URL-synced params
   const page = Math.max(1, toNumberOrUndefined(searchParams.get("page")) ?? 1);
-
   const category_id = searchParams.get("category_id") ?? undefined;
   const brand_id = searchParams.get("brand_id") ?? undefined;
-
-  // Existing catalog query param (keep it)
   const q = searchParams.get("q") ?? undefined;
-
   const price_min = toNumberOrUndefined(searchParams.get("price_min"));
   const price_max = toNumberOrUndefined(searchParams.get("price_max"));
   const min_rating = toNumberOrUndefined(searchParams.get("min_rating"));
-
   const discount_only = searchParams.get("discount_only") === "true";
   const in_stock_only = searchParams.get("in_stock_only") === "true";
-
   const sortBy = (searchParams.get("sort") as SortOption | null) ?? "featured";
 
-  // Metadata for filters
+  // Data hooks
   const categoriesQuery = useCategories();
   const brandsQuery = useBrands();
-  useAttributes(); // fetched to comply with Stage 2 requirement; UI expansion later
+  useAttributes();
 
-  // Stage 7: Search results + analytics + click tracking
   const searchQuery = useSearchResults(queryTerm, 20);
   const trackClick = useTrackSearchClick();
   const sessionId = useMemo(() => getDiscoverySessionId(), []);
@@ -691,122 +650,62 @@ const ProductsPage = () => {
     const searchEventId = searchQuery.data?.searchEventId;
     if (searchEventId) {
       try {
-        await trackClick.mutateAsync({
-          search_event_id: searchEventId,
-          product_id: item.product_id,
-          position,
-          session_id: sessionId,
-        });
-      } catch {
-        // ignore tracking failures
-      }
+        await trackClick.mutateAsync({ search_event_id: searchEventId, product_id: item.product_id, position, session_id: sessionId });
+      } catch { /* ignore */ }
     }
-
     navigate(`/products/${item.slug}`);
   };
 
-  // Feed mode query: simulate pagination by increasing limit
   const feedLimit = FEED_LIMIT + (page - 1) * FEED_LIMIT;
   const feedQuery = useDiscoveryFeedPaged((feedType ?? "trending") as DiscoveryFeedType, feedLimit);
-
   const feedProductsAll = useMemo(() => {
     if (!isFeedMode) return [];
-    const items = feedQuery.data?.items ?? [];
-    return items.map(mapDiscoveryItemToProduct);
+    return (feedQuery.data?.items ?? []).map(mapDiscoveryItemToProduct);
   }, [isFeedMode, feedQuery.data]);
 
   const feedPageItems = useMemo(() => {
     if (!isFeedMode) return [];
     const start = (page - 1) * PAGE_SIZE;
-    const end = page * PAGE_SIZE;
-    return feedProductsAll.slice(start, end);
+    return feedProductsAll.slice(start, start + PAGE_SIZE);
   }, [isFeedMode, feedProductsAll, page]);
 
   const feedHasMore = isFeedMode ? feedProductsAll.length >= page * PAGE_SIZE : false;
 
-  // Catalog mode query
   const catalogParams = useMemo(() => {
     if (isFeedMode || isSearchMode) return null;
-
-    const sort =
-      sortBy === "price-asc"
-        ? "price_asc"
-        : sortBy === "price-desc"
-          ? "price_desc"
-          : sortBy === "rating"
-            ? "rating_desc"
-            : sortBy === "newest"
-              ? "new_arrivals"
-              : undefined;
-
-    return {
-      page,
-      page_size: PAGE_SIZE,
-      sort,
-      category_id,
-      brand_id,
-      q,
-      price_min,
-      price_max,
-      min_rating,
-      discount_only: discount_only || undefined,
-      in_stock_only: in_stock_only || undefined,
-    };
-  }, [
-    isFeedMode,
-    isSearchMode,
-    page,
-    category_id,
-    brand_id,
-    q,
-    price_min,
-    price_max,
-    min_rating,
-    discount_only,
-    in_stock_only,
-    sortBy,
-  ]);
+    const sort = sortBy === "price-asc" ? "price_asc" : sortBy === "price-desc" ? "price_desc" : sortBy === "rating" ? "rating_desc" : sortBy === "newest" ? "new_arrivals" : undefined;
+    return { page, page_size: PAGE_SIZE, sort, category_id, brand_id, q, price_min, price_max, min_rating, discount_only: discount_only || undefined, in_stock_only: in_stock_only || undefined };
+  }, [isFeedMode, isSearchMode, page, category_id, brand_id, q, price_min, price_max, min_rating, discount_only, in_stock_only, sortBy]);
 
   const catalogQuery = useCatalogProducts(catalogParams ?? { page: 1, page_size: PAGE_SIZE });
-
   const catalogProducts = useMemo(() => {
     if (isFeedMode || isSearchMode) return [];
-    const items = catalogQuery.data?.items ?? [];
-    return items.map(mapCatalogItemToProduct);
+    return (catalogQuery.data?.items ?? []).map(mapCatalogItemToProduct);
   }, [isFeedMode, isSearchMode, catalogQuery.data]);
 
   const activeItems = isSearchMode ? searchProducts : isFeedMode ? feedPageItems : catalogProducts;
 
   const totalPages = useMemo(() => {
     if (isSearchMode) return 1;
-
-    if (isFeedMode) {
-      return Math.max(1, Math.ceil(feedProductsAll.length / PAGE_SIZE));
-    }
+    if (isFeedMode) return Math.max(1, Math.ceil(feedProductsAll.length / PAGE_SIZE));
     if (!catalogQuery.data) return 1;
     return Math.max(1, Math.ceil(catalogQuery.data.total / catalogQuery.data.size));
   }, [isSearchMode, isFeedMode, feedProductsAll.length, catalogQuery.data]);
 
-  const isLoading = isSearchMode ? (searchQuery.isLoading || searchQuery.isFetching)
-  : isFeedMode ? (feedQuery.isLoading || feedQuery.isFetching)
-  : (catalogQuery.isLoading || catalogQuery.isFetching);
+  const isLoading = isSearchMode
+    ? searchQuery.isLoading || searchQuery.isFetching
+    : isFeedMode
+    ? feedQuery.isLoading || feedQuery.isFetching
+    : catalogQuery.isLoading || catalogQuery.isFetching;
 
-  const headerTitle = isSearchMode ? "Search results" : isFeedMode ? `${feedType?.replaceAll("_", " ")} products` : "All Products";
+  const isEmpty = !isLoading && activeItems.length === 0;
+  const totalCount = isSearchMode ? searchItems.length : isFeedMode ? feedProductsAll.length : (catalogQuery.data?.total ?? 0);
 
-  const headerSubtitle = isLoading
-    ? "Loading products…"
-    : isSearchMode
-      ? `${searchItems.length} results for “${queryTerm}”`
-      : isFeedMode
-        ? `${feedProductsAll.length} products loaded`
-        : `${catalogQuery.data?.total ?? 0} products found`;
-
+  // Filter helpers
   const setParam = (key: string, value: string | undefined) => {
     const next = new URLSearchParams(searchParams);
-
     if (value === undefined || value === "") next.delete(key);
     else next.set(key, value);
-
     if (key !== "page") next.set("page", "1");
     setSearchParams(next);
   };
@@ -815,7 +714,44 @@ const ProductsPage = () => {
     const next = new URLSearchParams(searchParams);
     next.set("page", String(nextPage));
     setSearchParams(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const handleFilterChange: FilterSidebarProps["onChange"] = (patch) => {
+    const next = new URLSearchParams(searchParams);
+    const apply = (key: string, val: string | null | undefined) => {
+      if (val === undefined) return;
+      if (!val) next.delete(key);
+      else next.set(key, val);
+    };
+    apply("category_id", patch.category_id);
+    apply("brand_id", patch.brand_id);
+    apply("price_min", patch.price_min);
+    apply("price_max", patch.price_max);
+    apply("min_rating", patch.min_rating);
+    if (patch.discount_only !== undefined) patch.discount_only ? next.set("discount_only", "true") : next.delete("discount_only");
+    if (patch.in_stock_only !== undefined) patch.in_stock_only ? next.set("in_stock_only", "true") : next.delete("in_stock_only");
+    next.set("page", "1");
+    setSearchParams(next);
+  };
+
+  const clearAllFilters = () => {
+    const next = new URLSearchParams();
+    next.set("page", "1");
+    setSearchParams(next);
+  };
+
+  const removeFilter = (key: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.delete(key);
+    next.set("page", "1");
+    setSearchParams(next);
+  };
+
+  const activeFilterCount = [
+    category_id, brand_id, price_min, price_max, min_rating,
+    discount_only || undefined, in_stock_only || undefined,
+  ].filter(Boolean).length;
 
   useEffect(() => {
     if (!searchParams.get("page")) {
@@ -826,79 +762,162 @@ const ProductsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const isEmpty = !isLoading && activeItems.length === 0;
-
-
-    const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL ?? window.location.origin;
-
-  // canonical should include query params because this page is driven by them
+  // SEO
+  const siteUrl = import.meta.env.VITE_PUBLIC_SITE_URL ?? window.location.origin;
   const canonicalUrl = `${siteUrl}/products${window.location.search}`;
+  const seoTitle = isSearchMode ? `Search: ${queryTerm} | Zentora` : isFeedMode && feedType ? `${feedType.replaceAll("_", " ")} Products | Zentora` : "Products | Zentora";
+  const seoDescription = isSearchMode ? `Browse search results for "${queryTerm}" on Zentora.` : isFeedMode && feedType ? `Browse ${feedType.replaceAll("_", " ")} products on Zentora.` : "Browse products on Zentora. Filter by category, brand, price and rating.";
+  const shareImage = (activeItems[0]?.thumbnail?.startsWith("http") ? activeItems[0].thumbnail : undefined) ?? `${siteUrl}/public/zentora_logo_clear.png`;
 
-  const seoTitle = isSearchMode
-    ? `Search: ${queryTerm} | Zentora`
-    : isFeedMode && feedType
-      ? `${feedType.replaceAll("_", " ")} Products | Zentora`
-      : "Products | Zentora";
+  const categories = (categoriesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name }));
+  const brands = (brandsQuery.data ?? []).map((b) => ({ id: b.id, name: b.name }));
 
-  const seoDescription = isSearchMode
-    ? `Browse search results for "${queryTerm}" on Zentora.`
-    : isFeedMode && feedType
-      ? `Browse ${feedType.replaceAll("_", " ")} products on Zentora.`
-      : "Browse products on Zentora. Filter by category, brand, price and rating.";
-
-  // For a listing page, pick a stable share image (or the first product thumbnail if loaded).
-  const shareImage =
-    (activeItems[0]?.thumbnail && activeItems[0].thumbnail.startsWith("http") ? activeItems[0].thumbnail : undefined) ??
-    `${siteUrl}/public/zentora_logo_clear.png`;
-
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <MainLayout>
-      <Seo
-        title={seoTitle}
-        description={seoDescription}
-        canonicalUrl={canonicalUrl}
-        imageUrl={shareImage}
-        type="website"
-      />
-      <div className="bg-background">
-        <ProductsPageHeader
-          title={headerTitle}
-          subtitle={headerSubtitle}
-          isSearchMode={isSearchMode}
-          onClearSearch={() => {
-            const next = new URLSearchParams(searchParams);
-            next.delete("query");
-            next.set("page", "1");
-            setSearchParams(next);
-          }}
-          onOpenFilters={() => setShowFilters(true)}
-        />
+      <Seo title={seoTitle} description={seoDescription} canonicalUrl={canonicalUrl} imageUrl={shareImage} type="website" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
-            <aside className="hidden lg:block">
-              <div className="rounded-2xl border border-border bg-background shadow-sm">
-                <div className="p-5 border-b border-border">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-semibold tracking-wide text-foreground">Filters</h2>
-                    <span
-                      className={cn(
-                        "text-[11px] px-2 py-0.5 rounded-full border border-border text-foreground/60",
-                        (isFeedMode || isSearchMode) && "opacity-70"
-                      )}
-                      title={isFeedMode || isSearchMode ? "Filters disabled in feed/search mode" : "Filters enabled"}
+      <div className="bg-background">
+
+        {/* ── Compact page header ─────────────────────────────────────────── */}
+        <div className="border-b border-border bg-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4">
+            {/* Breadcrumb */}
+            <nav className="flex items-center gap-1.5 text-xs text-foreground/50 mb-2">
+              <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+              <span className="text-foreground/25">/</span>
+              <span className="text-foreground/80 font-medium">Products</span>
+            </nav>
+
+            {/* Title row + controls */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg font-bold text-foreground leading-tight truncate">
+                  {isSearchMode
+                    ? <>Results for <span className="text-primary">"{queryTerm}"</span></>
+                    : isFeedMode
+                    ? <span className="capitalize">{feedType?.replaceAll("_", " ")} Products</span>
+                    : "All Products"}
+                </h1>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-xs text-foreground/50">
+                    {isLoading ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded-full border border-foreground/30 border-t-transparent animate-spin inline-block" />
+                        Loading…
+                      </span>
+                    ) : (
+                      <><span className="font-semibold text-foreground">{totalCount.toLocaleString()}</span> {isSearchMode ? "results" : "products"}</>
+                    )}
+                  </p>
+                  {isSearchMode && (
+                    <button
+                      onClick={() => { const n = new URLSearchParams(searchParams); n.delete("query"); n.set("page","1"); setSearchParams(n); }}
+                      className="text-xs text-primary hover:underline inline-flex items-center gap-0.5"
                     >
-                      {isFeedMode || isSearchMode ? "Disabled" : "Enabled"}
+                      <XIcon /> Clear search
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Sort (desktop inline) + Filter button (mobile) */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Mobile filter trigger */}
+                <button
+                  className="lg:hidden inline-flex items-center gap-1.5 h-9 px-3 rounded-xl border border-border bg-background text-sm font-medium hover:bg-muted transition-colors relative"
+                  onClick={() => setShowFilters(true)}
+                >
+                  <FilterIcon />
+                  <span>Filter</span>
+                  {activeFilterCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 text-[9px] font-bold bg-primary text-white rounded-full flex items-center justify-center">
+                      {activeFilterCount}
                     </span>
+                  )}
+                </button>
+
+                {/* Sort dropdown — always visible */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-foreground/50 hidden sm:inline">Sort:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => { const n = new URLSearchParams(searchParams); n.set("sort", e.target.value); n.set("page","1"); setSearchParams(n); }}
+                    className="h-9 text-xs border border-border rounded-xl px-2.5 pr-7 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
+                    disabled={isFeedMode || isSearchMode}
+                  >
+                    <option value="featured">Featured</option>
+                    <option value="price-asc">Price: Low → High</option>
+                    <option value="price-desc">Price: High → Low</option>
+                    <option value="rating">Top Rated</option>
+                    <option value="newest">Newest</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Active filter chips */}
+            {activeFilterCount > 0 && !isFeedMode && !isSearchMode && (
+              <div className="mt-3 pt-3 border-t border-border">
+                <ActiveFilters
+                  categories={categories}
+                  brands={brands}
+                  selectedCategoryId={category_id ?? null}
+                  selectedBrandId={brand_id ?? null}
+                  priceMin={price_min ?? null}
+                  priceMax={price_max ?? null}
+                  minRating={min_rating ?? null}
+                  discountOnly={discount_only}
+                  inStockOnly={in_stock_only}
+                  onClear={clearAllFilters}
+                  onRemove={removeFilter}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── Body: [Sidebar] [Grid] ───────────────────────────────────────── */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+          <div className="flex gap-6">
+
+            {/* ── Filter sidebar (desktop, sticky) ─────────────────────────── */}
+            <aside className="hidden lg:block w-52 xl:w-56 shrink-0">
+              <div className="sticky top-20">
+                {/* Sidebar header */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-1.5">
+                    <FilterIcon />
+                    <span className="text-sm font-semibold text-foreground">Filters</span>
+                    {activeFilterCount > 0 && (
+                      <span className="text-[10px] font-bold bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center">
+                        {activeFilterCount}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs text-foreground/50 mt-1">Refine results by category, brand and more</p>
+                  {activeFilterCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={clearAllFilters}
+                      className="text-[11px] text-destructive hover:underline"
+                    >
+                      Clear all
+                    </button>
+                  )}
                 </div>
 
-                <div className="p-5">
+                {/* Disabled overlay for feed/search mode */}
+                {(isFeedMode || isSearchMode) && (
+                  <div className="mb-3 text-[11px] text-foreground/50 bg-muted rounded-lg px-3 py-2 text-center">
+                    Filters unavailable in {isSearchMode ? "search" : "feed"} mode
+                  </div>
+                )}
+
+                <div className="rounded-xl border border-border bg-background p-3 overflow-hidden">
                   <FilterSidebar
                     disabled={isFeedMode || isSearchMode}
-                    categories={(categoriesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name }))}
-                    brands={(brandsQuery.data ?? []).map((b) => ({ id: b.id, name: b.name }))}
+                    categories={categories}
+                    brands={brands}
                     selectedCategoryId={category_id ?? null}
                     selectedBrandId={brand_id ?? null}
                     priceMin={price_min ?? null}
@@ -906,119 +925,81 @@ const ProductsPage = () => {
                     minRating={min_rating ?? null}
                     discountOnly={discount_only}
                     inStockOnly={in_stock_only}
-                    onChange={(patch) => {
-                      if (patch.category_id !== undefined) setParam("category_id", patch.category_id ?? undefined);
-                      if (patch.brand_id !== undefined) setParam("brand_id", patch.brand_id ?? undefined);
-                      if (patch.price_min !== undefined) setParam("price_min", patch.price_min ?? undefined);
-                      if (patch.price_max !== undefined) setParam("price_max", patch.price_max ?? undefined);
-                      if (patch.min_rating !== undefined) setParam("min_rating", patch.min_rating ?? undefined);
-                      if (patch.discount_only !== undefined) setParam("discount_only", patch.discount_only ? "true" : undefined);
-                      if (patch.in_stock_only !== undefined) setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
-                    }}
+                    onChange={handleFilterChange}
                   />
                 </div>
               </div>
             </aside>
 
-            <section className="min-w-0">
-              <div className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
-                <ProductsToolbar
-                  sortBy={sortBy}
-                  disabled={isFeedMode || isSearchMode}
-                  isLoading={isLoading}
-                  showingCount={activeItems.length}
-                  onSortChange={(v) => {
-                    const next = new URLSearchParams(searchParams);
-                    next.set("sort", v);
-                    next.set("page", "1");
-                    setSearchParams(next);
-                  }}
-                />
-
-               
-                <div className="p-4 sm:p-6">
-                  {isLoading ? (
-                    <ProductsGridSkeleton count={12} />
-                  ) : isEmpty ? (
-                    <div className="space-y-6">
-                      <ProductsGrid
-                        mode="empty"
-                        activeItems={activeItems}
-                        isSearchMode={isSearchMode}
-                        searchItems={searchItems}
-                        onSearchResultClick={onSearchResultClick}
-                      />
-
-                      {!isFeedMode && !isSearchMode && (
-                        <div className="flex justify-center">
-                          <button
-                            className="inline-flex items-center justify-center gap-2 rounded-xl font-medium transition h-10 px-5 text-sm bg-primary text-white hover:opacity-90"
-                            onClick={() => setSearchParams(new URLSearchParams({ page: "1" }))}
-                          >
-                            Clear Filters
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ) : isSearchMode ? (
-                    <ProductsGrid
-                      mode="search"
-                      activeItems={activeItems}
-                      isSearchMode={isSearchMode}
-                      searchItems={searchItems}
-                      onSearchResultClick={onSearchResultClick}
-                    />
-                  ) : (
-                    <ProductsGrid
-                      mode="normal"
-                      activeItems={activeItems}
-                      isSearchMode={isSearchMode}
-                      searchItems={searchItems}
-                      onSearchResultClick={onSearchResultClick}
-                    />
-                  )}
-              
+            {/* ── Product grid ─────────────────────────────────────────────── */}
+            <section className="flex-1 min-w-0">
+              {isLoading ? (
+                <ProductsGridSkeleton count={20} />
+              ) : isEmpty ? (
+                <EmptyState isSearchMode={isSearchMode} onClearFilters={clearAllFilters} />
+              ) : isSearchMode ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                  {searchItems.map((item, idx) => {
+                    const product = mapSearchItemToProduct(item);
+                    return (
+                      <div
+                        key={product.slug}
+                        role="button"
+                        tabIndex={0}
+                        className="transition-transform hover:-translate-y-0.5 hover:shadow-md rounded-xl cursor-pointer"
+                        onClick={() => onSearchResultClick(item, idx + 1)}
+                        onKeyDown={(e) => { if (e.key === "Enter") onSearchResultClick(item, idx + 1); }}
+                      >
+                        <ProductCard product={product} hideAddToCart />
+                      </div>
+                    );
+                  })}
                 </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                  {activeItems.map((product) => (
+                    <div key={product.slug} className="transition-transform hover:-translate-y-0.5 hover:shadow-md rounded-xl">
+                      <ProductCard product={product} hideAddToCart />
+                    </div>
+                  ))}
+                </div>
+              )}
 
-                {!isSearchMode && (
-                  <ProductsPagination
-                    page={page}
-                    totalPages={totalPages}
-                    canNext={isFeedMode ? feedHasMore : page !== totalPages}
-                    onPrev={() => setPage(page - 1)}
-                    onNext={() => setPage(page + 1)}
-                    onSetPage={(p) => setPage(p)}
-                  />
-                )}
-              </div>
+              {/* Pagination */}
+              {!isSearchMode && !isEmpty && !isLoading && (
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  canNext={isFeedMode ? feedHasMore : page < totalPages}
+                  onPrev={() => setPage(page - 1)}
+                  onNext={() => setPage(page + 1)}
+                  onSetPage={setPage}
+                />
+              )}
             </section>
+
           </div>
         </div>
-
-        <MobileFiltersDrawer
-          open={showFilters}
-          onClose={() => setShowFilters(false)}
-          disabled={isFeedMode || isSearchMode}
-          categories={(categoriesQuery.data ?? []).map((c) => ({ id: c.id, name: c.name }))}
-          brands={(brandsQuery.data ?? []).map((b) => ({ id: b.id, name: b.name }))}
-          selectedCategoryId={category_id ?? null}
-          selectedBrandId={brand_id ?? null}
-          priceMin={price_min ?? null}
-          priceMax={price_max ?? null}
-          minRating={min_rating ?? null}
-          discountOnly={discount_only}
-          inStockOnly={in_stock_only}
-          onChange={(patch) => {
-            if (patch.category_id !== undefined) setParam("category_id", patch.category_id ?? undefined);
-            if (patch.brand_id !== undefined) setParam("brand_id", patch.brand_id ?? undefined);
-            if (patch.price_min !== undefined) setParam("price_min", patch.price_min ?? undefined);
-            if (patch.price_max !== undefined) setParam("price_max", patch.price_max ?? undefined);
-            if (patch.min_rating !== undefined) setParam("min_rating", patch.min_rating ?? undefined);
-            if (patch.discount_only !== undefined) setParam("discount_only", patch.discount_only ? "true" : undefined);
-            if (patch.in_stock_only !== undefined) setParam("in_stock_only", patch.in_stock_only ? "true" : undefined);
-          }}
-        />
       </div>
+
+      {/* Mobile filters drawer */}
+      <MobileFiltersDrawer
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+        activeFilterCount={activeFilterCount}
+        disabled={isFeedMode || isSearchMode}
+        categories={categories}
+        brands={brands}
+        selectedCategoryId={category_id ?? null}
+        selectedBrandId={brand_id ?? null}
+        priceMin={price_min ?? null}
+        priceMax={price_max ?? null}
+        minRating={min_rating ?? null}
+        discountOnly={discount_only}
+        inStockOnly={in_stock_only}
+        onChange={handleFilterChange}
+        onClearAll={clearAllFilters}
+      />
     </MainLayout>
   );
 };
