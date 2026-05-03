@@ -12,12 +12,17 @@ export const CreateAttributeForm = ({
   onSubmit: (values: CreateAttributeValues) => Promise<void> | void;
   isSubmitting: boolean;
 }) => {
-  const { register, handleSubmit, formState } = useForm<CreateAttributeValues>({
+  const { register, handleSubmit, formState, reset } = useForm<CreateAttributeValues>({
     defaultValues: { name: "", slug: "" },
   });
 
+  const handleSubmitAndReset = async (values: CreateAttributeValues) => {
+    await onSubmit(values);
+    reset();
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleSubmitAndReset)} className="space-y-4">
       <div>
         <label className="text-xs font-medium text-foreground/60">Name *</label>
         <input

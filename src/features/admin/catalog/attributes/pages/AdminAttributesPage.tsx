@@ -7,12 +7,18 @@ import { CreateAttributeForm } from "@/features/admin/catalog/attributes/compone
 
 const AdminAttributesPage = () => {
   const [open, setOpen] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
   const query = useAttributes();
   const create = useCreateAttribute();
   const del = useDeleteAttribute();
 
   const rows = useMemo(() => query.data ?? [], [query.data]);
+
+  const handleOpen = () => {
+    setFormKey((k) => k + 1); // force form to re-mount with clean state
+    setOpen(true);
+  };
 
   return (
     <div className="space-y-4">
@@ -27,7 +33,7 @@ const AdminAttributesPage = () => {
         action={
           <button
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={handleOpen}
             className="inline-flex items-center justify-center rounded-xl font-semibold transition h-10 px-4 text-sm bg-primary text-white hover:opacity-90"
           >
             New Attribute
@@ -45,7 +51,7 @@ const AdminAttributesPage = () => {
           <div className="text-sm text-foreground/60 mt-1">Create attributes to support product variants and filtering.</div>
           <button
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={handleOpen}
             className="mt-4 inline-flex items-center justify-center rounded-xl font-semibold transition h-10 px-4 text-sm bg-primary text-white hover:opacity-90"
           >
             Create Attribute
@@ -57,6 +63,7 @@ const AdminAttributesPage = () => {
 
       <AdminModal open={open} title="New Attribute" subtitle="Add an attribute like Size, Color, Material." onClose={() => setOpen(false)}>
         <CreateAttributeForm
+          key={formKey}
           isSubmitting={create.isPending}
           onSubmit={async (values) => {
             await create.mutateAsync({
