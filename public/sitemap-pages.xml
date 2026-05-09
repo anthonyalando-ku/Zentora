@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Static pages sitemap — zentorashop.co.ke
+  Update lastmod whenever a page's content changes significantly.
+-->
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://zentorashop.co.ke/</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Product catalog index -->
+  <url>
+    <loc>https://zentorashop.co.ke/products</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- About -->
+  <url>
+    <loc>https://zentorashop.co.ke/about</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Contact -->
+  <url>
+    <loc>https://zentorashop.co.ke/contact</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Help Center -->
+  <url>
+    <loc>https://zentorashop.co.ke/help</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Return & Refund Policy -->
+  <url>
+    <loc>https://zentorashop.co.ke/returns</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+</urlset>

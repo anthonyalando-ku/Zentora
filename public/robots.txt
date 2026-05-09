@@ -1,4 +1,70 @@
+# ============================================================
+# robots.txt — zentorashop.co.ke
+# ============================================================
+
+# ── All crawlers ─────────────────────────────────────────────
 User-agent: *
 Allow: /
 
-Sitemap: https://zentorashop.co.ke/sitemap.xml
+# Disallow pages that should never be indexed
+Disallow: /checkout
+Disallow: /account
+Disallow: /account/
+Disallow: /cart
+Disallow: /unauthorized
+Disallow: /admin
+Disallow: /admin/
+
+# Disallow query-param URLs that create duplicate content
+# (filter combinations, pagination, sort orders)
+Disallow: /products?page=
+Disallow: /products?sort=
+Disallow: /products?feed_type=
+Disallow: /products?discount_only=
+Disallow: /products?in_stock_only=
+
+# Allow clean product + category filter URLs (these ARE canonical)
+Allow: /products$
+Allow: /products?category_id=
+Allow: /products/
+
+# ── Googlebot-specific ────────────────────────────────────────
+User-agent: Googlebot
+Allow: /
+Disallow: /checkout
+Disallow: /account
+Disallow: /cart
+Disallow: /unauthorized
+Disallow: /admin
+Crawl-delay: 1
+
+# ── Google Image Bot ─────────────────────────────────────────
+User-agent: Googlebot-Image
+Allow: /
+
+# ── Bingbot ──────────────────────────────────────────────────
+User-agent: Bingbot
+Allow: /
+Disallow: /checkout
+Disallow: /account
+Disallow: /cart
+Crawl-delay: 2
+
+# ── Block AI scrapers that don't respect content ─────────────
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# ── Sitemaps ──────────────────────────────────────────────────
+Sitemap: https://zentorashop.co.ke/sitemap-index.xml

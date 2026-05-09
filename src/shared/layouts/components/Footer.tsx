@@ -199,6 +199,11 @@ export const Footer = ({ catalogCategories = [] }: FooterProps) => {
                   Returns & Refunds
                 </a>
               </li>
+              <li>
+                <Link to="/returns" className="text-xs text-foreground/60 hover:text-primary transition-colors">
+                  Returns Policy
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Category pages sitemap — zentorashop.co.ke
+  One URL per category using the canonical ?category_id=N filter.
+  These are the pages Google indexes when someone searches "Buy tablets Kenya" etc.
+  Regenerate whenever categories are added or renamed.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Electronics (id=1) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=1</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Mobile Devices (id=28) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=28</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Android Tablets (id=27) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=27</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tablets (id=30) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=30</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Smart Devices (id=29) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=29</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Power Banks (id=25) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=25</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Kitchen (id=12) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=12</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Home & Living (id=13) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=13</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Beauty & Personal Care (id=14) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=14</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Sports & Outdoors (id=15) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=15</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Fashion & Apparel (id=16) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=16</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Baby & Kids (id=17) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=17</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Health & Wellness (id=18) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=18</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Automotive (id=19) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=19</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Car Accessories (id=23) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=23</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Emergency Tools (id=24) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=24</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Air Compressors (id=26) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=26</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Books & Stationery (id=20) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=20</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Agriculture (id=31) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=31</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Tools (id=32) -->
+  <url>
+    <loc>https://zentorashop.co.ke/products?category_id=32</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

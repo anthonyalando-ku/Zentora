@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sitemap Index — zentorashop.co.ke
+  Points to individual sitemaps by content type.
+  Regenerate lastmod dates when you redeploy or run the product sitemap job.
+-->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Static pages (homepage, about, contact, help, returns) -->
+  <sitemap>
+    <loc>https://zentorashop.co.ke/sitemap-pages.xml</loc>
+    <lastmod>2026-05-09</lastmod>
+  </sitemap>
+
+  <!-- Category landing pages (/products?category_id=N) -->
+  <sitemap>
+    <loc>https://zentorashop.co.ke/sitemap-categories.xml</loc>
+    <lastmod>2026-05-09</lastmod>
+  </sitemap>
+
+  <!-- Individual product pages — generated dynamically by the API -->
+  <!-- Split into chunks of 1 000 URLs each (Google limit is 50 000 per file) -->
+  <sitemap>
+    <loc>https://zentora-api.onrender.com/sitemaps/products-1.xml</loc>
+    <lastmod>2026-05-09</lastmod>
+  </sitemap>
+  <!-- Add more product sitemap chunks here as your catalog grows:
+  <sitemap>
+    <loc>https://zentora-api.onrender.com/sitemaps/products-2.xml</loc>
+    <lastmod>2026-05-09</lastmod>
+  </sitemap>
+  -->
+
+</sitemapindex>
