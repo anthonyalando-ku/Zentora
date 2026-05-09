@@ -2,94 +2,202 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
-    <!-- Basic -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zentora | Home Appliances, Deals & Best Sellers in Kenya</title>
+
+    <!-- ── Primary SEO ───────────────────────────────────────────────────── -->
+    <title>Zentora | Electronics, Appliances &amp; Deals in Kenya</title>
     <meta
       name="description"
-      content="Zentora is a modern marketplace in Kenya. Shop trending appliances, best sellers and deals with fast delivery, secure payments and easy returns."
+      content="Shop electronics, tablets, power banks, home appliances and more at Zentora Kenya. Fast delivery in Nairobi, secure payments, easy 7-day returns."
     />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="theme-color" content="#0ea5e9" />
-
-    <!-- Canonical (homepage). For SPA routes, you can also set canonical with Helmet per page. -->
+    <meta name="author" content="Zentora" />
+    <meta name="keywords" content="electronics Kenya, tablets Nairobi, power banks Kenya, home appliances Kenya, online shopping Kenya" />
     <link rel="canonical" href="https://zentorashop.co.ke/" />
 
-    <!-- Icons (place these in /public) -->
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- ── Icons ─────────────────────────────────────────────────────────── -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Open Graph (Social Previews) -->
+    <!-- ── Open Graph ────────────────────────────────────────────────────── -->
     <meta property="og:site_name" content="Zentora" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Zentora | Home Appliances, Deals & Best Sellers in Kenya" />
+    <meta property="og:locale" content="en_KE" />
+    <meta property="og:title" content="Zentora | Electronics, Appliances &amp; Deals in Kenya" />
     <meta
       property="og:description"
-      content="Shop trending appliances, best sellers and deals on Zentora. Fast delivery, secure payments and easy returns."
+      content="Shop electronics, tablets, power banks and home appliances at Zentora Kenya. Fast Nairobi delivery, secure payments, easy returns."
     />
     <meta property="og:url" content="https://zentorashop.co.ke/" />
     <meta property="og:image" content="https://zentorashop.co.ke/og-default.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Zentora — Shop Electronics and Appliances in Kenya" />
 
-    <!-- Twitter -->
+    <!-- ── Twitter ───────────────────────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Zentora | Home Appliances, Deals & Best Sellers in Kenya" />
+    <meta name="twitter:site" content="@zentorashop" />
+    <meta name="twitter:title" content="Zentora | Electronics, Appliances &amp; Deals in Kenya" />
     <meta
       name="twitter:description"
-      content="Shop trending appliances, best sellers and deals on Zentora. Fast delivery, secure payments and easy returns."
+      content="Shop electronics, tablets, power banks and home appliances at Zentora Kenya. Fast Nairobi delivery, secure payments, easy returns."
     />
     <meta name="twitter:image" content="https://zentorashop.co.ke/og-default.png" />
+    <meta name="twitter:image:alt" content="Zentora Kenya" />
+
+    <!-- ── Google Search Console verification ────────────────────────────── -->
     <meta name="google-site-verification" content="ucBUSOiYGYH2ieu-AK8GCeZr4juDxyg3-nWsSfvPtRw" />
 
-    <!-- Optional: Preconnect to API/CDN (only if you use them) -->
+    <!-- ── Preconnect to speed up first request to API and image CDN ──────── -->
     <link rel="preconnect" href="https://zentora-api.onrender.com" crossorigin />
+    <link rel="preconnect" href="https://ik.imagekit.io" crossorigin />
+    <link rel="dns-prefetch" href="https://zentora-api.onrender.com" />
+    <link rel="dns-prefetch" href="https://ik.imagekit.io" />
 
-    <!-- Structured data (Organization + Website). Helps Google show rich results. -->
+    <!-- ══════════════════════════════════════════════════════════════════════
+         JSON-LD Structured Data
+         Three blocks:
+           1. Organization  — tells Google who you are
+           2. LocalBusiness — tells Google WHERE you are (critical for Kenya SEO)
+           3. WebSite       — enables the Search Box in Google results
+         ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- 1. Organization -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Zentora",
-        "url": "https://zentorashop.co.ke/",
-        "logo": "https://zentorashop.co.ke/og-default.png",
-        "sameAs": []
-      }
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Zentora",
+      "alternateName": "Zentora Shop",
+      "url": "https://zentorashop.co.ke/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://zentorashop.co.ke/og-default.png",
+        "width": 512,
+        "height": 512
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+254795974591",
+        "contactType": "customer service",
+        "areaServed": "KE",
+        "availableLanguage": "English"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Gabrone Plaza, 2nd Floor",
+        "addressLocality": "Nairobi CBD",
+        "addressRegion": "Nairobi",
+        "addressCountry": "KE"
+      },
+      "sameAs": []
+    }
     </script>
 
+    <!-- 2. LocalBusiness
+         This is the schema that powers Google Maps integration and
+         "near me" searches. Fill in your exact coordinates below.
+         Get them from: maps.google.com → right-click your location → copy coords -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Zentora",
-        "url": "https://zentorashop.co.ke/",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://zentorashop.co.ke/products?query={search_term_string}",
-          "query-input": "required name=search_term_string"
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "Zentora Shop",
+      "image": "https://zentorashop.co.ke/og-default.png",
+      "url": "https://zentorashop.co.ke/",
+      "telephone": "+254795974591",
+      "email": "ezekielmulongo254@gmail.com",
+      "priceRange": "KES",
+      "currenciesAccepted": "KES",
+      "paymentAccepted": "M-Pesa, Cash, Bank Transfer",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Gabrone Plaza, 2nd Floor",
+        "addressLocality": "Nairobi CBD",
+        "addressRegion": "Nairobi",
+        "postalCode": "00100",
+        "addressCountry": "KE"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -1.2841155,
+        "longitude": 36.8221420
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+          "opens": "09:00",
+          "closes": "18:00"
         }
-      }
+      ],
+      "hasMap": "https://maps.app.goo.gl/fyjBbr7LjKE1Lpoa6",
+      "sameAs": [
+        "https://maps.app.goo.gl/fyjBbr7LjKE1Lpoa6"
+      ]
+    }
     </script>
+
+    <!-- 3. WebSite — enables the Sitelinks Search Box in Google results.
+         When users search "zentora" on Google, a search box appears directly
+         in the results pointing to your /products?query= search. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Zentora",
+      "alternateName": "Zentora Shop Kenya",
+      "url": "https://zentorashop.co.ke/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://zentorashop.co.ke/products?query={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
   </head>
 
   <body>
-    <!-- Static crawlable links fallback (helps some crawlers & provides internal linking) -->
+    <!--
+      Noscript fallback — only shown to crawlers and browsers with JS disabled.
+      Use canonical product URLs only (no ?feed_type= params — those are
+      not indexable pages and create duplicate content signals).
+    -->
     <noscript>
-      <div style="max-width: 900px; margin: 40px auto; font-family: Arial, sans-serif; line-height: 1.6;">
-        <h1>Zentora</h1>
+      <div style="max-width:900px;margin:40px auto;font-family:Arial,sans-serif;line-height:1.8">
+        <h1>Zentora — Electronics &amp; Appliances in Kenya</h1>
         <p>
-          Shop trending appliances, best sellers and deals in Kenya. Fast delivery, secure payments and easy returns.
+          Shop electronics, tablets, power banks, home appliances and more.
+          Fast delivery in Nairobi, secure payments, easy 7-day returns.
         </p>
-        <ul>
-          <li><a href="/products">Products</a></li>
-          <li><a href="/products?feed_type=trending">Trending</a></li>
-          <li><a href="/products?feed_type=best_sellers">Best Sellers</a></li>
-          <li><a href="/products?feed_type=new_arrivals">New Arrivals</a></li>
-          <li><a href="/help">Help Center</a></li>
-          <li><a href="/contact">Contact Us</a></li>
-          <li><a href="/about">About Us</a></li>
-        </ul>
+        <nav aria-label="Main navigation">
+          <ul>
+            <li><a href="/products">All Products</a></li>
+            <li><a href="/products?category_id=1">Electronics</a></li>
+            <li><a href="/products?category_id=28">Mobile Devices</a></li>
+            <li><a href="/products?category_id=27">Tablets</a></li>
+            <li><a href="/products?category_id=25">Power Banks</a></li>
+            <li><a href="/products?category_id=12">Kitchen</a></li>
+            <li><a href="/products?category_id=13">Home &amp; Living</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/help">Help Center</a></li>
+            <li><a href="/returns">Return Policy</a></li>
+          </ul>
+        </nav>
+        <p>
+          <strong>Address:</strong> Gabrone Plaza, 2nd Floor, Nairobi CBD, Kenya<br />
+          <strong>Phone:</strong> +254 795 974 591<br />
+          <strong>Hours:</strong> Mon–Sat, 9:00am – 6:00pm
+        </p>
       </div>
     </noscript>
 
