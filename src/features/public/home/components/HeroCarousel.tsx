@@ -229,7 +229,7 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
             <button
               type="button"
               aria-label="Next slide"
-              onClick={next => goTo((index + 1) % slides.length, "next")}
+              onClick={() => goTo((index + 1) % slides.length, "next")}
               className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full border border-white/20 bg-black/20 text-white hover:bg-black/40 transition-colors backdrop-blur-sm flex items-center justify-center"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
