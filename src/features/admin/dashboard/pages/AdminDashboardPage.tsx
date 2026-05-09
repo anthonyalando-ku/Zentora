@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AdminPageHeader } from "@/features/admin/shared/components/AdminPageHeader";
-import { ProductHubSection } from "@/features/admin/products/components/hub/ProductHubSection";
+//import { ProductHubSection } from "@/features/admin/products/components/hub/ProductHubSection";
 import {
   useAdminDashboardOrderStats,
   useAdminDashboardPendingOrders,
