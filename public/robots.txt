@@ -67,4 +67,4 @@ User-agent: Claude-Web
 Disallow: /
 
 # ── Sitemaps ──────────────────────────────────────────────────
-Sitemap: https://zentorashop.co.ke/sitemap-index.xml
+Sitemap: https://zentorashop.co.ke/sitemaps/sitemap-index.xml

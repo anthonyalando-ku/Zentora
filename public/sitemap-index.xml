@@ -21,7 +21,7 @@
   <!-- Individual product pages — generated dynamically by the API -->
   <!-- Split into chunks of 1 000 URLs each (Google limit is 50 000 per file) -->
   <sitemap>
-    <loc>https://zentora-api.onrender.com/sitemaps/products-1.xml</loc>
+    <loc>https://zentorashop.co.ke/sitemaps/products-1.xml</loc>
     <lastmod>2026-05-09</lastmod>
   </sitemap>
   <!-- Add more product sitemap chunks here as your catalog grows:
