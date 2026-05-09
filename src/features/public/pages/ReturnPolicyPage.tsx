@@ -1,15 +1,72 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { MainLayout } from "@/shared/layouts";
 
-const EFFECTIVE_DATE = "1 May 2025";
-const WINDOW_DAYS = 7;
-const SUPPORT_EMAIL = "ezekielmulongo254@gmail.com";
-const SUPPORT_PHONE = "+254 795 974 591";
-const SHOP_NAME = "Zentora Shop";
+// ── Constants ─────────────────────────────────────────────────────────────────
+const EFFECTIVE_DATE    = "1 May 2025";
+const WINDOW_DAYS       = 7;
+const SUPPORT_EMAIL     = "ezekielmulongo254@gmail.com";
+const SUPPORT_PHONE     = "+254 795 974 591";
+const SUPPORT_PHONE_RAW = "+254795974591";
+const SHOP_NAME         = "Zentora Shop";
+const WHATSAPP          = `https://wa.me/${SUPPORT_PHONE_RAW.replace("+", "")}?text=${encodeURIComponent("Hi Zentora, I'd like to start a return for order #")}`;
 
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section className="rounded-2xl border border-border p-6 sm:p-7 space-y-3">
-    <h2 className="text-base font-semibold text-foreground">{title}</h2>
+// ── JSON-LD blocks ────────────────────────────────────────────────────────────
+
+// WebPage + BreadcrumbList
+const PAGE_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Return & Refund Policy — Zentora",
+  description: `Zentora accepts returns within ${WINDOW_DAYS} days of delivery on items in original condition. Refunds via M-Pesa, bank transfer, or store credit.`,
+  url: "https://zentorashop.co.ke/returns",
+  dateModified: "2025-05-01",
+  publisher: {
+    "@type": "Organization",
+    name: SHOP_NAME,
+    url: "https://zentorashop.co.ke/",
+  },
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",    item: "https://zentorashop.co.ke/" },
+      { "@type": "ListItem", position: 2, name: "Returns", item: "https://zentorashop.co.ke/returns" },
+    ],
+  },
+};
+
+// MerchantReturnPolicy — powers the return badge in Google Shopping results
+const MERCHANT_RETURN_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "MerchantReturnPolicy",
+  name: "Zentora 7-Day Return Policy",
+  url: "https://zentorashop.co.ke/returns",
+  applicableCountry: "KE",
+  returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+  merchantReturnDays: WINDOW_DAYS,
+  returnMethod: "https://schema.org/ReturnByMail",
+  returnFees: "https://schema.org/FreeReturn",
+  refundType: "https://schema.org/FullRefund",
+};
+
+// ── Primitives ────────────────────────────────────────────────────────────────
+const Section = ({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <section
+    id={id}
+    className="rounded-2xl border border-border p-6 sm:p-7 space-y-3"
+    aria-labelledby={`${id}-heading`}
+  >
+    <h2 id={`${id}-heading`} className="text-base font-semibold text-foreground">
+      {title}
+    </h2>
     <div className="text-sm text-foreground/70 space-y-2">{children}</div>
   </section>
 );
@@ -47,21 +104,72 @@ const Step = ({ n, title, desc }: { n: number; title: string; desc: string }) =>
   </div>
 );
 
+const WhatsAppIcon = () => (
+  <svg className="w-4 h-4" viewBox="0 0 32 32" fill="currentColor">
+    <path d="M19.11 17.59c-.27-.14-1.62-.8-1.87-.89-.25-.09-.44-.14-.62.14-.18.27-.71.89-.87 1.07-.16.18-.32.21-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.6-1.5-1.87-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.44.09-.18.05-.34-.02-.48-.07-.14-.62-1.5-.85-2.06-.22-.54-.45-.47-.62-.48l-.53-.01c-.18 0-.48.07-.73.34-.25.27-.96.94-.96 2.3s.98 2.68 1.12 2.87c.14.18 1.93 2.95 4.68 4.13.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.62-.66 1.85-1.3.23-.64.23-1.19.16-1.3-.07-.11-.25-.18-.52-.32Z" />
+    <path d="M16.03 3C8.86 3 3.03 8.82 3.03 15.99c0 2.28.6 4.5 1.74 6.46L3 29l6.73-1.76a12.9 12.9 0 006.3 1.62h.01c7.17 0 13-5.82 13-12.99C29.04 8.82 23.2 3 16.03 3Zm0 23.62h-.01a10.77 10.77 0 01-5.5-1.52l-.39-.23-3.99 1.04 1.06-3.89-.25-.4a10.8 10.8 0 01-1.65-5.71c0-5.95 4.84-10.79 10.79-10.79 2.88 0 5.58 1.12 7.61 3.16a10.72 10.72 0 013.15 7.62c0 5.95-4.84 10.79-10.82 10.79Z" />
+  </svg>
+);
+
+// ── Table of contents ─────────────────────────────────────────────────────────
+const TOC = [
+  { id: "eligibility",    label: "1. Return eligibility" },
+  { id: "how-to-return",  label: "2. How to start a return" },
+  { id: "refunds",        label: "3. Refunds" },
+  { id: "damaged",        label: "4. Damaged, defective, or wrong items" },
+  { id: "exchanges",      label: "5. Exchanges" },
+  { id: "non-returnable", label: "6. Non-returnable categories" },
+  { id: "notes",          label: "7. Important notes" },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const ReturnPolicyPage = () => {
   return (
     <MainLayout>
+
+      {/* ── SEO ── */}
+      <Helmet>
+        <title>Return &amp; Refund Policy | Zentora Kenya — 7-Day Returns</title>
+        <meta
+          name="description"
+          content="Zentora Kenya accepts returns within 7 days of delivery on items in original condition. Refunds via M-Pesa or bank transfer. Simple 5-step return process."
+        />
+        <link rel="canonical" href="https://zentorashop.co.ke/returns" />
+        <meta property="og:type"        content="website" />
+        <meta property="og:title"       content="Return & Refund Policy | Zentora Kenya — 7-Day Returns" />
+        <meta property="og:description" content="7-day return window. Refunds via M-Pesa or bank transfer. Damaged items covered at no charge. Learn how to start a return at Zentora." />
+        <meta property="og:url"         content="https://zentorashop.co.ke/returns" />
+        <meta property="og:image"       content="https://zentorashop.co.ke/og-default.png" />
+        <meta name="twitter:card"        content="summary_large_image" />
+        <meta name="twitter:title"       content="Return & Refund Policy | Zentora Kenya" />
+        <meta name="twitter:description" content="7-day returns. Refunds via M-Pesa or bank transfer. Damaged items replaced free of charge." />
+        <script type="application/ld+json">{JSON.stringify(PAGE_JSON_LD)}</script>
+        <script type="application/ld+json">{JSON.stringify(MERCHANT_RETURN_JSON_LD)}</script>
+      </Helmet>
+
       <div className="bg-background">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
 
-            {/* Header */}
-            <div className="px-5 sm:px-8 py-8 border-b border-border bg-secondary/5">
+            {/* ── Header ── */}
+            <header className="px-5 sm:px-8 py-8 border-b border-border bg-secondary/5">
+              {/* Breadcrumb */}
+              <nav
+                className="flex items-center gap-1.5 text-xs text-foreground/40 mb-4"
+                aria-label="Breadcrumb"
+              >
+                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                <span>/</span>
+                <span className="text-foreground/70">Return &amp; Refund Policy</span>
+              </nav>
+
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
-                    Return & Refund Policy
+                    Return &amp; Refund Policy
                   </h1>
-                  <p className="text-sm text-foreground/60 mt-2 max-w-2xl">
+                  <p className="text-sm text-foreground/60 mt-2 max-w-2xl leading-relaxed">
                     We want you to be completely satisfied with your purchase. If something isn't right,
                     we'll work with you to make it right — within the terms below.
                   </p>
@@ -85,28 +193,68 @@ const ReturnPolicyPage = () => {
                   </Link>
                 </div>
               </div>
-            </div>
+            </header>
 
             <div className="px-5 sm:px-8 py-8 space-y-6">
 
-              {/* At-a-glance summary cards */}
+              {/* ── At-a-glance ── */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Badge
-                  label={`${WINDOW_DAYS}-day return window`}
-                  sub="From the date you receive your order."
-                />
-                <Badge
-                  label="Original condition required"
-                  sub="Unused, undamaged, with original packaging."
-                />
-                <Badge
-                  label="Refund or exchange"
-                  sub="Your choice — store credit, replacement, or refund."
-                />
+                <Badge label={`${WINDOW_DAYS}-day return window`}   sub="From the date you receive your order." />
+                <Badge label="Original condition required"           sub="Unused, undamaged, with original packaging." />
+                <Badge label="Refund or exchange"                    sub="Your choice — store credit, replacement, or refund." />
               </div>
 
-              {/* 1. Eligibility */}
-              <Section title="1. Return eligibility">
+              {/* ── Quick-start CTA (new) ── */}
+              <div className="rounded-2xl border border-primary/15 bg-primary/4 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-foreground">Want to start a return right now?</div>
+                  <div className="text-sm text-foreground/60 mt-0.5">
+                    WhatsApp us your order number — it's the fastest way to get the process started.
+                  </div>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <a
+                    href={WHATSAPP}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="h-10 px-4 rounded-xl bg-[#25D366] text-white hover:opacity-90 transition text-sm font-semibold inline-flex items-center gap-2 justify-center"
+                  >
+                    <WhatsAppIcon />
+                    WhatsApp
+                  </a>
+                  <a
+                    href={`tel:${SUPPORT_PHONE_RAW}`}
+                    className="h-10 px-4 rounded-xl border border-border hover:bg-secondary/10 transition text-sm font-semibold inline-flex items-center justify-center"
+                  >
+                    Call us
+                  </a>
+                </div>
+              </div>
+
+              {/* ── Table of contents (new) ── */}
+              <nav
+                aria-label="Policy sections"
+                className="rounded-2xl border border-border p-5"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wider text-foreground/40 mb-3">
+                  In this policy
+                </p>
+                <ol className="space-y-1.5">
+                  {TOC.map(({ id, label }) => (
+                    <li key={id}>
+                      <a
+                        href={`#${id}`}
+                        className="text-sm text-foreground/65 hover:text-primary transition-colors hover:underline underline-offset-2"
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+
+              {/* ── Section 1 ── */}
+              <Section id="eligibility" title="1. Return eligibility">
                 <p>
                   You may return most items purchased from {SHOP_NAME} within{" "}
                   <strong>{WINDOW_DAYS} calendar days</strong> of the delivery date, provided the item
@@ -134,8 +282,8 @@ const ReturnPolicyPage = () => {
                 </ul>
               </Section>
 
-              {/* 2. How to return */}
-              <Section title="2. How to start a return">
+              {/* ── Section 2 ── */}
+              <Section id="how-to-return" title="2. How to start a return">
                 <p>Follow these steps to request a return or exchange:</p>
                 <div className="mt-4 space-y-4">
                   <Step
@@ -166,8 +314,8 @@ const ReturnPolicyPage = () => {
                 </div>
               </Section>
 
-              {/* 3. Refunds */}
-              <Section title="3. Refunds">
+              {/* ── Section 3 ── */}
+              <Section id="refunds" title="3. Refunds">
                 <p>
                   Approved refunds are issued using the original payment method where possible. Processing
                   times vary by method:
@@ -179,8 +327,8 @@ const ReturnPolicyPage = () => {
                   </div>
                   {[
                     ["M-Pesa / Mobile money", "1–3 business days"],
-                    ["Bank transfer", "3–5 business days"],
-                    ["Store credit", "Instant upon approval"],
+                    ["Bank transfer",         "3–5 business days"],
+                    ["Store credit",          "Instant upon approval"],
                   ].map(([method, time]) => (
                     <div
                       key={method}
@@ -202,8 +350,8 @@ const ReturnPolicyPage = () => {
                 </p>
               </Section>
 
-              {/* 4. Damaged or wrong items */}
-              <Section title="4. Damaged, defective, or wrong items">
+              {/* ── Section 4 ── */}
+              <Section id="damaged" title="4. Damaged, defective, or wrong items">
                 <p>
                   If your order arrives damaged, defective, or is not what you ordered, we will cover
                   all return shipping costs and offer you a full refund or replacement at no extra charge.
@@ -216,8 +364,8 @@ const ReturnPolicyPage = () => {
                 </ul>
               </Section>
 
-              {/* 5. Exchanges */}
-              <Section title="5. Exchanges">
+              {/* ── Section 5 ── */}
+              <Section id="exchanges" title="5. Exchanges">
                 <p>
                   We offer direct exchanges for the same product in a different size, colour, or variant.
                   If the desired variant is out of stock, we will issue a full refund or store credit.
@@ -229,8 +377,8 @@ const ReturnPolicyPage = () => {
                 </p>
               </Section>
 
-              {/* 6. Non-returnable categories */}
-              <Section title="6. Non-returnable product categories">
+              {/* ── Section 6 ── */}
+              <Section id="non-returnable" title="6. Non-returnable product categories">
                 <p>
                   The following categories are non-returnable due to health, safety, or digital delivery
                   reasons unless the item arrives defective or damaged:
@@ -244,8 +392,8 @@ const ReturnPolicyPage = () => {
                 </ul>
               </Section>
 
-              {/* 7. Policy notes */}
-              <Section title="7. Important notes">
+              {/* ── Section 7 ── */}
+              <Section id="notes" title="7. Important notes">
                 <p>
                   {SHOP_NAME} reserves the right to refuse a return that does not meet the eligibility
                   criteria above. If a return is declined, we will notify you with the reason and, where
@@ -266,7 +414,38 @@ const ReturnPolicyPage = () => {
                 </p>
               </Section>
 
-              {/* CTA footer */}
+              {/* ── Related links (new) ── */}
+              <section
+                aria-labelledby="related-heading"
+                className="rounded-2xl border border-border p-6 sm:p-7"
+              >
+                <h2
+                  id="related-heading"
+                  className="text-sm font-semibold text-foreground mb-4"
+                >
+                  Related policies &amp; support
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { label: "Help Center",     sub: "FAQs and step-by-step guides.",   to: "/help"     },
+                    { label: "Contact Support", sub: "Reach us by WhatsApp or phone.",  to: "/contact"  },
+                    { label: "All Products",    sub: "Continue shopping.",              to: "/products" },
+                  ].map(({ label, sub, to }) => (
+                    <Link
+                      key={label}
+                      to={to}
+                      className="rounded-xl border border-border p-4 hover:bg-secondary/5 hover:border-primary/20 transition-all group"
+                    >
+                      <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                        {label}
+                      </div>
+                      <div className="text-xs text-foreground/55 mt-1">{sub}</div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+
+              {/* ── CTA footer ── */}
               <div className="rounded-2xl border border-border p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <div className="text-sm font-semibold">Ready to start a return?</div>
