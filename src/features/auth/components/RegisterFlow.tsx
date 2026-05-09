@@ -14,41 +14,62 @@ export type RegisterData = {
   password?: string;
 };
 
-const StepIndicator = ({ step }: { step: number }) => {
-  return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between text-xs text-foreground/60">
-        <span className="font-medium">Step {step} of 3</span>
-        <span>{step === 1 ? "Email" : step === 2 ? "Verify OTP" : "Profile"}</span>
-      </div>
+const STEPS = [
+  { n: 1, label: "Email" },
+  { n: 2, label: "Verify" },
+  { n: 3, label: "Profile" },
+];
 
-      <div className="mt-3 flex items-center gap-2">
-        {[1, 2, 3].map((n) => (
-          <div
-            key={n}
-            className={[
-              "h-2 flex-1 rounded-full border border-border",
-              n <= step ? "bg-primary border-primary/30" : "bg-secondary/10",
-            ].join(" ")}
-            aria-hidden="true"
-          />
-        ))}
-      </div>
+const StepIndicator = ({ step }: { step: number }) => (
+  <div className="mb-8" aria-label={`Step ${step} of 3`}>
+    <div className="flex items-center gap-0">
+      {STEPS.map(({ n, label }, idx) => {
+        const done    = n < step;
+        const active  = n === step;
+        const isLast  = idx === STEPS.length - 1;
 
-      <div className="mt-3 flex items-center justify-center gap-2" aria-hidden="true">
-        {[1, 2, 3].map((n) => (
-          <span
-            key={n}
-            className={[
-              "h-2.5 w-2.5 rounded-full",
-              n < step ? "bg-primary" : n === step ? "bg-secondary" : "bg-foreground/20",
-            ].join(" ")}
-          />
-        ))}
-      </div>
+        return (
+          <div key={n} className="flex items-center flex-1 last:flex-none">
+            {/* Circle */}
+            <div className="flex flex-col items-center gap-1 shrink-0">
+              <div
+                className={[
+                  "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300",
+                  done   ? "bg-primary border-primary text-white"
+                         : active ? "bg-background border-primary text-primary"
+                         : "bg-background border-border text-foreground/30",
+                ].join(" ")}
+                aria-current={active ? "step" : undefined}
+              >
+                {done ? (
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : n}
+              </div>
+              <span className={[
+                "text-[10px] font-semibold uppercase tracking-wide",
+                active ? "text-primary" : done ? "text-primary/60" : "text-foreground/30",
+              ].join(" ")}>
+                {label}
+              </span>
+            </div>
+
+            {/* Connector line */}
+            {!isLast && (
+              <div className="flex-1 h-[2px] mx-2 mb-4 rounded-full overflow-hidden bg-border">
+                <div
+                  className="h-full bg-primary transition-all duration-500 rounded-full"
+                  style={{ width: done ? "100%" : "0%" }}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
-  );
-};
+  </div>
+);
 
 export const RegisterFlow = () => {
   const [step, setStep] = useState(1);
@@ -60,13 +81,9 @@ export const RegisterFlow = () => {
     setStep((prev) => prev + 1);
   };
 
-  const back = () => {
-    setStep((prev) => Math.max(prev - 1, 1));
-  };
+  const back = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const complete = () => {
-    navigate("/", { replace: true });
-  };
+  const complete = () => navigate("/", { replace: true });
 
   return (
     <>

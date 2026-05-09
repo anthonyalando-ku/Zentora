@@ -10,7 +10,6 @@ import { AuthSocialButtons } from "@/features/auth/components/AuthSocialButtons"
 
 type Props = {
   onNext: (data: { email: string; emailToken: string }) => void;
-  /** Control if social auth buttons show */
   showSocials?: boolean;
 };
 
@@ -30,41 +29,60 @@ export const RegisterStepEmail = ({ onNext, showSocials = false }: Props) => {
 
   const errorMessage =
     error instanceof AppError
-      ? `${error.message}${error.details ? ` - ${String(error.details)}` : ""}`
-      : "Unable to send email";
+      ? `${error.message}${error.details ? ` — ${String(error.details)}` : ""}`
+      : "Unable to send verification email. Please try again.";
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-6">
-      <div>
-        <label className="text-xs font-medium text-foreground/60">Email</label>
+    <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-5" noValidate>
+
+      <div className="space-y-1.5">
+        <label htmlFor="reg-email" className="text-xs font-semibold text-foreground/60 uppercase tracking-wide">
+          Email address
+        </label>
         <Input
+          id="reg-email"
           type="email"
-          placeholder="Enter your email"
+          placeholder="you@email.com"
           {...register("email")}
           error={formState.errors.email?.message}
-          className="mt-1 h-11 rounded-lg"
+          className="h-11 rounded-xl"
+          autoComplete="email"
+          autoFocus
         />
+        <p className="text-[11px] text-foreground/40 mt-1">
+          We'll send a verification code to this address.
+        </p>
       </div>
 
-      <Button type="submit" className="w-full h-11 rounded-lg" loading={isPending}>
-        Continue
-      </Button>
+      {error && (
+        <div className="flex items-start gap-2.5 rounded-xl bg-destructive/8 border border-destructive/20 px-4 py-3">
+          <svg className="w-4 h-4 text-destructive shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <p className="text-sm text-destructive leading-snug">{errorMessage}</p>
+        </div>
+      )}
 
-      {error && <p className="text-sm text-destructive text-center">{errorMessage}</p>}
+      <Button
+        type="submit"
+        className="w-full h-11 rounded-xl font-semibold text-sm"
+        loading={isPending}
+      >
+        {isPending ? "Sending code…" : "Continue"}
+      </Button>
 
       <AuthSocialButtons
         show={showSocials}
         verb="Continue with"
         onClick={(provider) => {
-          // UI only for now
           console.log("social register clicked:", provider);
         }}
       />
 
-      <p className="text-sm text-center">
+      <p className="text-sm text-center text-foreground/55">
         Already have an account?{" "}
-        <Link to="/auth/login" className="text-primary font-medium hover:underline">
-          Login
+        <Link to="/auth/login" className="text-primary font-semibold hover:underline underline-offset-2">
+          Sign in
         </Link>
       </p>
     </form>
