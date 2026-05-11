@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
 
 import { useCategories } from "@/features/catalog/hooks/useCategories";
@@ -13,7 +13,7 @@ import { useDiscoveryFeedPaged } from "@/features/discovery/hooks/useDiscoveryFe
 
 import type { Product } from "@/shared/types/product";
 import { Seo } from "@/shared/seo/Seo";
-import { useCollectionSeo } from "../utils/useCollectionseo";
+import { useCollectionSeo } from "../utils/useCollectionSeo";
 
 import { FilterSidebar, type FilterSidebarProps } from "../components/products_page/FilterSidebar";
 import { ActiveFilters } from "../components/products_page/ActiveFilters";
@@ -106,7 +106,7 @@ const CollectionPage = () => {
   const meta = getFeedMeta(feedType);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [showFilters, setShowFilters] = useState(false);
 
   // ── URL params (filters only — no sort on collection pages) ────────────────
