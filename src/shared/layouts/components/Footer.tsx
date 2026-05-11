@@ -106,17 +106,17 @@ export const Footer = ({ catalogCategories = [] }: FooterProps) => {
                 </Link>
               </li>
               <li>
-                <Link to="/products?feed_type=deals" className="text-xs text-foreground/60 hover:text-primary transition-colors">
+                <Link to="/collection/deals" className="text-xs text-foreground/60 hover:text-primary transition-colors">
                   Today's Deals
                 </Link>
               </li>
               <li>
-                <Link to="/products?feed_type=new_arrivals" className="text-xs text-foreground/60 hover:text-primary transition-colors">
+                <Link to="/collection/new_arrivals" className="text-xs text-foreground/60 hover:text-primary transition-colors">
                   New Arrivals
                 </Link>
               </li>
               <li>
-                <Link to="/products?feed_type=best_sellers" className="text-xs text-foreground/60 hover:text-primary transition-colors">
+                <Link to="/collection/best_sellers" className="text-xs text-foreground/60 hover:text-primary transition-colors">
                   Best Sellers
                 </Link>
               </li>

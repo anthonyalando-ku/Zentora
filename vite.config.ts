@@ -17,7 +17,7 @@ export default defineConfig({
 
     proxy: {
       "/api": {
-        target: "https://zentora-api.onrender.com",
+        target: "https://zentora-api.onrender.com",//http://localhost:8001/api/v1 https://zentora-api.onrender.com
         changeOrigin: true,
         secure: false,
 
