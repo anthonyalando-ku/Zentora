@@ -13,12 +13,11 @@ const WHATSAPP          = `https://wa.me/${SUPPORT_PHONE_RAW.replace("+", "")}?t
 
 // ── JSON-LD blocks ────────────────────────────────────────────────────────────
 
-// WebPage + BreadcrumbList
 const PAGE_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Return & Refund Policy — Zentora",
-  description: `Zentora accepts returns within ${WINDOW_DAYS} days of delivery on items in original condition. Refunds via M-Pesa, bank transfer, or store credit.`,
+  description: `Zentora accepts returns within ${WINDOW_DAYS} days of delivery on all items — defective or not — in original condition. Refunds via M-Pesa, bank transfer, or store credit.`,
   url: "https://zentorashop.co.ke/returns",
   dateModified: "2025-05-01",
   publisher: {
@@ -35,18 +34,44 @@ const PAGE_JSON_LD = {
   },
 };
 
-// MerchantReturnPolicy — powers the return badge in Google Shopping results
-const MERCHANT_RETURN_JSON_LD = {
+
+// Policy 1 — general returns (new, non-defective, change-of-mind)
+const RETURN_POLICY_GENERAL_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "MerchantReturnPolicy",
-  name: "Zentora 7-Day Return Policy",
+  name: "Zentora 7-Day Return Policy — All Items",
+  description: "We accept returns of new, unused items in original packaging within 7 days of delivery, regardless of reason.",
   url: "https://zentorashop.co.ke/returns",
   applicableCountry: "KE",
+  // MerchantReturnFiniteReturnWindow = fixed window, accepts non-defective returns
   returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
   merchantReturnDays: WINDOW_DAYS,
+  // ReturnInStore = drop off at our Nairobi location
+  returnMethod: "https://schema.org/ReturnInStore",
+  // FreeReturn = customer pays nothing to return
+  returnFees: "https://schema.org/FreeReturn",
+  // FullRefund covers refund OR exchange (Google accepts this)
+  refundType: "https://schema.org/FullRefund",
+  // Where to drop off
+  returnLabelSource: "https://schema.org/ReturnLabelCustomerResponsibility",
+  merchantReturnLink: "https://zentorashop.co.ke/returns",
+};
+
+// Policy 2 — defective / damaged / wrong item returns
+const RETURN_POLICY_DEFECTIVE_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "MerchantReturnPolicy",
+  name: "Zentora Defective Item Return Policy",
+  description: "Items that arrive damaged, defective, or incorrect may be returned or replaced at any time. We cover all return shipping costs.",
+  url: "https://zentorashop.co.ke/returns",
+  applicableCountry: "KE",
+  // MerchantReturnUnlimitedWindow = no fixed deadline for defective items
+  returnPolicyCategory: "https://schema.org/MerchantReturnUnlimitedWindow",
   returnMethod: "https://schema.org/ReturnByMail",
+  // FreeReturn = we pay for the return of defective/wrong items
   returnFees: "https://schema.org/FreeReturn",
   refundType: "https://schema.org/FullRefund",
+  merchantReturnLink: "https://zentorashop.co.ke/returns",
 };
 
 // ── Primitives ────────────────────────────────────────────────────────────────
@@ -133,19 +158,21 @@ const ReturnPolicyPage = () => {
         <title>Return &amp; Refund Policy | Zentora Kenya — 7-Day Returns</title>
         <meta
           name="description"
-          content="Zentora Kenya accepts returns within 7 days of delivery on items in original condition. Refunds via M-Pesa or bank transfer. Simple 5-step return process."
+          content="Zentora Kenya accepts returns within 7 days of delivery on all items — defective or not — in original condition. Refunds via M-Pesa or bank transfer. Simple 5-step return process."
         />
         <link rel="canonical" href="https://zentorashop.co.ke/returns" />
         <meta property="og:type"        content="website" />
         <meta property="og:title"       content="Return & Refund Policy | Zentora Kenya — 7-Day Returns" />
-        <meta property="og:description" content="7-day return window. Refunds via M-Pesa or bank transfer. Damaged items covered at no charge. Learn how to start a return at Zentora." />
+        <meta property="og:description" content="7-day return window on all items. Refunds via M-Pesa or bank transfer. Damaged items covered at no charge." />
         <meta property="og:url"         content="https://zentorashop.co.ke/returns" />
         <meta property="og:image"       content="https://zentorashop.co.ke/og-default.png" />
         <meta name="twitter:card"        content="summary_large_image" />
         <meta name="twitter:title"       content="Return & Refund Policy | Zentora Kenya" />
-        <meta name="twitter:description" content="7-day returns. Refunds via M-Pesa or bank transfer. Damaged items replaced free of charge." />
+        <meta name="twitter:description" content="7-day returns on all items. Refunds via M-Pesa or bank transfer. Damaged items replaced free of charge." />
+        {/* Two separate MerchantReturnPolicy blocks — required by Google Merchant Center */}
         <script type="application/ld+json">{JSON.stringify(PAGE_JSON_LD)}</script>
-        <script type="application/ld+json">{JSON.stringify(MERCHANT_RETURN_JSON_LD)}</script>
+        <script type="application/ld+json">{JSON.stringify(RETURN_POLICY_GENERAL_JSON_LD)}</script>
+        <script type="application/ld+json">{JSON.stringify(RETURN_POLICY_DEFECTIVE_JSON_LD)}</script>
       </Helmet>
 
       <div className="bg-background">
@@ -154,7 +181,6 @@ const ReturnPolicyPage = () => {
 
             {/* ── Header ── */}
             <header className="px-5 sm:px-8 py-8 border-b border-border bg-secondary/5">
-              {/* Breadcrumb */}
               <nav
                 className="flex items-center gap-1.5 text-xs text-foreground/40 mb-4"
                 aria-label="Breadcrumb"
@@ -170,8 +196,8 @@ const ReturnPolicyPage = () => {
                     Return &amp; Refund Policy
                   </h1>
                   <p className="text-sm text-foreground/60 mt-2 max-w-2xl leading-relaxed">
-                    We want you to be completely satisfied with your purchase. If something isn't right,
-                    we'll work with you to make it right — within the terms below.
+                    We accept returns on <strong>all items</strong> — whether defective or not — within{" "}
+                    {WINDOW_DAYS} days of delivery. If something isn't right, we'll make it right.
                   </p>
                   <p className="text-xs text-foreground/40 mt-3">
                     Effective date: {EFFECTIVE_DATE} &nbsp;·&nbsp; {SHOP_NAME}
@@ -199,12 +225,12 @@ const ReturnPolicyPage = () => {
 
               {/* ── At-a-glance ── */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Badge label={`${WINDOW_DAYS}-day return window`}   sub="From the date you receive your order." />
+                <Badge label={`${WINDOW_DAYS}-day return window`}   sub="All items — defective or not." />
                 <Badge label="Original condition required"           sub="Unused, undamaged, with original packaging." />
-                <Badge label="Refund or exchange"                    sub="Your choice — store credit, replacement, or refund." />
+                <Badge label="Refund or exchange"                    sub="Your choice — store credit, replacement, or full refund." />
               </div>
 
-              {/* ── Quick-start CTA (new) ── */}
+              {/* ── Quick-start CTA ── */}
               <div className="rounded-2xl border border-primary/15 bg-primary/4 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-foreground">Want to start a return right now?</div>
@@ -231,11 +257,8 @@ const ReturnPolicyPage = () => {
                 </div>
               </div>
 
-              {/* ── Table of contents (new) ── */}
-              <nav
-                aria-label="Policy sections"
-                className="rounded-2xl border border-border p-5"
-              >
+              {/* ── Table of contents ── */}
+              <nav aria-label="Policy sections" className="rounded-2xl border border-border p-5">
                 <p className="text-xs font-semibold uppercase tracking-wider text-foreground/40 mb-3">
                   In this policy
                 </p>
@@ -253,32 +276,42 @@ const ReturnPolicyPage = () => {
                 </ol>
               </nav>
 
-              {/* ── Section 1 ── */}
+              {/* ── Section 1 — Eligibility ── */}
               <Section id="eligibility" title="1. Return eligibility">
+                {/* Key addition: explicitly state both defective AND non-defective returns are accepted */}
                 <p>
-                  You may return most items purchased from {SHOP_NAME} within{" "}
-                  <strong>{WINDOW_DAYS} calendar days</strong> of the delivery date, provided the item
-                  meets all conditions below.
+                  We accept returns on <strong>all eligible items</strong> — including change-of-mind
+                  returns — within <strong>{WINDOW_DAYS} calendar days</strong> of the confirmed delivery
+                  date. Both defective and non-defective products may be returned, subject to the
+                  conditions below.
                 </p>
 
-                <p className="font-medium text-foreground mt-1">Items we accept back:</p>
+                <p className="font-medium text-foreground mt-1">Accepted returns — new, non-defective items:</p>
                 <ul className="space-y-1.5 mt-1">
-                  <Check>Item is in the same condition as when it was delivered — unused and unaltered.</Check>
-                  <Check>Original packaging, accessories, manuals, and any included gifts are present.</Check>
-                  <Check>Tags, seals, and shrink-wrap are intact and have not been removed or broken.</Check>
+                  <Check>Item is unused and in the same condition as when delivered.</Check>
+                  <Check>Original packaging, accessories, manuals, and any included gifts are present and intact.</Check>
+                  <Check>Tags, seals, and shrink-wrap have not been removed or broken.</Check>
                   <Check>Return is initiated within {WINDOW_DAYS} days of confirmed delivery.</Check>
                   <Check>Proof of purchase (order number or receipt) is provided.</Check>
+                </ul>
+
+                <p className="font-medium text-foreground mt-3">Accepted returns — defective or damaged items:</p>
+                <ul className="space-y-1.5 mt-1">
+                  <Check>Item arrived damaged, stops working, or has a manufacturing defect.</Check>
+                  <Check>Item received is different from what was ordered.</Check>
+                  <Check>Report within 48 hours of delivery for priority handling; we accept defective reports beyond the 7-day window where reasonable.</Check>
+                  <Check>We cover all return shipping costs for defective or incorrect items.</Check>
                 </ul>
 
                 <p className="font-medium text-foreground mt-3">Items we cannot accept back:</p>
                 <ul className="space-y-1.5 mt-1">
                   <Cross>Item shows signs of use, wear, physical damage, or tampering after delivery.</Cross>
                   <Cross>Original packaging has been discarded or is significantly damaged.</Cross>
-                  <Cross>Seals, hygiene stickers, or security tags have been removed (applies to personal care, earphones, etc.).</Cross>
-                  <Cross>Return request is submitted more than {WINDOW_DAYS} days after delivery.</Cross>
-                  <Cross>Item was purchased during a final-sale or clearly-marked non-returnable promotion.</Cross>
+                  <Cross>Seals or hygiene stickers have been removed (personal care, earphones, etc.).</Cross>
+                  <Cross>Return request is submitted more than {WINDOW_DAYS} days after delivery (except defective items).</Cross>
+                  <Cross>Item was purchased during a clearly-marked final-sale promotion.</Cross>
                   <Cross>Software, digital products, or downloadable content once activated or accessed.</Cross>
-                  <Cross>Consumable goods that have been opened (batteries, lubricants, cartridges).</Cross>
+                  <Cross>Consumable goods that have been opened (batteries, cartridges).</Cross>
                 </ul>
               </Section>
 
@@ -289,7 +322,7 @@ const ReturnPolicyPage = () => {
                   <Step
                     n={1}
                     title="Contact our support team"
-                    desc={`Email us at ${SUPPORT_EMAIL} or call ${SUPPORT_PHONE} within ${WINDOW_DAYS} days of receiving your order. Include your order number and a brief description of the issue.`}
+                    desc={`Email us at ${SUPPORT_EMAIL} or call/WhatsApp ${SUPPORT_PHONE} within ${WINDOW_DAYS} days of receiving your order. Include your order number and a brief description of the issue.`}
                   />
                   <Step
                     n={2}
@@ -299,12 +332,12 @@ const ReturnPolicyPage = () => {
                   <Step
                     n={3}
                     title="Package the item securely"
-                    desc="Repack the item in its original packaging with all accessories and documents included. Attach or write the RMA reference clearly on the outside of the package."
+                    desc="Repack the item in its original packaging with all accessories and documents. Write the RMA reference clearly on the outside of the package."
                   />
                   <Step
                     n={4}
-                    title="Drop off or arrange collection"
-                    desc="Bring the package to our Nairobi CBD location (Gabrone Plaza, 2nd Floor) or arrange a courier pickup as instructed. Keep your shipping receipt as proof."
+                    title="Drop off at our store"
+                    desc="Bring the package to Zentora Shop, Gabrone Plaza, 2nd Floor, Nairobi CBD. For defective or wrong items we can arrange a courier pickup."
                   />
                   <Step
                     n={5}
@@ -317,8 +350,8 @@ const ReturnPolicyPage = () => {
               {/* ── Section 3 ── */}
               <Section id="refunds" title="3. Refunds">
                 <p>
-                  Approved refunds are issued using the original payment method where possible. Processing
-                  times vary by method:
+                  Approved refunds are issued using the original payment method where possible.
+                  Processing times vary by method:
                 </p>
                 <div className="mt-3 rounded-xl border border-border overflow-hidden text-sm">
                   <div className="grid grid-cols-2 bg-secondary/10 px-4 py-2 font-semibold text-foreground text-xs uppercase tracking-wide">
@@ -326,8 +359,8 @@ const ReturnPolicyPage = () => {
                     <span>Refund timeline</span>
                   </div>
                   {[
-                    ["M-Pesa / Mobile money", "1–3 business days"],
-                    ["Bank transfer",         "3–5 business days"],
+                    ["M-Pesa / Mobile money", "1–2 business days"],
+                    ["Bank transfer",         "2–3 business days"],
                     ["Store credit",          "Instant upon approval"],
                   ].map(([method, time]) => (
                     <div
@@ -340,27 +373,29 @@ const ReturnPolicyPage = () => {
                   ))}
                 </div>
                 <p className="mt-3">
-                  If you prefer, we can issue a <strong>store credit</strong> or arrange a direct{" "}
+                  If you prefer, we can issue <strong>store credit</strong> or arrange a direct{" "}
                   <strong>exchange</strong> for a different size, colour, or variant of the same product —
                   subject to availability.
                 </p>
                 <p>
-                  Shipping fees paid at the time of purchase are non-refundable unless the return is due
-                  to our error (wrong item sent, item arrived damaged).
+                  Shipping fees paid at purchase are non-refundable unless the return is due to our error
+                  (wrong item sent, item arrived damaged or defective).
                 </p>
               </Section>
 
               {/* ── Section 4 ── */}
               <Section id="damaged" title="4. Damaged, defective, or wrong items">
                 <p>
-                  If your order arrives damaged, defective, or is not what you ordered, we will cover
-                  all return shipping costs and offer you a full refund or replacement at no extra charge.
+                  If your order arrives damaged, stops working shortly after delivery, or is not what you
+                  ordered, we will cover all return costs and offer a <strong>full refund or free
+                  replacement</strong> — your choice.
                 </p>
                 <ul className="space-y-1.5 mt-2">
-                  <Check>Report the issue within 48 hours of delivery for fastest resolution.</Check>
-                  <Check>Photograph the damage or incorrect item and send it with your support request.</Check>
-                  <Check>We will arrange a pickup or provide a prepaid return label.</Check>
-                  <Check>Priority processing — resolved within 2 business days of us receiving the item.</Check>
+                  <Check>Report within 48 hours of delivery for fastest resolution.</Check>
+                  <Check>Send photographs of the damage or incorrect item with your support request.</Check>
+                  <Check>We arrange pickup or provide a prepaid return label — at no cost to you.</Check>
+                  <Check>Priority processing: resolved within 2 business days of receiving the item.</Check>
+                  <Check>Defective item reports accepted beyond the standard 7-day window where reasonable.</Check>
                 </ul>
               </Section>
 
@@ -368,20 +403,21 @@ const ReturnPolicyPage = () => {
               <Section id="exchanges" title="5. Exchanges">
                 <p>
                   We offer direct exchanges for the same product in a different size, colour, or variant.
-                  If the desired variant is out of stock, we will issue a full refund or store credit.
+                  Exchanges are accepted for both <strong>non-defective items</strong> (change of mind,
+                  wrong size ordered) and <strong>defective items</strong> (manufacturing fault, damage
+                  in transit).
                 </p>
                 <p>
-                  Exchanges are subject to the same {WINDOW_DAYS}-day window and condition requirements
-                  as standard returns. Any price difference between variants will be charged or refunded
-                  accordingly.
+                  If the desired variant is out of stock, we will issue a full refund or store credit.
+                  Any price difference between variants will be charged or refunded accordingly.
                 </p>
               </Section>
 
               {/* ── Section 6 ── */}
               <Section id="non-returnable" title="6. Non-returnable product categories">
                 <p>
-                  The following categories are non-returnable due to health, safety, or digital delivery
-                  reasons unless the item arrives defective or damaged:
+                  The following categories are non-returnable unless the item arrives defective or
+                  damaged:
                 </p>
                 <ul className="space-y-1.5 mt-2">
                   <Cross>Personal care and hygiene products once opened (earphones, trimmers, massagers).</Cross>
@@ -396,40 +432,32 @@ const ReturnPolicyPage = () => {
               <Section id="notes" title="7. Important notes">
                 <p>
                   {SHOP_NAME} reserves the right to refuse a return that does not meet the eligibility
-                  criteria above. If a return is declined, we will notify you with the reason and, where
-                  possible, return the item to you at your expense.
+                  criteria above. If a return is declined, we will notify you with the reason.
                 </p>
                 <p>
-                  We do not offer cash refunds at our physical location. All monetary refunds are
-                  processed electronically to the original payment source or as store credit.
+                  All monetary refunds are processed electronically (M-Pesa or bank transfer). We do not
+                  issue cash refunds at our physical location.
                 </p>
                 <p>
                   This policy applies to purchases made directly through {SHOP_NAME}. Items purchased
-                  through third-party sellers or marketplaces are subject to those sellers' own policies.
+                  through third-party sellers are subject to those sellers' own policies.
                 </p>
                 <p>
-                  We may update this policy from time to time. The version displayed on this page is
-                  always the current version. Continued use of our store after changes are posted
-                  constitutes acceptance of the updated policy.
+                  We may update this policy from time to time. The version on this page is always
+                  current. Continued use of our store after changes constitutes acceptance.
                 </p>
               </Section>
 
-              {/* ── Related links (new) ── */}
-              <section
-                aria-labelledby="related-heading"
-                className="rounded-2xl border border-border p-6 sm:p-7"
-              >
-                <h2
-                  id="related-heading"
-                  className="text-sm font-semibold text-foreground mb-4"
-                >
+              {/* ── Related links ── */}
+              <section aria-labelledby="related-heading" className="rounded-2xl border border-border p-6 sm:p-7">
+                <h2 id="related-heading" className="text-sm font-semibold text-foreground mb-4">
                   Related policies &amp; support
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { label: "Help Center",     sub: "FAQs and step-by-step guides.",   to: "/help"     },
-                    { label: "Contact Support", sub: "Reach us by WhatsApp or phone.",  to: "/contact"  },
-                    { label: "All Products",    sub: "Continue shopping.",              to: "/products" },
+                    { label: "Help Center",     sub: "FAQs and step-by-step guides.",  to: "/help"     },
+                    { label: "Contact Support", sub: "Reach us by WhatsApp or phone.", to: "/contact"  },
+                    { label: "All Products",    sub: "Continue shopping.",             to: "/products" },
                   ].map(({ label, sub, to }) => (
                     <Link
                       key={label}
