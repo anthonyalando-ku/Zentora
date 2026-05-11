@@ -60,10 +60,16 @@
 
     <!-- ══════════════════════════════════════════════════════════════════════
          JSON-LD Structured Data
-         Three blocks:
-           1. Organization  — tells Google who you are
-           2. LocalBusiness — tells Google WHERE you are (critical for Kenya SEO)
-           3. WebSite       — enables the Search Box in Google results
+         Two blocks (WebSite / SearchAction removed — Google deprecated the
+         Sitelinks Search Box on 21 Nov 2024; the markup no longer does anything):
+
+           1. Organization  — tells Google who you are; powers Knowledge Panel
+           2. LocalBusiness — tells Google WHERE you are; powers Maps / "near me"
+
+         HIGH-VALUE schema to add on individual pages (via your Seo component):
+           • Product     — on /products/:slug  → price, rating stars in results
+           • ItemList    — on /collections/:slug → rich list result
+           • BreadcrumbList — on all inner pages → breadcrumb trail in results
          ══════════════════════════════════════════════════════════════════════ -->
 
     <!-- 1. Organization -->
@@ -76,7 +82,7 @@
       "url": "https://zentorashop.co.ke/",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://zentorashop.co.ke/og-default.png",
+        "url": "https://zentorashop.co.ke/zentora_logo_clear.png",
         "width": 512,
         "height": 512
       },
@@ -98,10 +104,7 @@
     }
     </script>
 
-    <!-- 2. LocalBusiness
-         This is the schema that powers Google Maps integration and
-         "near me" searches. Fill in your exact coordinates below.
-         Get them from: maps.google.com → right-click your location → copy coords -->
+    <!-- 2. LocalBusiness — powers Google Maps / "electronics store near me" -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -142,35 +145,9 @@
     }
     </script>
 
-    <!-- 3. WebSite — enables the Sitelinks Search Box in Google results.
-         When users search "zentora" on Google, a search box appears directly
-         in the results pointing to your /products?query= search. -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Zentora",
-      "alternateName": "Zentora Shop Kenya",
-      "url": "https://zentorashop.co.ke/",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://zentorashop.co.ke/products?query={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-
   </head>
 
   <body>
-    <!--
-      Noscript fallback — only shown to crawlers and browsers with JS disabled.
-      Use canonical product URLs only (no ?feed_type= params — those are
-      not indexable pages and create duplicate content signals).
-    -->
     <noscript>
       <div style="max-width:900px;margin:40px auto;font-family:Arial,sans-serif;line-height:1.8">
         <h1>Zentora — Electronics &amp; Appliances in Kenya</h1>
@@ -181,6 +158,9 @@
         <nav aria-label="Main navigation">
           <ul>
             <li><a href="/products">All Products</a></li>
+            <li><a href="/collections/new_arrivals">New Arrivals</a></li>
+            <li><a href="/collections/deals">Deals</a></li>
+            <li><a href="/collections/trending">Trending</a></li>
             <li><a href="/products?category_id=1">Electronics</a></li>
             <li><a href="/products?category_id=28">Mobile Devices</a></li>
             <li><a href="/products?category_id=27">Tablets</a></li>
@@ -191,6 +171,8 @@
             <li><a href="/contact">Contact Us</a></li>
             <li><a href="/help">Help Center</a></li>
             <li><a href="/returns">Return Policy</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms of Service</a></li>
           </ul>
         </nav>
         <p>
