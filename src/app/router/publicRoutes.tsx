@@ -1,44 +1,44 @@
 import React, { Suspense } from "react";
 import { LoaderFallback } from "@/shared/components/ui";
 import { RouteError } from "@/core/error/RouteError";
+import { lazyWithRetry } from "@/shared/utils/lazyWithRetry";
 
-const AboutUsPage        = React.lazy(() => import("@/features/public/pages/AboutUsPage"));
-const ContactUsPage      = React.lazy(() => import("@/features/public/pages/ContactUsPage"));
-const HelpCenterPage     = React.lazy(() => import("@/features/public/pages/HelpCenterPage"));
-const ReturnPolicyPage   = React.lazy(() => import("@/features/public/pages/ReturnPolicyPage"));
-const PrivacyPolicyPage  = React.lazy(() => import("@/features/public/pages/PrivacyPolicyPage"));
-const TermsOfServicePage = React.lazy(() => import("@/features/public/pages/TermsOfServicePage"));
+const AboutUsPage        = lazyWithRetry(() => import("@/features/public/pages/AboutUsPage"));
+const ContactUsPage      = lazyWithRetry(() => import("@/features/public/pages/ContactUsPage"));
+const HelpCenterPage     = lazyWithRetry(() => import("@/features/public/pages/HelpCenterPage"));
+const ReturnPolicyPage   = lazyWithRetry(() => import("@/features/public/pages/ReturnPolicyPage"));
+const PrivacyPolicyPage  = lazyWithRetry(() => import("@/features/public/pages/PrivacyPolicyPage"));
+const TermsOfServicePage = lazyWithRetry(() => import("@/features/public/pages/TermsOfServicePage"));
 
-const HomePage             = React.lazy(() => import("@/features/public/home/pages/HomePage"));
-const UnauthorizedPage     = React.lazy(() => import("@/features/public/unauthorized/pages/UnauthorizedPage"));
-const ProductsPage         = React.lazy(() => import("@/features/products/pages/ProductsPage"));
-const ProductDetailPage    = React.lazy(() => import("@/features/products/pages/ProductDetailPage"));
-const CartPage             = React.lazy(() => import("@/features/cart/pages/CartPage"));
-const CheckoutPage         = React.lazy(() => import("@/features/checkout/pages/CheckoutPage"));
-const AccountDashboardPage = React.lazy(() => import("@/features/account/pages/AccountDashboardPage"));
+const HomePage             = lazyWithRetry(() => import("@/features/public/home/pages/HomePage"));
+const UnauthorizedPage     = lazyWithRetry(() => import("@/features/public/unauthorized/pages/UnauthorizedPage"));
+const ProductsPage         = lazyWithRetry(() => import("@/features/products/pages/ProductsPage"));
+const ProductDetailPage    = lazyWithRetry(() => import("@/features/products/pages/ProductDetailPage"));
+const CartPage             = lazyWithRetry(() => import("@/features/cart/pages/CartPage"));
+const CheckoutPage         = lazyWithRetry(() => import("@/features/checkout/pages/CheckoutPage"));
+const AccountDashboardPage = lazyWithRetry(() => import("@/features/account/pages/AccountDashboardPage"));
+
+const withError = (route: object) => ({ ...route, errorElement: <RouteError /> });
 
 const wrap = (component: React.ReactNode) => (
   <Suspense fallback={<LoaderFallback />}>{component}</Suspense>
 );
 
 export const publicRoutes = [
-  {
-    path: "/",
-    element: wrap(<HomePage />),
-    errorElement: <RouteError />,
-  },
-  { path: "/unauthorized",   element: wrap(<UnauthorizedPage />) },
-  { path: "/products",       element: wrap(<ProductsPage />) },
-  { path: "/products/:slug", element: wrap(<ProductDetailPage />) },
-  { path: "/cart",           element: wrap(<CartPage />) },
-  { path: "/checkout",       element: wrap(<CheckoutPage />) },
-  { path: "/account",        element: wrap(<AccountDashboardPage />) },
+    withError({ path: "/", element: wrap(<HomePage />) }),
+    withError({ path: "/products", element: wrap(<ProductsPage />) }),
+    withError({ path: "/products/:slug", element: wrap(<ProductDetailPage />) }),
+    withError({ path: "/unauthorized",   element: wrap(<UnauthorizedPage />) }),
+
+  withError({ path: "/cart",           element: wrap(<CartPage />) }),
+  withError({ path: "/checkout",       element: wrap(<CheckoutPage />) }),
+  withError({ path: "/account",        element: wrap(<AccountDashboardPage />) }),
 
   // ── Public information pages ──────────────────────────────────────────────
-  { path: "/about",   element: wrap(<AboutUsPage />) },
-  { path: "/contact", element: wrap(<ContactUsPage />) },
-  { path: "/help",    element: wrap(<HelpCenterPage />) },
-  { path: "/returns", element: wrap(<ReturnPolicyPage />) },
-  { path: "/privacy", element: wrap(<PrivacyPolicyPage />) },
-  { path: "/terms",   element: wrap(<TermsOfServicePage />) },
+  withError({ path: "/about",   element: wrap(<AboutUsPage />) }),
+  withError({ path: "/contact", element: wrap(<ContactUsPage />) }),
+  withError({ path: "/help",    element: wrap(<HelpCenterPage />) }),
+  withError({ path: "/returns", element: wrap(<ReturnPolicyPage />) }),
+  withError({ path: "/privacy", element: wrap(<PrivacyPolicyPage />) }),
+  withError({ path: "/terms",   element: wrap(<TermsOfServicePage />) }),
 ];

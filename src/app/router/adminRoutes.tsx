@@ -1,29 +1,31 @@
 import React, { Suspense } from "react";
 import { RoleRoute } from "@/core/guards/RoleRoute";
 import { Loader } from "@/shared/components/ui";
+import { RouteError } from "@/core/error/RouteError";
+import { lazyWithRetry } from "@/shared/utils/lazyWithRetry";
 
-const AdminLayout = React.lazy(() => import("@/features/admin/shared/layouts/AdminLayout"));
+const AdminLayout = lazyWithRetry(() => import("@/features/admin/shared/layouts/AdminLayout"));
 
-const AdminDashboardPage = React.lazy(() => import("@/features/admin/dashboard/pages/AdminDashboardPage"));
-const AdminProductsPage = React.lazy(() => import("@/features/admin/products/pages/AdminProductsPage"));
-const AdminProductNewPage = React.lazy(() => import("@/features/admin/products/pages/AdminProductNewPage"));
-const AdminProductDetailPage = React.lazy(() => import("@/features/admin/products/pages/AdminProductDetailPage"));
-const AdminInventoryPage = React.lazy(() => import("@/features/admin/inventory/pages/AdminInventoryPage"));
-const AdminOrdersPage = React.lazy(() => import("@/features/admin/orders/pages/AdminOrdersPage"));
-const AdminOrderDetailPage = React.lazy(() => import("@/features/admin/orders/pages/AdminOrderDetailPage"));
+const AdminDashboardPage = lazyWithRetry(() => import("@/features/admin/dashboard/pages/AdminDashboardPage"));
+const AdminProductsPage = lazyWithRetry(() => import("@/features/admin/products/pages/AdminProductsPage"));
+const AdminProductNewPage = lazyWithRetry(() => import("@/features/admin/products/pages/AdminProductNewPage"));
+const AdminProductDetailPage = lazyWithRetry(() => import("@/features/admin/products/pages/AdminProductDetailPage"));
+const AdminInventoryPage = lazyWithRetry(() => import("@/features/admin/inventory/pages/AdminInventoryPage"));
+const AdminOrdersPage = lazyWithRetry(() => import("@/features/admin/orders/pages/AdminOrdersPage"));
+const AdminOrderDetailPage = lazyWithRetry(() => import("@/features/admin/orders/pages/AdminOrderDetailPage"));
 
-const AdminCategoriesPage = React.lazy(() => import("@/features/admin/catalog/categories/pages/AdminCategoriesPage"));
-const AdminBrandsPage = React.lazy(() => import("@/features/admin/catalog/brands/pages/AdminBrandsPage"));
-const AdminAttributesPage = React.lazy(() => import("@/features/admin/catalog/attributes/pages/AdminAttributesPage"));
-const AdminAttributeValuesPage = React.lazy(
+const AdminCategoriesPage = lazyWithRetry(() => import("@/features/admin/catalog/categories/pages/AdminCategoriesPage"));
+const AdminBrandsPage = lazyWithRetry(() => import("@/features/admin/catalog/brands/pages/AdminBrandsPage"));
+const AdminAttributesPage = lazyWithRetry(() => import("@/features/admin/catalog/attributes/pages/AdminAttributesPage"));
+const AdminAttributeValuesPage = lazyWithRetry(
   () => import("@/features/admin/catalog/attributes/pages/AdminAttributeValuesPage")
 );
 
-const AdminDiscountsPage = React.lazy(() => import("@/features/admin/catalog/discounts/pages/AdminDiscountsPage"));
-const AdminInventoryLocationsPage = React.lazy(
+const AdminDiscountsPage = lazyWithRetry(() => import("@/features/admin/catalog/discounts/pages/AdminDiscountsPage"));
+const AdminInventoryLocationsPage = lazyWithRetry(
   () => import("@/features/admin/inventory/locations/AdminInventoryLocationsPage")
 );
-const VariantInventoryPage = React.lazy(
+const VariantInventoryPage = lazyWithRetry(
   () => import("@/features/admin/inventory/variantInventory/VariantInventoryPage")
 );
 
@@ -42,6 +44,7 @@ const wrap = (el: React.ReactNode) => (
 export const adminRoutes = [
   {
     path: "/admin",
+    errorElement: <RouteError returnTo="/admin" />,
     element: (
       <RoleRoute roles={["admin", "super_admin"]}>
         {wrap(<AdminLayout />)}
@@ -52,7 +55,6 @@ export const adminRoutes = [
 
       { path: "products", element: wrap(<AdminProductsPage />) },
       { path: "products/new", element: wrap(<AdminProductNewPage />) },
-      //{ path: "products/:id", element: wrap(<AdminProductDetailPage />) },
       { path: "products/:slug", element: wrap(<AdminProductDetailPage />) },
 
       { path: "inventory", element: wrap(<AdminInventoryPage />) },
