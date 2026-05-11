@@ -13,6 +13,7 @@ const TermsOfServicePage = lazyWithRetry(() => import("@/features/public/pages/T
 const HomePage             = lazyWithRetry(() => import("@/features/public/home/pages/HomePage"));
 const UnauthorizedPage     = lazyWithRetry(() => import("@/features/public/unauthorized/pages/UnauthorizedPage"));
 const ProductsPage         = lazyWithRetry(() => import("@/features/products/pages/ProductsPage"));
+const CollectionPage       = lazyWithRetry(() => import("@/features/products/pages/CollectionPage"));
 const ProductDetailPage    = lazyWithRetry(() => import("@/features/products/pages/ProductDetailPage"));
 const CartPage             = lazyWithRetry(() => import("@/features/cart/pages/CartPage"));
 const CheckoutPage         = lazyWithRetry(() => import("@/features/checkout/pages/CheckoutPage"));
@@ -27,6 +28,8 @@ const wrap = (component: React.ReactNode) => (
 export const publicRoutes = [
     withError({ path: "/", element: wrap(<HomePage />) }),
     withError({ path: "/products", element: wrap(<ProductsPage />) }),
+    withError({ path: "/collections/:slug",   element: wrap(<CollectionPage />), }),
+
     withError({ path: "/products/:slug", element: wrap(<ProductDetailPage />) }),
     withError({ path: "/unauthorized",   element: wrap(<UnauthorizedPage />) }),
 

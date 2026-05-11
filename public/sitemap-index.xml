@@ -6,28 +6,34 @@
 -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Static pages (homepage, about, contact, help, returns) -->
+  <!-- Static pages (homepage, catalog, about, contact, help, returns, privacy, terms) -->
   <sitemap>
     <loc>https://zentorashop.co.ke/sitemap-pages.xml</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-05-11</lastmod>
+  </sitemap>
+
+  <!-- Collection pages (/collections/:slug — curated feed + catalog blend) -->
+  <sitemap>
+    <loc>https://zentorashop.co.ke/sitemap-collections.xml</loc>
+    <lastmod>2026-05-11</lastmod>
   </sitemap>
 
   <!-- Category landing pages (/products?category_id=N) -->
   <sitemap>
     <loc>https://zentorashop.co.ke/sitemap-categories.xml</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-05-11</lastmod>
   </sitemap>
 
   <!-- Individual product pages — generated dynamically by the API -->
   <!-- Split into chunks of 1 000 URLs each (Google limit is 50 000 per file) -->
   <sitemap>
     <loc>https://zentorashop.co.ke/sitemaps/products-1.xml</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-05-11</lastmod>
   </sitemap>
   <!-- Add more product sitemap chunks here as your catalog grows:
   <sitemap>
-    <loc>https://zentora-api.onrender.com/sitemaps/products-2.xml</loc>
-    <lastmod>2026-05-09</lastmod>
+    <loc>https://zentorashop.co.ke/sitemaps/products-2.xml</loc>
+    <lastmod>2026-05-11</lastmod>
   </sitemap>
   -->
 

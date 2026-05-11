@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Collection pages sitemap — zentorashop.co.ke
+  One URL per curated feed at /collections/:slug.
+  These pages show ranked discovery feed products blended with the full catalog.
+  Each slug maps to a DiscoveryFeedType served by /discovery/feed.
+  Update lastmod when feed content or page design changes significantly.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Trending Now — refreshes constantly, daily crawl appropriate -->
+  <url>
+    <loc>https://zentorashop.co.ke/collections/trending</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- New Arrivals — high-value landing page for new product searchers -->
+  <url>
+    <loc>https://zentorashop.co.ke/collections/new_arrivals</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Deals — time-sensitive, crawl daily -->
+  <url>
+    <loc>https://zentorashop.co.ke/collections/deals</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Best Sellers — changes weekly as sales data updates -->
+  <url>
+    <loc>https://zentorashop.co.ke/collections/best_sellers</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Featured — curated editorial selection, changes less frequently -->
+  <url>
+    <loc>https://zentorashop.co.ke/collections/featured</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Highly Rated — stable ranking, weekly refresh is sufficient -->
+  <url>
+    <loc>https://zentorashop.co.ke/collections/highly_rated</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Most Wishlisted — social proof page, weekly crawl -->
+  <url>
+    <loc>https://zentorashop.co.ke/collections/most_wishlisted</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Editorial — hand-curated, changes infrequently -->
+  <url>
+    <loc>https://zentorashop.co.ke/collections/editorial</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!--
+    NOTE: "recommended" and "also_viewed" are intentionally excluded.
+    - recommended: personalised per-user, not indexable (no canonical content)
+    - also_viewed:  context-dependent (requires a source product), not a standalone page
+  -->
+
+</urlset>

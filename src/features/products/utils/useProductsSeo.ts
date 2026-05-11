@@ -4,6 +4,15 @@ import type { Product } from "@/shared/types/product";
 const SITE_NAME = "Zentora";
 const DEFAULT_OG_IMAGE = "/zentora_logo_clear.png";
 
+const FEED_LABELS: Record<string, string> = {
+  new_arrivals: "New Arrivals",
+  trending: "Trending Now",
+  featured: "Featured",
+  flash_deals: "Flash Deals",
+  best_sellers: "Best Sellers",
+  top_rated: "Top Rated",
+};
+
 type UseProductsSeoParams = {
   isSearchMode: boolean;
   isFeedMode: boolean;
@@ -29,7 +38,7 @@ type SeoResult = {
  *
  * Rules:
  * - Search mode: "Results for X | Zentora" + concise description
- * - Feed mode: capitalised feed label + description
+ * - Feed mode: named feed label in title; canonical uses feed_type param
  * - Category filter: category name in title for indexability
  * - Brand filter: brand name in title
  * - Default catalog: generic title + description with product count
@@ -59,7 +68,7 @@ export const useProductsSeo = ({
         ? firstThumb
         : `${siteUrl}${DEFAULT_OG_IMAGE}`;
 
-    // ── Search mode ────────────────────────────────────────────────────────
+    // ── Search mode ─────────────────────────────────────────────────────────
     if (isSearchMode) {
       return {
         title: `"${queryTerm}" – Search Results | ${SITE_NAME}`,
@@ -69,19 +78,24 @@ export const useProductsSeo = ({
       };
     }
 
-    // ── Feed mode (trending, best_sellers, etc.) ───────────────────────────
+    // ── Feed mode ───────────────────────────────────────────────────────────
     if (isFeedMode && feedType) {
-      const label = feedType.replaceAll("_", " ");
-      const capitalized = label.charAt(0).toUpperCase() + label.slice(1);
+      const label = FEED_LABELS[feedType] ?? feedType.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+      // Build canonical — include stable filter params if any are active
+      const canonicalParams = new URLSearchParams({ feed_type: feedType });
+      if (selectedCategoryId) canonicalParams.set("category_id", selectedCategoryId);
+      if (selectedBrandId)    canonicalParams.set("brand_id",    selectedBrandId);
+
       return {
-        title: `${capitalized} Products | ${SITE_NAME}`,
-        description: `Browse ${label} products on ${SITE_NAME}. Discover the best deals in electronics, accessories, home and more.`,
-        canonicalUrl: `${siteUrl}/products?feed_type=${feedType}`,
+        title: `${label} | ${SITE_NAME}`,
+        description: `Shop ${label.toLowerCase()} on ${SITE_NAME}. Discover the best deals in electronics, accessories, home and more.`,
+        canonicalUrl: `${siteUrl}/products?${canonicalParams.toString()}`,
         shareImage,
       };
     }
 
-    // ── Catalog mode — build context-aware title from active filters ───────
+    // ── Catalog mode — build context-aware title from active filters ────────
     const categoryName = selectedCategoryId
       ? categories.find((c) => String(c.id) === selectedCategoryId)?.name
       : null;
