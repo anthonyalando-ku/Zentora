@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { useCartStore } from "@/features/cart/store/cartStore";
@@ -63,6 +63,16 @@ const buildWhatsAppUrl = (name: string, price: number, slug: string) => {
 const ProductDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+
+  // Read ?variant=<id> from the URL (e.g. ?variant=58)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const variantParamId = useMemo(() => {
+    const raw = searchParams.get("variant");
+    if (!raw) return undefined;
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) ? n : undefined;
+  }, [searchParams]);
+
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // ── Data ──
@@ -80,12 +90,50 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  // ── Variant initialisation ──────────────────────────────────────────────────
+  // Priority:
+  //   1. ?variant=<id> param, if the id exists in this product's variants
+  //   2. First variant (original fallback)
+  // Only runs once per product load (when selectedVariantId is still undefined).
   useEffect(() => {
     if (!variants.length || selectedVariantId !== undefined) return;
+
+    if (variantParamId !== undefined) {
+      const matchedVariant = variants.find((v) => v.id === variantParamId);
+      if (matchedVariant) {
+        setSelectedVariantId(matchedVariant.id);
+        return;
+      }
+      // Param id doesn't match any variant on this product —
+      // fall through to default and clean the invalid param from the URL.
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("variant");
+        return next;
+      }, { replace: true });
+    }
+
     setSelectedVariantId(variants[0].id);
-  }, [variants, selectedVariantId]);
+  }, [variants, selectedVariantId, variantParamId, setSearchParams]);
+
+  // When the user manually selects a different variant, update the URL param
+  // so the URL stays shareable / deep-linkable.
+  const handleSelectVariant = (id: number) => {
+    setSelectedVariantId(id);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("variant", String(id));
+      return next;
+    }, { replace: true });
+  };
 
   useEffect(() => { setSelectedImage(0); }, [productId]);
+
+  // When navigating to a different product, reset selection so the new
+  // product's variant param (or default) is picked up cleanly.
+  useEffect(() => {
+    setSelectedVariantId(undefined);
+  }, [slug]);
 
   const selectedVariant = useMemo(
     () => variants.find((v) => v.id === selectedVariantId),
@@ -360,7 +408,7 @@ const ProductDetailPage = () => {
               inStock={inStock}
               availableQty={availableQty}
               selectedVariantSku={selectedVariant?.sku}
-              onSelectVariant={setSelectedVariantId}
+              onSelectVariant={handleSelectVariant}
               onSetActiveTab={setActiveTab}
               onToggleWishlist={handleToggleWishlist}
             />
