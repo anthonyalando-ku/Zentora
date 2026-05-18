@@ -12,9 +12,9 @@ const ADDRESS     = "Gabrone Plaza, 2nd Floor, Nairobi CBD, Kenya";
 const HOURS       = "Monday – Saturday, 9:00 am – 6:00 pm";
 const MAP_URL     = "https://maps.app.goo.gl/fyjBbr7LjKE1Lpoa6";
 const WHATSAPP    = `https://wa.me/${PHONE_RAW.replace("+", "")}?text=${encodeURIComponent("Hi Zentora, I need help with ")}`;
-const TIKTOK      = "https://www.tiktok.com/@zentorashop";
+const TIKTOK      = "https://www.tiktok.com/@zentorashopkenya";
 const FACEBOOK    = "https://www.facebook.com/zentorashop";
-const INSTAGRAM   = "https://www.instagram.com/zentorashop";
+const INSTAGRAM   = "https://www.instagram.com/zentorashopkenya1";
 const MAP_EMBED   = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.816319881411!2d36.8221420775937!3d-1.2841155953611947!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f11e849a53eb7%3A0x235009a1613022f4!2sGaberone%20plaza!5e0!3m2!1sen!2ske!4v1774789137005!5m2!1sen!2ske";
 
 const CONTACT_JSON_LD = {
@@ -342,7 +342,7 @@ const ContactUsPage = () => {
                     </span>
                     <div className="min-w-0">
                       <div className="text-sm font-semibold text-foreground">TikTok</div>
-                      <div className="text-xs text-foreground/50 truncate">@zentorashop</div>
+                      <div className="text-xs text-foreground/50 truncate">@zentorashopkenya</div>
                     </div>
                   </a>
 
