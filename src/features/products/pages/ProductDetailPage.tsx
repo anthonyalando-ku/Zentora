@@ -53,8 +53,9 @@ const mapDiscoveryItemToProduct = (item: DiscoveryFeedItem): Product => {
   };
 };
 
+const PHONE_NUMBER = "254795974591";
 const buildWhatsAppUrl = (name: string, price: number, slug: string) => {
-  const phone = "254795974591";
+  const phone = PHONE_NUMBER;
   const text = `Hi Zentora, I'm interested in: ${name} (KSh ${price}) - ${window.location.origin}/products/${slug}`;
   return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 };
@@ -431,6 +432,7 @@ const ProductDetailPage = () => {
               productName={product.name}
               productSlug={product.slug}
               whatsAppUrl={whatsAppUrl}
+              phoneNumber={PHONE_NUMBER}
               onDecrement={onDecrement}
               onIncrement={onIncrement}
               onAddToCart={handleAddToCart}

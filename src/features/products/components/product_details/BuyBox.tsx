@@ -1,4 +1,4 @@
-import { HeartIcon, WhatsAppIcon, ShieldCheckIcon, TruckIcon, ArrowReturnIcon } from "./icons";
+import { HeartIcon, WhatsAppIcon, PhoneIcon ,ShieldCheckIcon, TruckIcon, ArrowReturnIcon } from "./icons";
 import { QtyControl, StockPill } from "./QtyControl";
 
 const cn = (...classes: Array<string | false | undefined | null>) =>
@@ -21,6 +21,7 @@ type BuyBoxProps = {
   productName: string;
   productSlug: string;
   whatsAppUrl: string;
+  phoneNumber: string;
   onDecrement: () => void;
   onIncrement: () => void;
   onAddToCart: () => void;
@@ -45,6 +46,7 @@ export const BuyBox = ({
   upsertPending,
   removePending,
   whatsAppUrl,
+  phoneNumber,
   onDecrement,
   onIncrement,
   onAddToCart,
@@ -148,6 +150,15 @@ export const BuyBox = ({
         >
           <WhatsAppIcon className="w-4 h-4" />
           Enquire on WhatsApp
+        </a>
+
+        {/* Phone */}
+        <a
+          href={`tel:${phoneNumber}`}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all h-10 text-sm border border-blue-400/40 text-blue-500 hover:bg-blue-500/10 active:scale-[0.98]"
+        >
+          <PhoneIcon className="w-4 h-4" />
+          Call us
         </a>
 
         {/* Wishlist */}
