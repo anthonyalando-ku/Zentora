@@ -32,16 +32,36 @@ export const ProductWizardStepCategoriesTags = ({
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
+  // const addTag = () => {
+  //   const t = tagInput.trim();
+  //   if (!t) return;
+  //   setTags((prev) => {
+  //     const exists = prev.some((x) => x.toLowerCase() === t.toLowerCase());
+  //     if (exists) return prev;
+  //     return [...prev, t];
+  //   });
+  //   setTagInput("");
+  // };
   const addTag = () => {
-    const t = tagInput.trim();
-    if (!t) return;
-    setTags((prev) => {
-      const exists = prev.some((x) => x.toLowerCase() === t.toLowerCase());
-      if (exists) return prev;
-      return [...prev, t];
-    });
-    setTagInput("");
-  };
+  const parts = tagInput
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) return;
+
+  setTags((prev) => {
+    const next = [...prev];
+    for (const t of parts) {
+      if (!next.some((x) => x.toLowerCase() === t.toLowerCase())) {
+        next.push(t);
+      }
+    }
+    return next;
+  });
+
+  setTagInput("");
+};
 
   const removeTag = (t: string) => setTags((prev) => prev.filter((x) => x !== t));
 
