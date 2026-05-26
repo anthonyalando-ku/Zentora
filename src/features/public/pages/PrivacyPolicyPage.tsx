@@ -90,12 +90,12 @@ const PrivacyPolicyPage = () => (
       <link rel="canonical" href={`${SITE_URL}/privacy`} />
       <meta property="og:type"        content="website" />
       <meta property="og:title"       content="Privacy Policy | Zentora Kenya" />
-      <meta property="og:description" content="How Zentora collects, uses and protects your personal data." />
+      <meta property="og:description" content="Zentora's Privacy Policy covers what personal data we collect when you shop on zentorashop.co.ke, how we use it, and your rights under Kenyan data-protection law." />
       <meta property="og:url"         content={`${SITE_URL}/privacy`} />
       <meta property="og:image"       content={`${SITE_URL}/og-default.png`} />
       <meta name="twitter:card"        content="summary" />
       <meta name="twitter:title"       content="Privacy Policy | Zentora Kenya" />
-      <meta name="twitter:description" content="How Zentora collects, uses and protects your personal data." />
+      <meta name="twitter:description" content="How Zentora collects, stores and protects your personal data — and your rights as a customer under Kenyan law." />
       <script type="application/ld+json">{JSON.stringify(POLICY_JSON_LD)}</script>
     </Helmet>
 

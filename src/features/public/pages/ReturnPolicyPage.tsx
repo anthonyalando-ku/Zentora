@@ -158,17 +158,17 @@ const ReturnPolicyPage = () => {
         <title>Return &amp; Refund Policy | Zentora Kenya — 7-Day Returns</title>
         <meta
           name="description"
-          content="Zentora Kenya accepts returns within 7 days of delivery on all items — defective or not — in original condition. Refunds via M-Pesa or bank transfer. Simple 5-step return process."
+          content="7-day return window on all items — defective or not. Refunds via M-Pesa or bank transfer. Wrong or damaged items replaced at no charge."
         />
         <link rel="canonical" href="https://zentorashop.co.ke/returns" />
         <meta property="og:type"        content="website" />
         <meta property="og:title"       content="Return & Refund Policy | Zentora Kenya — 7-Day Returns" />
-        <meta property="og:description" content="7-day return window on all items. Refunds via M-Pesa or bank transfer. Damaged items covered at no charge." />
+        <meta property="og:description" content="Zentora's 7-day return window covers all items — defective or not — in original condition. Refunds via M-Pesa or bank transfer within 3–5 business days. Damaged or wrong items replaced free of charge." />
         <meta property="og:url"         content="https://zentorashop.co.ke/returns" />
         <meta property="og:image"       content="https://zentorashop.co.ke/og-default.png" />
         <meta name="twitter:card"        content="summary_large_image" />
-        <meta name="twitter:title"       content="Return & Refund Policy | Zentora Kenya" />
-        <meta name="twitter:description" content="7-day returns on all items. Refunds via M-Pesa or bank transfer. Damaged items replaced free of charge." />
+        <meta name="twitter:title"       content="Return &amp; Refund Policy | Zentora Kenya — 7-Day Returns" />
+        <meta name="twitter:description" content="Return any item within 7 days of delivery. Refunds via M-Pesa or bank transfer. Damaged or incorrect items replaced at no cost." />
         {/* Two separate MerchantReturnPolicy blocks — required by Google Merchant Center */}
         <script type="application/ld+json">{JSON.stringify(PAGE_JSON_LD)}</script>
         <script type="application/ld+json">{JSON.stringify(RETURN_POLICY_GENERAL_JSON_LD)}</script>

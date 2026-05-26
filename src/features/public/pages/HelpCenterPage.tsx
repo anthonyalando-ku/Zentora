@@ -237,12 +237,12 @@ const HelpCenterPage = () => {
         <link rel="canonical" href="https://zentorashop.co.ke/help" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Zentora Help Center — FAQs &amp; Customer Support" />
-        <meta property="og:description" content="Find answers to common questions about orders, delivery, payments and returns at Zentora Kenya." />
+        <meta property="og:description" content="Find answers to common questions about placing orders, delivery timelines, M-Pesa payments and 7-day returns at Zentora Kenya. Can't find your answer? Reach us on WhatsApp." />
         <meta property="og:url" content="https://zentorashop.co.ke/help" />
         <meta property="og:image" content="https://zentorashop.co.ke/og-default.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Zentora Help Center" />
-        <meta name="twitter:description" content="FAQs and support for Zentora Kenya — orders, delivery, payments, returns." />
+        <meta name="twitter:title" content="Zentora Help Center — FAQs &amp; Customer Support Kenya" />
+        <meta name="twitter:description" content="Answers to common questions about Zentora orders, delivery, M-Pesa payments and returns. Still stuck? WhatsApp us for fast support." />
         {/* FAQPage JSON-LD — enables FAQ rich results in Google Search */}
         <script type="application/ld+json">{JSON.stringify(HELP_JSON_LD)}</script>
       </Helmet>

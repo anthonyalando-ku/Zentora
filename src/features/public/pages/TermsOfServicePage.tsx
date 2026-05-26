@@ -92,20 +92,20 @@ const DataRow = ({ label, value }: { label: string; value: React.ReactNode }) =>
 const TermsOfServicePage = () => (
   <MainLayout>
     <Helmet>
-      <title>Terms of Service | Zentora Kenya</title>
+      <title>Terms of Service | Zentora Kenya — Orders, Payments &amp; Your Rights</title>
       <meta
         name="description"
-        content="Read Zentora Kenya's Terms of Service — the rules governing your use of zentorashop.co.ke, how we handle orders, payments, returns and your rights as a customer."
+        content="Zentora Kenya Terms of Service — rules governing zentorashop.co.ke use, orders, M-Pesa payments, delivery, returns and your rights as a customer in Kenya."
       />
       <link rel="canonical" href={`${SITE_URL}/terms`} />
       <meta property="og:type"        content="website" />
-      <meta property="og:title"       content="Terms of Service | Zentora Kenya" />
-      <meta property="og:description" content="The terms governing your use of zentorashop.co.ke — orders, payments, returns and your rights." />
+      <meta property="og:title"       content="Terms of Service | Zentora Kenya — Orders, Payments &amp; Your Rights" />
+      <meta property="og:description" content="The full terms governing your use of zentorashop.co.ke — account rules, how orders and payments work, our delivery and return commitments, and your rights as a customer in Kenya." />
       <meta property="og:url"         content={`${SITE_URL}/terms`} />
       <meta property="og:image"       content={`${SITE_URL}/og-default.png`} />
       <meta name="twitter:card"        content="summary" />
       <meta name="twitter:title"       content="Terms of Service | Zentora Kenya" />
-      <meta name="twitter:description" content="Rules governing your use of Zentora — orders, payments, returns and your rights." />
+      <meta name="twitter:description" content="Rules covering your use of Zentora — orders, M-Pesa payments, delivery, returns, account use and your rights under Kenyan consumer law." />
       <script type="application/ld+json">{JSON.stringify(TERMS_JSON_LD)}</script>
     </Helmet>
 

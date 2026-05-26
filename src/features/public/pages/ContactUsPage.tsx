@@ -106,12 +106,12 @@ const ContactUsPage = () => {
         <link rel="canonical" href="https://zentorashop.co.ke/contact" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Contact Zentora Kenya — Phone, WhatsApp &amp; Location" />
-        <meta property="og:description" content="Reach Zentora by WhatsApp, phone or email. Visit us at Gabrone Plaza, Nairobi CBD." />
+        <meta property="og:description" content="Reach Zentora on WhatsApp (+254 795 974 591), by phone, or by email. Walk-in store at Gabrone Plaza, 2nd Floor, Nairobi CBD — open Mon–Sat, 9am–6pm." />
         <meta property="og:url" content="https://zentorashop.co.ke/contact" />
         <meta property="og:image" content="https://zentorashop.co.ke/og-default.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Contact Zentora Kenya" />
-        <meta name="twitter:description" content="WhatsApp, call or email Zentora. Nairobi CBD store open Mon–Sat." />
+        <meta name="twitter:title" content="Contact Zentora Kenya — WhatsApp, Phone &amp; Store Location" />
+        <meta name="twitter:description" content="Chat on WhatsApp, call or email Zentora Kenya. Walk-in store at Gabrone Plaza, Nairobi CBD — open Mon–Sat, 9am to 6pm." />
         <script type="application/ld+json">{JSON.stringify(CONTACT_JSON_LD)}</script>
       </Helmet>
 

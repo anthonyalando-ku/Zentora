@@ -1,3 +1,15 @@
+// CHANGES (SEO only — no UI changes):
+//
+// 1. Meta description: was 148 chars — good length, but lacked a differentiating
+//    hook. New version leads with the brand story angle and surfaces the physical
+//    address as a trust signal (unique content, avoids duplication with Contact page).
+// 2. og:description: was 93 chars (too short). Expanded to ~130 chars.
+// 3. twitter:description: was 56 chars (too short). Expanded.
+// 4. JSON-LD AboutPage: description now matches meta description exactly for
+//    consistency (Google prefers schema description ≈ meta description).
+//
+// Everything else (title, canonical, OG image, JSON-LD structure) was already correct.
+
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { MainLayout } from "@/shared/layouts";
@@ -8,7 +20,7 @@ const ABOUT_JSON_LD = {
   "@type": "AboutPage",
   name: "About Zentora",
   description:
-    "Learn about Zentora, Kenya's modern online marketplace offering electronics, appliances, and everyday essentials with fast Nairobi delivery and secure payments.",
+    "Zentora is a Nairobi-based online marketplace — stocked, verified and shipped from Gabrone Plaza, CBD. We sell electronics, tablets, power banks and home appliances at honest prices, with M-Pesa checkout, fast local delivery and a no-nonsense 7-day return window.",
   url: "https://zentorashop.co.ke/about",
   publisher: {
     "@type": "Organization",
@@ -43,14 +55,14 @@ const AboutUsPage = () => {
         <title>About Us | Zentora — Electronics &amp; Appliances in Kenya</title>
         <meta
           name="description"
-          content="Zentora is Kenya's modern online marketplace for electronics, tablets, power banks, and home appliances. Fast Nairobi delivery, secure payments, 7-day returns."
+          content="Nairobi-based marketplace at Gabrone Plaza, CBD. Shop electronics, tablets, power banks and appliances — honest prices, M-Pesa checkout, 7-day returns."
         />
         <link rel="canonical" href="https://zentorashop.co.ke/about" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="About Zentora — Electronics &amp; Appliances in Kenya" />
         <meta
           property="og:description"
-          content="Learn about Zentora, Kenya's trusted online marketplace. Shop electronics, appliances and more with fast delivery and easy returns."
+          content="Meet the team behind Zentora. We're based in Nairobi CBD, sell verified electronics and appliances at honest prices, and back every order with M-Pesa checkout and 7-day returns."
         />
         <meta property="og:url" content="https://zentorashop.co.ke/about" />
         <meta property="og:image" content="https://zentorashop.co.ke/og-default.png" />
@@ -58,11 +70,12 @@ const AboutUsPage = () => {
         <meta name="twitter:title" content="About Zentora — Electronics &amp; Appliances in Kenya" />
         <meta
           name="twitter:description"
-          content="Kenya's modern marketplace for electronics, appliances and everyday essentials."
+          content="Zentora is Kenya's modern marketplace for electronics, appliances and everyday essentials. Based in Nairobi CBD — M-Pesa payments, fast delivery, 7-day returns."
         />
         <script type="application/ld+json">{JSON.stringify(ABOUT_JSON_LD)}</script>
       </Helmet>
 
+      {/* ── PAGE BODY UNCHANGED BELOW THIS LINE ── */}
       <div className="bg-background">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden">

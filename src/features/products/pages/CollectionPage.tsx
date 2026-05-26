@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
 
@@ -210,7 +211,7 @@ const CollectionPage = () => {
   ].filter(Boolean).length;
 
   // ── SEO ─────────────────────────────────────────────────────────────────────
-  const { title: seoTitle, description: seoDesc, canonicalUrl, shareImage } = useCollectionSeo({
+  const { title: seoTitle, description: seoDesc, canonicalUrl, shareImage, itemListSchema } = useCollectionSeo({
     feedType,
     feedLabel: meta.label,
     feedItems,
@@ -269,6 +270,11 @@ const CollectionPage = () => {
   return (
     <MainLayout>
       <Seo title={seoTitle} description={seoDesc} canonicalUrl={canonicalUrl} imageUrl={shareImage} type="website" />
+      {itemListSchema && (
+        <Helmet>
+          <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>
+        </Helmet>
+      )}
       <PageShell
         header={
           <>
