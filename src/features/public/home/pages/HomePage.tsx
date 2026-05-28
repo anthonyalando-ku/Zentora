@@ -76,9 +76,9 @@ const HomePage = () => {
         {/* <PromoStack /> */}
 
         {/* 3. Trust strip — credibility anchor right after the promos */}
-        <div className="pt-4 md:pt-6">
-          <TrustBadges />
-        </div>
+        <div className="hidden lg:block pt-4 md:pt-6">
+  <TrustBadges />
+</div>
 
         {/* 4. Discovery feeds — Trending, Deals, Best sellers, etc. */}
         {sortedFeeds.map((feed) => (
