@@ -121,7 +121,7 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
 
   return (
     <section
-      className={cn("w-full", className)}
+      className={cn("w-full overflow-hidden", className)}
       aria-label="Featured promotions"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -131,27 +131,33 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
       <div
         className={cn(
           "relative overflow-hidden rounded-2xl",
-          // Responsive heights: tall enough on mobile to be impactful but
-          // not so tall that it dominates the fold. Bigger on desktop.
-          "aspect-[16/11] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[24/9]",
-          "min-h-[280px] sm:min-h-[320px] md:min-h-[360px] lg:min-h-[420px]"
+          // Mobile: no aspect ratio — height driven by content so nothing clips.
+          // md+: fixed cinematic aspect ratio with a generous min-height.
+          "md:aspect-[21/9] lg:aspect-[24/9]",
+          "md:min-h-[360px] lg:min-h-[420px]"
         )}
         style={{ backgroundColor: background, color: tone.ink }}
       >
-        {/* Decorative soft shape */}
+        {/* Decorative soft shape — kept inside overflow-hidden so it can't bleed */}
         <div
-          className="absolute -right-20 -top-20 w-72 h-72 rounded-full opacity-30 pointer-events-none"
+          className="absolute right-0 top-0 -translate-y-1/3 translate-x-1/3 w-72 h-72 rounded-full opacity-30 pointer-events-none"
           style={{ backgroundColor: "rgba(255,255,255,0.55)" }}
           aria-hidden="true"
         />
 
-        <div className="relative z-10 h-full grid grid-cols-1 md:grid-cols-[1.05fr_1fr] gap-2 md:gap-4">
+        {/*
+          Layout:
+          • Mobile  — single column: text on top, image thumbnail below
+          • md+     — side-by-side: text left, image right (absolutely filled)
+        */}
+        <div className="relative z-10 flex flex-col md:grid md:grid-cols-[1.05fr_1fr] md:h-full gap-0">
+
           {/* ── Content ── */}
-          <div className="h-full flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 py-6">
+          <div className="flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 pt-7 pb-4 md:py-8">
             <div className={contentMotion}>
               {slide.badge && (
                 <span
-                  className="inline-block mb-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border"
+                  className="inline-block mb-2.5 text-[10px] font-bold uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border"
                   style={{ borderColor: "rgba(0,0,0,0.18)", color: tone.ink }}
                 >
                   {slide.badge}
@@ -159,10 +165,11 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
               )}
 
               <h2
-                className="font-extrabold leading-[1.02] tracking-tight mb-3"
+                className="font-extrabold leading-[1.05] tracking-tight mb-2"
                 style={{
                   color: tone.ink,
-                  fontSize: "clamp(1.75rem, 5.5vw, 3.5rem)",
+                  // Smaller floor on mobile so long titles don't overflow
+                  fontSize: "clamp(1.4rem, 4.5vw, 3.2rem)",
                 }}
               >
                 {slide.title}
@@ -170,25 +177,25 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
 
               {slide.subtitle && (
                 <p
-                  className="text-sm sm:text-base md:text-lg mb-5 max-w-[36ch] leading-snug"
-                  style={{ color: tone.ink, opacity: 0.78 }}
+                  className="text-xs sm:text-sm md:text-base mb-4 max-w-[30ch] leading-snug"
+                  style={{ color: tone.ink, opacity: 0.75 }}
                 >
                   {slide.subtitle}
                 </p>
               )}
 
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex flex-wrap items-center gap-2">
                 <Link
                   to={slide.primary.href}
-                  className="inline-flex items-center gap-2 h-11 sm:h-12 pl-2 pr-5 rounded-full bg-foreground text-background text-sm sm:text-[15px] font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-md"
+                  className="inline-flex items-center gap-2 h-10 sm:h-11 pl-2 pr-4 rounded-full bg-foreground text-background text-sm font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-md"
                 >
-                  <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-background/15 grid place-items-center">
-                    <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-background/15 grid place-items-center">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14l-1.2 9.2A2 2 0 0 1 15.8 19H8.2a2 2 0 0 1-2-1.8L5 8Z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 8V6a3 3 0 0 1 6 0v2" />
                     </svg>
                   </span>
-                  <span className="uppercase tracking-wider text-[12px] sm:text-[13px]">
+                  <span className="uppercase tracking-wider text-[11px] sm:text-[12px]">
                     {slide.primary.label}
                   </span>
                 </Link>
@@ -196,7 +203,7 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
                 {slide.secondary && (
                   <Link
                     to={slide.secondary.href}
-                    className="inline-flex items-center h-11 sm:h-12 px-4 sm:px-5 rounded-full border text-sm font-semibold hover:bg-foreground/5 transition-colors"
+                    className="inline-flex items-center h-10 sm:h-11 px-4 rounded-full border text-xs sm:text-sm font-semibold hover:bg-foreground/5 transition-colors"
                     style={{ borderColor: "rgba(0,0,0,0.25)", color: tone.ink }}
                   >
                     {slide.secondary.label}
@@ -206,14 +213,16 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
             </div>
           </div>
 
-          {/* ── Image ── */}
-          <div className="relative h-full overflow-hidden">
+          {/* ── Image ──
+               Mobile:  fixed height thumbnail, image covers it.
+               md+:     absolutely fills the right column (as before).
+          */}
+          <div className="relative h-44 sm:h-52 md:h-full overflow-hidden">
             <img
               src={slide.image}
               alt={slide.alt ?? slide.title}
               className={cn(
                 "absolute inset-0 w-full h-full object-cover object-center md:object-right-bottom",
-                "opacity-90 md:opacity-100",
                 imageMotion
               )}
               loading="eager"
@@ -237,9 +246,9 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
               type="button"
               aria-label="Previous slide"
               onClick={prev}
-              className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/15 hover:bg-black/30 text-white transition-colors backdrop-blur-sm grid place-items-center"
+              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/15 hover:bg-black/30 text-white transition-colors backdrop-blur-sm grid place-items-center"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -247,9 +256,9 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
               type="button"
               aria-label="Next slide"
               onClick={() => goTo((index + 1) % slides.length, "next")}
-              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/15 hover:bg-black/30 text-white transition-colors backdrop-blur-sm grid place-items-center"
+              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/15 hover:bg-black/30 text-white transition-colors backdrop-blur-sm grid place-items-center"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -257,9 +266,9 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
         )}
 
         {/* ── Dots + counter ── */}
-        <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 z-20 flex items-center justify-center gap-2">
+        <div className="absolute bottom-2.5 sm:bottom-3 left-0 right-0 z-20 flex items-center justify-center gap-2">
           <span
-            className="text-[10px] sm:text-[11px] font-semibold tabular-nums mr-1"
+            className="text-[10px] font-semibold tabular-nums mr-1"
             style={{ color: tone.ink, opacity: 0.55 }}
           >
             {String(index + 1).padStart(2, "0")}/{String(slides.length).padStart(2, "0")}
@@ -273,7 +282,7 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
               onClick={() => goTo(i, i > index ? "next" : "prev")}
               className={cn(
                 "rounded-full transition-all duration-300",
-                i === index ? "w-6 h-1.5" : "w-1.5 h-1.5 hover:opacity-100"
+                i === index ? "w-5 h-1.5" : "w-1.5 h-1.5 hover:opacity-100"
               )}
               style={{
                 backgroundColor: i === index ? tone.ink : "rgba(0,0,0,0.25)",
