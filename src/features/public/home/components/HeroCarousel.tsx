@@ -1,21 +1,22 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Badge } from "@/shared/components/ui";
 import { cn } from "@/shared/utils/cn";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type HeroSlide = {
   id: string;
-  badge: string;
+  badge?: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
+  /** Hero product image — works best as a transparent/light-bg cutout. */
   image: string;
-  /** Tailwind gradient classes applied to the accent half, e.g. "from-sky-600 to-cyan-500" */
-  gradient: string;
-  /** Optional solid accent for the diagonal slash — defaults to bg-primary */
-  accentClass?: string;
-  cta1: { label: string; href: string };
-  cta2: { label: string; href: string };
+  alt?: string;
+  /** Background pastel tone. Defaults to "mint" if no `background` provided. */
+  tone?: keyof typeof TONES;
+  /** Custom background (CSS color or gradient). Overrides `tone`. */
+  background?: string;
+  primary: { label: string; href: string };
+  secondary?: { label: string; href: string };
 };
 
 type Props = {
@@ -25,12 +26,17 @@ type Props = {
   interval?: number;
 };
 
-// ── Daily seed ────────────────────────────────────────────────────────────────
-/**
- * Returns the index to start on today.
- * Changes every calendar day so returning visitors see a different slide first.
- * Uses day-of-year mod slides.length — no server, no storage, no flicker.
- */
+// ── Pastel tone presets ───────────────────────────────────────────────────────
+const TONES = {
+  mint:   { bg: "#dff1d6", ink: "#1d2718", accent: "#1d2718" },
+  sand:   { bg: "#f1e7d0", ink: "#2a2418", accent: "#2a2418" },
+  peach:  { bg: "#fadcc8", ink: "#2a1a12", accent: "#2a1a12" },
+  sky:    { bg: "#d8e7f5", ink: "#13202d", accent: "#13202d" },
+  lilac:  { bg: "#e6dbf2", ink: "#1f1830", accent: "#1f1830" },
+  rose:   { bg: "#f5d8df", ink: "#2a1320", accent: "#2a1320" },
+} as const;
+
+// ── Daily-seed start index ────────────────────────────────────────────────────
 function getDailyStartIndex(total: number): number {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
@@ -38,20 +44,19 @@ function getDailyStartIndex(total: number): number {
   return dayOfYear % total;
 }
 
-// ── Transition direction tracking ─────────────────────────────────────────────
 type Dir = "next" | "prev" | "idle";
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
-  const [index, setIndex]   = useState(() => getDailyStartIndex(slides.length));
-  const [dir, setDir]       = useState<Dir>("idle");
+  const [index, setIndex] = useState(() => getDailyStartIndex(slides.length));
+  const [dir, setDir] = useState<Dir>("idle");
   const [animating, setAnimating] = useState(false);
   const [paused, setPaused] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const timerRef    = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const TICK        = 60; // ms — progress bar update granularity
+  const TICK = 60;
 
   const goTo = useCallback(
     (next: number, direction: Dir) => {
@@ -78,138 +83,150 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
     [goTo, index, slides.length]
   );
 
-  // Auto-advance + progress bar
   useEffect(() => {
     if (paused) {
-      if (timerRef.current)    clearInterval(timerRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
       if (progressRef.current) clearInterval(progressRef.current);
       return;
     }
-
     setProgress(0);
-
     timerRef.current = setInterval(advance, interval);
     progressRef.current = setInterval(
       () => setProgress((p) => Math.min(p + (TICK / interval) * 100, 100)),
       TICK
     );
-
     return () => {
-      if (timerRef.current)    clearInterval(timerRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
       if (progressRef.current) clearInterval(progressRef.current);
     };
   }, [paused, advance, interval]);
 
   const slide = slides[index];
+  const tone = (slide.tone && TONES[slide.tone]) || TONES.mint;
+  const background = slide.background ?? tone.bg;
 
-  // CSS classes for enter animation
+  // Enter motion
   const contentMotion = cn(
     "transition-all duration-[420ms] ease-out",
-    animating && dir === "next"  && "translate-x-4 opacity-0",
-    animating && dir === "prev"  && "-translate-x-4 opacity-0",
-    !animating                   && "translate-x-0 opacity-100"
+    animating && dir === "next" && "translate-x-4 opacity-0",
+    animating && dir === "prev" && "-translate-x-4 opacity-0",
+    !animating && "translate-x-0 opacity-100"
   );
-
   const imageMotion = cn(
     "transition-all duration-[420ms] ease-out",
-    animating && dir === "next"  && "translate-x-3 opacity-0 scale-[1.02]",
-    animating && dir === "prev"  && "-translate-x-3 opacity-0 scale-[1.02]",
-    !animating                   && "translate-x-0 opacity-100 scale-100"
+    animating && dir === "next" && "translate-x-3 opacity-0 scale-[1.02]",
+    animating && dir === "prev" && "-translate-x-3 opacity-0 scale-[1.02]",
+    !animating && "translate-x-0 opacity-100 scale-100"
   );
 
   return (
-    <div
-      className={cn("h-full min-h-0", className)}
+    <section
+      className={cn("w-full", className)}
+      aria-label="Featured promotions"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <div className="relative h-full min-h-0 rounded-2xl overflow-hidden border border-border shadow-sm">
-
-        {/* ── Background gradient ── */}
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-2xl",
+          // Responsive heights: tall enough on mobile to be impactful but
+          // not so tall that it dominates the fold. Bigger on desktop.
+          "aspect-[16/11] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[24/9]",
+          "min-h-[280px] sm:min-h-[320px] md:min-h-[360px] lg:min-h-[420px]"
+        )}
+        style={{ backgroundColor: background, color: tone.ink }}
+      >
+        {/* Decorative soft shape */}
         <div
-          className={cn(
-            "absolute inset-0 bg-gradient-to-br transition-all duration-700",
-            slide.gradient
-          )}
+          className="absolute -right-20 -top-20 w-72 h-72 rounded-full opacity-30 pointer-events-none"
+          style={{ backgroundColor: "rgba(255,255,255,0.55)" }}
           aria-hidden="true"
         />
 
-        {/* ── Diagonal slash accent ── */}
-        <div
-          className="absolute inset-y-0 right-[40%] w-24 -skew-x-6 opacity-20 bg-white pointer-events-none hidden md:block"
-          aria-hidden="true"
-        />
-
-        {/* ── Grain overlay for depth ── */}
-        <div
-          className="absolute inset-0 opacity-[0.04] pointer-events-none"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-            backgroundSize: "180px 180px",
-          }}
-          aria-hidden="true"
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 h-full min-h-0 relative z-10">
-
-          {/* ── Content half ── */}
-          <div className="p-6 md:p-9 xl:p-11 flex flex-col justify-center min-h-0">
+        <div className="relative z-10 h-full grid grid-cols-1 md:grid-cols-[1.05fr_1fr] gap-2 md:gap-4">
+          {/* ── Content ── */}
+          <div className="h-full flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 py-6">
             <div className={contentMotion}>
-              <Badge
-                variant="sale"
-                className="mb-4 w-fit text-[10px] font-bold px-2.5 py-0.5 tracking-widest uppercase"
-              >
-                {slide.badge}
-              </Badge>
+              {slide.badge && (
+                <span
+                  className="inline-block mb-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border"
+                  style={{ borderColor: "rgba(0,0,0,0.18)", color: tone.ink }}
+                >
+                  {slide.badge}
+                </span>
+              )}
 
-              <h2 className="text-[1.65rem] md:text-[2rem] xl:text-[2.3rem] font-extrabold text-white leading-[1.12] tracking-tight mb-3">
+              <h2
+                className="font-extrabold leading-[1.02] tracking-tight mb-3"
+                style={{
+                  color: tone.ink,
+                  fontSize: "clamp(1.75rem, 5.5vw, 3.5rem)",
+                }}
+              >
                 {slide.title}
               </h2>
 
-              <p className="text-white/70 text-sm md:text-[0.9rem] mb-7 max-w-[22ch] leading-relaxed">
-                {slide.subtitle}
-              </p>
+              {slide.subtitle && (
+                <p
+                  className="text-sm sm:text-base md:text-lg mb-5 max-w-[36ch] leading-snug"
+                  style={{ color: tone.ink, opacity: 0.78 }}
+                >
+                  {slide.subtitle}
+                </p>
+              )}
 
-              <div className="flex flex-wrap gap-2.5">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <Link
-                  to={slide.cta1.href}
-                  className="h-10 px-5 inline-flex items-center justify-center rounded-xl bg-white text-primary text-sm font-bold hover:bg-white/90 active:scale-[0.97] transition-all shadow-md shadow-black/20"
+                  to={slide.primary.href}
+                  className="inline-flex items-center gap-2 h-11 sm:h-12 pl-2 pr-5 rounded-full bg-foreground text-background text-sm sm:text-[15px] font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-md"
                 >
-                  {slide.cta1.label}
+                  <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-background/15 grid place-items-center">
+                    <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14l-1.2 9.2A2 2 0 0 1 15.8 19H8.2a2 2 0 0 1-2-1.8L5 8Z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 8V6a3 3 0 0 1 6 0v2" />
+                    </svg>
+                  </span>
+                  <span className="uppercase tracking-wider text-[12px] sm:text-[13px]">
+                    {slide.primary.label}
+                  </span>
                 </Link>
-                <Link
-                  to={slide.cta2.href}
-                  className="h-10 px-5 inline-flex items-center justify-center rounded-xl border border-white/30 text-white text-sm font-medium hover:bg-white/12 active:scale-[0.97] transition-all backdrop-blur-sm"
-                >
-                  {slide.cta2.label}
-                </Link>
+
+                {slide.secondary && (
+                  <Link
+                    to={slide.secondary.href}
+                    className="inline-flex items-center h-11 sm:h-12 px-4 sm:px-5 rounded-full border text-sm font-semibold hover:bg-foreground/5 transition-colors"
+                    style={{ borderColor: "rgba(0,0,0,0.25)", color: tone.ink }}
+                  >
+                    {slide.secondary.label}
+                  </Link>
+                )}
               </div>
             </div>
           </div>
 
-          {/* ── Image half ── */}
-          <div className="hidden md:block relative h-full min-h-0 overflow-hidden">
+          {/* ── Image ── */}
+          <div className="relative h-full overflow-hidden">
             <img
               src={slide.image}
-              alt={slide.title}
-              className={cn("w-full h-full object-cover", imageMotion)}
+              alt={slide.alt ?? slide.title}
+              className={cn(
+                "absolute inset-0 w-full h-full object-cover object-center md:object-right-bottom",
+                "opacity-90 md:opacity-100",
+                imageMotion
+              )}
               loading="eager"
               fetchPriority="high"
             />
-            {/* Edge fade to blend with gradient */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent pointer-events-none" />
           </div>
-
         </div>
 
-        {/* ── Progress bar (top) ── */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-white/10 z-20">
+        {/* ── Progress bar (top, subtle) ── */}
+        <div className="absolute top-0 inset-x-0 h-[3px] bg-black/5 z-20">
           <div
-            className="h-full bg-white/60 transition-none"
-            style={{ width: `${paused ? progress : progress}%` }}
+            className="h-full bg-black/30 transition-none"
+            style={{ width: `${progress}%` }}
           />
         </div>
 
@@ -220,9 +237,9 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
               type="button"
               aria-label="Previous slide"
               onClick={prev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full border border-white/20 bg-black/20 text-white hover:bg-black/40 transition-colors backdrop-blur-sm flex items-center justify-center"
+              className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/15 hover:bg-black/30 text-white transition-colors backdrop-blur-sm grid place-items-center"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -230,22 +247,23 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
               type="button"
               aria-label="Next slide"
               onClick={() => goTo((index + 1) % slides.length, "next")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full border border-white/20 bg-black/20 text-white hover:bg-black/40 transition-colors backdrop-blur-sm flex items-center justify-center"
+              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/15 hover:bg-black/30 text-white transition-colors backdrop-blur-sm grid place-items-center"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </>
         )}
 
-        {/* ── Slide counter + dots (bottom) ── */}
-        <div className="absolute bottom-3 left-0 right-0 z-20 flex items-center justify-center gap-2">
-          {/* Compact counter */}
-          <span className="text-[10px] font-semibold text-white/50 tabular-nums mr-1">
+        {/* ── Dots + counter ── */}
+        <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 z-20 flex items-center justify-center gap-2">
+          <span
+            className="text-[10px] sm:text-[11px] font-semibold tabular-nums mr-1"
+            style={{ color: tone.ink, opacity: 0.55 }}
+          >
             {String(index + 1).padStart(2, "0")}/{String(slides.length).padStart(2, "0")}
           </span>
-
           {slides.map((s, i) => (
             <button
               key={s.id}
@@ -255,24 +273,16 @@ const HeroCarousel = ({ slides, className, interval = 6000 }: Props) => {
               onClick={() => goTo(i, i > index ? "next" : "prev")}
               className={cn(
                 "rounded-full transition-all duration-300",
-                i === index
-                  ? "w-5 h-1.5 bg-white"
-                  : "w-1.5 h-1.5 bg-white/35 hover:bg-white/60"
+                i === index ? "w-6 h-1.5" : "w-1.5 h-1.5 hover:opacity-100"
               )}
+              style={{
+                backgroundColor: i === index ? tone.ink : "rgba(0,0,0,0.25)",
+              }}
             />
           ))}
         </div>
-
-        {/* ── Pause indicator ── */}
-        {paused && (
-          <div className="absolute top-3 right-3 z-20 flex items-center gap-1 text-[10px] font-semibold text-white/50 backdrop-blur-sm bg-black/20 px-2 py-0.5 rounded-full pointer-events-none">
-            <span className="w-1 h-2.5 bg-white/50 rounded-sm inline-block" />
-            <span className="w-1 h-2.5 bg-white/50 rounded-sm inline-block" />
-          </div>
-        )}
-
       </div>
-    </div>
+    </section>
   );
 };
 

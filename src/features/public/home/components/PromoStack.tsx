@@ -1,68 +1,151 @@
 import { Link } from "react-router-dom";
+import { cn } from "@/shared/utils/cn";
 
-const promos = [
+// ─────────────────────────────────────────────────────────────────────────────
+// PromoStack — repurposed as an editorial promo BANNER ROW.
+//
+// Previously this was a small icon+text stack column inside the hero. The new
+// homepage shows it as a row of full-image cards directly below the hero:
+//   • 1 col on mobile
+//   • 2 cols on tablet
+//   • 4 cols on desktop
+//
+// The cards are image-led — drop in your campaign creatives (one PNG/JPG per
+// card, ideally portrait 4:5) and the card chrome stays out of the way.
+// Optional `title` / `subtitle` overlay if you want text rendered by the app
+// instead of being baked into the image.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type PromoBanner = {
+  id: string;
+  /** Full-bleed creative for the card. Ideally portrait (4:5) and ≥800px wide. */
+  image: string;
+  alt: string;
+  href: string;
+  /** Optional overlay title (rendered when image has no baked-in text). */
+  title?: string;
+  /** Optional overlay subtitle. */
+  subtitle?: string;
+  /** Optional fallback background tint shown while the image loads. */
+  fallbackBg?: string;
+};
+
+const DEFAULT_BANNERS: PromoBanner[] = [
   {
-    title: "Fast Delivery",
-    desc: "Get items delivered quickly",
-    href: "/products?feed_type=trending",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-      </svg>
-    ),
-  },
-  {
-    title: "Secure Payments",
-    desc: "Protected checkout experience",
-    href: "/account",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Daily Deals",
-    desc: "Limited-time offers everyday",
+    id: "mega-sale",
+    image: "https://picsum.photos/seed/zentora-mega-sale/800/1000",
+    alt: "Mega sale — up to 50% off",
     href: "/products?feed_type=deals",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
-      </svg>
-    ),
+    title: "Mega Sale",
+    subtitle: "Up to 50% off",
+    fallbackBg: "#bfe16f",
+  },
+  {
+    id: "free-delivery",
+    image: "https://picsum.photos/seed/zentora-delivery/800/1000",
+    alt: "Free delivery on orders over KSh 10,000",
+    href: "/info/delivery",
+    title: "Free Delivery",
+    subtitle: "Orders over KSh 10,000",
+    fallbackBg: "#9bd1f0",
+  },
+  {
+    id: "seasonal",
+    image: "https://picsum.photos/seed/zentora-seasonal/800/1000",
+    alt: "Seasonal collection",
+    href: "/products?feed_type=featured",
+    title: "Seasonal Picks",
+    subtitle: "Up to 30% off",
+    fallbackBg: "#2f5d3a",
+  },
+  {
+    id: "fresh-start",
+    image: "https://picsum.photos/seed/zentora-fresh-start/800/1000",
+    alt: "Fresh start sale",
+    href: "/products?feed_type=new_arrivals",
+    title: "Fresh Start",
+    subtitle: "New arrivals weekly",
+    fallbackBg: "#e8e2cd",
   },
 ];
 
-const PromoStack = () => (
-  <aside className="lg:col-span-3">
-    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
-      {promos.map((p) => (
-        <Link
-          key={p.title}
-          to={p.href}
-          className="rounded-xl border border-border bg-background hover:border-primary/30 hover:shadow-sm transition-all p-4 flex items-center gap-3 group"
-        >
-          <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-foreground/50 group-hover:text-primary group-hover:bg-primary/8 transition-colors flex-shrink-0">
-            {p.icon}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-sm font-semibold text-foreground leading-tight">{p.title}</div>
-            <div className="text-xs text-foreground/50 mt-0.5">{p.desc}</div>
-          </div>
-          <svg
-            className="w-4 h-4 text-foreground/20 group-hover:text-foreground/40 flex-shrink-0 transition-colors"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-      ))}
-    </div>
-  </aside>
-);
+type PromoStackProps = {
+  banners?: PromoBanner[];
+  /** Render overlay text even if the image already has baked-in copy. Default: false. */
+  showOverlayText?: boolean;
+  className?: string;
+};
+
+const PromoStack = ({
+  banners = DEFAULT_BANNERS,
+  showOverlayText = false,
+  className,
+}: PromoStackProps) => {
+  if (!banners || banners.length === 0) return null;
+
+  return (
+    <section
+      className={cn(
+        "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 md:pt-5",
+        className
+      )}
+      aria-label="Promotions"
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {banners.map((b) => (
+          <PromoCard key={b.id} banner={b} showOverlayText={showOverlayText} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const PromoCard = ({
+  banner,
+  showOverlayText,
+}: {
+  banner: PromoBanner;
+  showOverlayText: boolean;
+}) => {
+  return (
+    <Link
+      to={banner.href}
+      aria-label={banner.alt}
+      className="group relative block overflow-hidden rounded-2xl aspect-[4/5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      style={{ backgroundColor: banner.fallbackBg ?? "#eee" }}
+    >
+      <img
+        src={banner.image}
+        alt={banner.alt}
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+      />
+
+      {/* Soft top→bottom gradient for legibility when overlay text is on */}
+      {showOverlayText && (banner.title || banner.subtitle) && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent pointer-events-none" />
+      )}
+
+      {/* Optional overlay copy */}
+      {showOverlayText && (banner.title || banner.subtitle) && (
+        <div className="absolute inset-x-0 bottom-0 p-4 text-white">
+          {banner.subtitle && (
+            <div className="text-[10.5px] font-bold uppercase tracking-[0.15em] opacity-90 mb-1">
+              {banner.subtitle}
+            </div>
+          )}
+          {banner.title && (
+            <div className="text-lg font-extrabold leading-tight tracking-tight">
+              {banner.title}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Subtle border on hover so the card lifts visually */}
+      <div className="absolute inset-0 rounded-2xl ring-1 ring-black/5 group-hover:ring-black/15 transition-colors pointer-events-none" />
+    </Link>
+  );
+};
 
 export default PromoStack;
