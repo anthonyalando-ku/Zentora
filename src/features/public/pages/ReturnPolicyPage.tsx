@@ -337,7 +337,7 @@ const ReturnPolicyPage = () => {
                   <Step
                     n={4}
                     title="Drop off at our store"
-                    desc="Bring the package to Zentora Shop, Gabrone Plaza, 2nd Floor, Nairobi CBD. For defective or wrong items we can arrange a courier pickup."
+                    desc="Bring the package to Zentora Shop, Accra Towers 5th floor Shop B12, Nairobi CBD. For defective or wrong items we can arrange a courier pickup."
                   />
                   <Step
                     n={5}

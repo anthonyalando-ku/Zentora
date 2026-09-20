@@ -201,7 +201,7 @@ export const AuthLayout = ({ title, subtitle, children }: AuthLayoutProps) => (
         <div className="flex items-center gap-2 pt-5" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div className="w-1 h-1 rounded-full bg-sky-500 shrink-0 opacity-50" />
           <p className="text-[10px] tracking-wide" style={{ color: "rgba(255,255,255,0.35)" }}>
-            Gabrone Plaza, 2nd Floor · Nairobi CBD, Kenya
+            Accra Towers 5th floor Shop B12, Nairobi CBD, Kenya
           </p>
         </div>
 

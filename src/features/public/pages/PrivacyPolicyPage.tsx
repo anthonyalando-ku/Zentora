@@ -9,7 +9,7 @@ const SHOP_NAME       = "Zentora Shop";
 const SITE_URL        = "https://zentorashop.co.ke";
 const CONTACT_EMAIL   = "ezekielmulongo254@gmail.com";
 const CONTACT_PHONE   = "+254 795 974 591";
-const ADDRESS         = "Gabrone Plaza, 2nd Floor, Nairobi CBD, Kenya";
+const ADDRESS         = "Accra Towers 5th floor Shop B12, Nairobi CBD, Kenya";
 
 // ── JSON-LD ───────────────────────────────────────────────────────────────────
 const POLICY_JSON_LD = {

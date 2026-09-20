@@ -8,7 +8,7 @@ const PHONE_RAW   = "+254795974591";
 const PHONE_DISPLAY = "+254 795 974 591";
 const EMAIL       = "ezekielmulongo254@gmail.com";
 const SHOP_NAME   = "Zentora Shop";
-const ADDRESS     = "Gabrone Plaza, 2nd Floor, Nairobi CBD, Kenya";
+const ADDRESS     = "Accra Towers 5th floor Shop B12, Nairobi CBD, Kenya";
 const HOURS       = "Monday – Saturday, 9:00 am – 6:00 pm";
 const MAP_URL     = "https://maps.app.goo.gl/fyjBbr7LjKE1Lpoa6";
 const WHATSAPP    = `https://wa.me/${PHONE_RAW.replace("+", "")}?text=${encodeURIComponent("Hi Zentora, I need help with ")}`;
@@ -21,7 +21,7 @@ const CONTACT_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
   name: "Contact Zentora",
-  description: "Reach Zentora Kenya by phone, WhatsApp, email or visit our Nairobi CBD store at Gabrone Plaza.",
+  description: "Reach Zentora Kenya by phone, WhatsApp, email or visit our Nairobi CBD store at Accra Towers 5th floor Shop B12.",
   url: "https://zentorashop.co.ke/contact",
   publisher: {
     "@type": "LocalBusiness",
@@ -30,7 +30,7 @@ const CONTACT_JSON_LD = {
     email: EMAIL,
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Gabrone Plaza, 2nd Floor",
+      streetAddress: "Accra Towers 5th floor Shop B12, Nairobi CBD",
       addressLocality: "Nairobi CBD",
       addressRegion: "Nairobi",
       addressCountry: "KE",
@@ -101,17 +101,17 @@ const ContactUsPage = () => {
         <title>Contact Us | Zentora Kenya — Phone, WhatsApp &amp; Store Location</title>
         <meta
           name="description"
-          content="Contact Zentora Kenya via WhatsApp, phone or email. Visit our store at Gabrone Plaza, Nairobi CBD. Mon–Sat 9am–6pm. Fast, helpful support."
+          content="Contact Zentora Kenya via WhatsApp, phone or email. Visit our store at Accra Towers 5th floor Shop B12, Nairobi CBD. Mon–Sat 9am–6pm. Fast, helpful support."
         />
         <link rel="canonical" href="https://zentorashop.co.ke/contact" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Contact Zentora Kenya — Phone, WhatsApp &amp; Location" />
-        <meta property="og:description" content="Reach Zentora on WhatsApp (+254 795 974 591), by phone, or by email. Walk-in store at Gabrone Plaza, 2nd Floor, Nairobi CBD — open Mon–Sat, 9am–6pm." />
+        <meta property="og:description" content="Reach Zentora on WhatsApp (+254 795 974 591), by phone, or by email. Walk-in store at Accra Towers 5th floor Shop B12, Nairobi CBD — open Mon–Sat, 9am–6pm." />
         <meta property="og:url" content="https://zentorashop.co.ke/contact" />
         <meta property="og:image" content="https://zentorashop.co.ke/og-default.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Contact Zentora Kenya — WhatsApp, Phone &amp; Store Location" />
-        <meta name="twitter:description" content="Chat on WhatsApp, call or email Zentora Kenya. Walk-in store at Gabrone Plaza, Nairobi CBD — open Mon–Sat, 9am to 6pm." />
+        <meta name="twitter:description" content="Chat on WhatsApp, call or email Zentora Kenya. Walk-in store at Accra Towers 5th floor Shop B12, Nairobi CBD — open Mon–Sat, 9am to 6pm." />
         <script type="application/ld+json">{JSON.stringify(CONTACT_JSON_LD)}</script>
       </Helmet>
 
@@ -281,7 +281,7 @@ const ContactUsPage = () => {
                     <div className="px-5 py-3.5 border-b border-border bg-background flex items-center justify-between">
                       <div>
                         <div className="text-sm font-semibold">{SHOP_NAME}</div>
-                        <div className="text-xs text-foreground/55 mt-0.5">Gabrone Plaza, Nairobi CBD</div>
+                        <div className="text-xs text-foreground/55 mt-0.5">Accra Towers 5th floor Shop B12, Nairobi CBD</div>
                       </div>
                       <a
                         href={MAP_URL}
@@ -294,7 +294,7 @@ const ContactUsPage = () => {
                     </div>
                     <div className="flex-1">
                       <iframe
-                        title="Zentora store location — Gabrone Plaza, Nairobi CBD"
+                        title="Zentora store location — Accra Towers 5th floor Shop B12, Nairobi CBD"
                         src={mapEmbedUrl}
                         className="w-full h-full min-h-[280px]"
                         loading="lazy"

@@ -20,7 +20,7 @@ const ABOUT_JSON_LD = {
   "@type": "AboutPage",
   name: "About Zentora",
   description:
-    "Zentora is a Nairobi-based online marketplace — stocked, verified and shipped from Gabrone Plaza, CBD. We sell electronics, tablets, power banks and home appliances at honest prices, with M-Pesa checkout, fast local delivery and a no-nonsense 7-day return window.",
+    "Zentora is a Nairobi-based online marketplace — stocked, verified and shipped from Accra Towers 5th floor Shop B12, CBD. We sell electronics, tablets, power banks and home appliances at honest prices, with M-Pesa checkout, fast local delivery and a no-nonsense 7-day return window.",
   url: "https://zentorashop.co.ke/about",
   publisher: {
     "@type": "Organization",
@@ -55,7 +55,7 @@ const AboutUsPage = () => {
         <title>About Us | Zentora — Electronics &amp; Appliances in Kenya</title>
         <meta
           name="description"
-          content="Nairobi-based marketplace at Gabrone Plaza, CBD. Shop electronics, tablets, power banks and appliances — honest prices, M-Pesa checkout, 7-day returns."
+          content="Nairobi-based marketplace at Accra Towers 5th floor Shop B12, CBD. Shop electronics, tablets, power banks and appliances — honest prices, M-Pesa checkout, 7-day returns."
         />
         <link rel="canonical" href="https://zentorashop.co.ke/about" />
         <meta property="og:type" content="website" />
@@ -123,7 +123,7 @@ const AboutUsPage = () => {
                     a store you could trust before you even clicked "add to cart".
                   </p>
                   <p>
-                    We're based in Nairobi CBD at Gabrone Plaza, and everything we list is something
+                    We're based in Nairobi CBD at Accra Towers 5th floor Shop B12, and everything we list is something
                     we've verified and stand behind. From tablets and power banks to kitchen appliances
                     and car accessories, our catalog is built around what Kenyan customers actually need —
                     not just what's easy to source.
@@ -217,7 +217,7 @@ const AboutUsPage = () => {
                     <div className="flex justify-between gap-3">
                       <span className="text-foreground/50 shrink-0">Address</span>
                       <span className="font-medium text-foreground text-right">
-                        Gabrone Plaza, 2nd Floor, Nairobi CBD
+                        Accra Towers 5th floor Shop B12, Nairobi CBD
                       </span>
                     </div>
                     <div className="flex justify-between gap-3">
@@ -259,7 +259,7 @@ const AboutUsPage = () => {
                   {/* Embedded map */}
                   <div className="rounded-xl overflow-hidden border border-border aspect-video sm:aspect-auto sm:h-full min-h-[160px]">
                     <iframe
-                      title="Zentora store location — Gabrone Plaza Nairobi"
+                      title="Zentora store location — Accra Towers 5th floor Shop B12 Nairobi"
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.816319881411!2d36.8221420775937!3d-1.2841155953611947!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f11e849a53eb7%3A0x235009a1613022f4!2sGaberone%20plaza!5e0!3m2!1sen!2ske!4v1774789137005!5m2!1sen!2ske"
                       className="w-full h-full"
                       loading="lazy"
