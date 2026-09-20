@@ -28,7 +28,7 @@ export const Header = ({
   onOpenSearch,
   pathname,
   catalogCategories,
-  shopLocation = "Gaborone Plaza, 6th Floor, Shop C2",
+  shopLocation = "Accra Towers 5th floor Shop B12, Nairobi CBD, Kenya",
 }: HeaderProps) => {
   const user = useAuthStore((s) => s.user);
   const isAdmin = Boolean(user?.roles?.includes("admin") || user?.roles?.includes("super_admin"));
