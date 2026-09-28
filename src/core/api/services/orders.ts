@@ -20,6 +20,14 @@ export type GuestShippingInput = {
 
 export type PaymentMethod = "pay_on_delivery" | "mpesa";
 
+export type CreatedOrder = {
+  ID: number;
+  TotalAmount: number;
+  Currency: string;
+};
+
+type CreateOrderResponse = { order: CreatedOrder };
+
 export const ordersApi = {
   placeGuestOrder: async (payload: {
     items: OrderItemInput[];
@@ -27,7 +35,7 @@ export const ordersApi = {
     payment_method: PaymentMethod;
     delivery_method?: string;
   }) => {
-    const { data } = await http.post("/orders/guest", payload);
+    const { data } = await http.post<CreateOrderResponse>("/orders/guest", payload);
     return data;
   },
 
@@ -37,7 +45,7 @@ export const ordersApi = {
     payment_method: PaymentMethod;
     delivery_method?: string;
   }) => {
-    const { data } = await http.post("/orders", payload);
+    const { data } = await http.post<CreateOrderResponse>("/orders", payload);
     return data;
   },
 };
