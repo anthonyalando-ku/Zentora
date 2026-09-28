@@ -55,7 +55,7 @@ export const OrdersTab = ({ ordersQuery }: { ordersQuery: any }) => {
             </div>
 
             <div className="mt-4 flex items-end justify-between">
-              <div className="text-xs text-foreground/60">Total</div>
+              <div className="text-xs text-foreground/60">{o.DeliveryInformation && !o.DeliveryInformation.included_in_order_total ? "Total (excluding delivery)" : "Total"}</div>
               <div className="text-sm font-bold text-primary">
                 {o.Currency} {Number(o.TotalAmount).toLocaleString()}
               </div>

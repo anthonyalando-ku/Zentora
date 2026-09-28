@@ -1,3 +1,4 @@
+import { OrderDeliveryInformation } from "@/features/delivery/DeliveryInformation";
 import { Link, useParams } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
 import { useOrderDetails } from "@/features/account/hooks/useOrderDetails";
@@ -180,7 +181,7 @@ const OrderDetailsPage = () => {
 
                 <div className="text-sm space-y-3">
                   <Row label="Subtotal" value={`${order.Currency} ${Number(order.Subtotal).toLocaleString()}`} />
-                  <Row label="Shipping" value={`${order.Currency} ${Number(order.ShippingFee).toLocaleString()}`} />
+                  <Row label="Delivery" value={order.DeliveryInformation && !order.DeliveryInformation.included_in_order_total ? "Confirmed separately" : `${order.Currency} ${Number(order.ShippingFee).toLocaleString()}`} />
                   <Row label="Tax" value={`${order.Currency} ${Number(order.TaxAmount).toLocaleString()}`} />
 
                   <div className="pt-4 mt-4 border-t border-border flex items-end justify-between">
@@ -190,11 +191,12 @@ const OrderDetailsPage = () => {
                         {order.Currency} {Number(order.TotalAmount).toLocaleString()}
                       </div>
                     </div>
-                    <span className="text-xs text-foreground/60">Final amount</span>
+                    <span className="text-xs text-foreground/60">{order.DeliveryInformation && !order.DeliveryInformation.included_in_order_total ? "Excluding delivery" : "Recorded total"}</span>
                   </div>
                 </div>
               </div>
 
+              <OrderDeliveryInformation snapshot={order.DeliveryInformation} />
               {/* Shipping */}
               <div className="rounded-2xl border border-border bg-background shadow-sm p-5 sm:p-6">
                 <h2 className="text-sm sm:text-base font-semibold text-foreground mb-4">Shipping Address</h2>

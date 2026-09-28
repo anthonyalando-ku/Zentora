@@ -1,3 +1,4 @@
+import { DeliveryInformation } from "@/features/delivery/DeliveryInformation";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
@@ -5,7 +6,7 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 import { useCart } from "@/features/cart/hooks/useCart";
 import { useCartStore } from "@/features/cart/store/cartStore";
 
-import type { PaymentMethod } from "@/core/api/services/orders";
+import type { CreatedOrder, PaymentMethod } from "@/core/api/services/orders";
 import { usePlaceGuestOrder } from "@/features/checkout/hooks/usePlaceGuestOrder";
 import { usePlaceMeOrder } from "@/features/checkout/hooks/usePlaceMeOrder";
 import { useMeAddresses } from "@/features/checkout/hooks/useMeAddresses";
@@ -100,7 +101,7 @@ const CheckoutPage = () => {
   const placeMeOrder = usePlaceMeOrder();
 
   // NEW: success screen state (no navigation)
-  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState<CreatedOrder | null>(null);
 
   const itemsPayload = useMemo(() => {
     return cart.items.map((i) => ({
@@ -148,7 +149,7 @@ const CheckoutPage = () => {
           return;
         }
 
-        await placeGuestOrder.mutateAsync({
+        const result = await placeGuestOrder.mutateAsync({
           items: itemsPayload,
           shipping: {
             full_name: shipping.full_name,
@@ -170,7 +171,7 @@ const CheckoutPage = () => {
         guestCart.clearCart();
 
         // Show success screen (no navigation)
-        setOrderSuccess(true);
+        setOrderSuccess(result.order);
         return;
       }
 
@@ -179,14 +180,14 @@ const CheckoutPage = () => {
         return;
       }
 
-      await placeMeOrder.mutateAsync({
+      const result = await placeMeOrder.mutateAsync({
         address_id: selectedAddressId,
         items: itemsPayload,
         payment_method: paymentMethod,
       });
 
       // NOTE: authenticated cart invalidation already handled in usePlaceMeOrder hook
-      setOrderSuccess(true);
+      setOrderSuccess(result.order);
     } catch (e) {
       alert("Failed to place order. Please try again.");
     }
@@ -196,7 +197,7 @@ const CheckoutPage = () => {
   if (orderSuccess) {
     return (
       <MainLayout>
-        <OrderSuccess /*orderId={orderId} */itemCount={cart.items.length} totalPrice={orderTotal} />
+        <OrderSuccess orderId={orderSuccess.OrderNumber || orderSuccess.ID} itemCount={orderSuccess.Items?.reduce((sum, item) => sum + item.Quantity, 0)} totalPrice={orderSuccess.TotalAmount} delivery={orderSuccess.DeliveryInformation} />
       </MainLayout>
     );
   }
@@ -232,31 +233,7 @@ const CheckoutPage = () => {
           </Link>
         </div>
 
-        {/* Shipping notice (explicitly informs user) */}
-        <div className="mb-6 rounded-2xl border border-border bg-secondary/5 px-4 sm:px-6 py-4">
-          <div className="flex items-start gap-3">
-            <span
-              className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-foreground/70 shrink-0"
-              aria-hidden="true"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h13v10H3V7Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 10h3l2 2v5h-5v-7Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
-              </svg>
-            </span>
-
-            <div className="min-w-0">
-              <div className="text-sm font-semibold text-foreground">Shipping & additional charges</div>
-              <p className="text-sm text-foreground/60 mt-1">
-                The total shown below is <span className="font-semibold text-foreground">exclusive of shipping</span>.
-                Shipping fees (and other delivery-related charges) may be applied depending on your address and delivery
-                method.
-              </p>
-            </div>
-          </div>
-        </div>
+        <div className="mb-6"><DeliveryInformation /></div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
@@ -485,15 +462,15 @@ const CheckoutPage = () => {
 
                 <div className="flex justify-between">
                   <span className="text-foreground/60">Shipping</span>
-                  <span className="font-medium text-foreground/70">Calculated after address</span>
+                  <span className="font-medium text-foreground/70">Confirmed separately</span>
                 </div>
 
                 <div className="text-xs text-foreground/60">
-                  Additional charges may include shipping fees depending on delivery location and method.
+                  Delivery is not included in the order total.
                 </div>
 
                 <div className="flex justify-between font-bold text-base pt-2 border-t border-border">
-                  <span>Estimated total</span>
+                  <span>Order total (excluding delivery)</span>
                   <span className="text-primary">KSh {orderTotal.toLocaleString()}</span>
                 </div>
               </div>

@@ -1,3 +1,4 @@
+import { DeliveryInformation } from "@/features/delivery/DeliveryInformation";
 import { HeartIcon, WhatsAppIcon, PhoneIcon ,ShieldCheckIcon, TruckIcon, ArrowReturnIcon } from "./icons";
 import { QtyControl, StockPill } from "./QtyControl";
 
@@ -190,13 +191,7 @@ export const BuyBox = ({
           ))}
         </div>
 
-        {/* Dispatch note */}
-        <div className="rounded-lg bg-muted/50 px-3 py-2.5 text-[11px] text-foreground/55 border border-border">
-          🚚 Usually dispatched within{" "}
-          <span className="font-semibold text-foreground/80">1–2 business days</span>. Delivery to
-          Nairobi from{" "}
-          <span className="font-semibold text-foreground/80">KSh 200</span>.
-        </div>
+        <DeliveryInformation />
 
       </div>
     </div>

@@ -4,6 +4,8 @@ import { Loader } from "@/shared/components/ui";
 import { RouteError } from "@/core/error/RouteError";
 import { lazyWithRetry } from "@/shared/utils/lazyWithRetry";
 
+const AdminDeliveryPage = lazyWithRetry(() => import("@/features/admin/delivery/AdminDeliveryPage"));
+
 const AdminLayout = lazyWithRetry(() => import("@/features/admin/shared/layouts/AdminLayout"));
 
 const AdminDashboardPage = lazyWithRetry(() => import("@/features/admin/dashboard/pages/AdminDashboardPage"));
@@ -52,6 +54,7 @@ export const adminRoutes = [
     ),
     children: [
       { index: true, element: wrap(<AdminDashboardPage />) },
+      { path: "delivery", element: wrap(<AdminDeliveryPage />) },
 
       { path: "products", element: wrap(<AdminProductsPage />) },
       { path: "products/new", element: wrap(<AdminProductNewPage />) },

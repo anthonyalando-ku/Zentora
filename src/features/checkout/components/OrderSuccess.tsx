@@ -1,13 +1,16 @@
+import type { DeliverySnapshot } from "@/core/api/services/delivery";
+import { OrderDeliveryInformation } from "@/features/delivery/DeliveryInformation";
 import { Link } from "react-router-dom";
 import { CheckCircleIcon, ShoppingCartIcon, HomeIcon } from "@heroicons/react/24/solid";
 
 interface OrderSuccessProps {
+  delivery?: DeliverySnapshot | null;
   orderId?: string | number;
   itemCount?: number;
   totalPrice?: number;
 }
 
-export const OrderSuccess = ({ orderId, itemCount, totalPrice }: OrderSuccessProps) => {
+export const OrderSuccess = ({ orderId, itemCount, totalPrice, delivery }: OrderSuccessProps) => {
   return (
     <div className="max-w-3xl mx-auto px-4 py-24 text-center">
       {/* Animated check icon */}
@@ -25,6 +28,9 @@ export const OrderSuccess = ({ orderId, itemCount, totalPrice }: OrderSuccessPro
           <span className="font-semibold">KSh {totalPrice?.toLocaleString()}</span>
         </p>
       )}
+
+      <p className="text-sm">Order total (excluding delivery)</p>
+      <OrderDeliveryInformation snapshot={delivery} />
 
       {/* Thank you message */}
       <p className="text-foreground/60 mb-8">

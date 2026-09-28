@@ -1,3 +1,4 @@
+import { OrderDeliveryInformation } from "@/features/delivery/DeliveryInformation";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AdminPageHeader } from "@/features/admin/shared/components/AdminPageHeader";
@@ -96,6 +97,7 @@ export default function AdminOrderDetailPage() {
             )}
           </ProductHubSection>
 
+          <OrderDeliveryInformation snapshot={order.DeliveryInformation} />
           <ProductHubSection title="Shipping" description="Customer shipping information.">
             <div className="text-sm text-foreground/70 space-y-1">
               <div>
@@ -134,14 +136,14 @@ export default function AdminOrderDetailPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-foreground/50">Shipping</span>
-                <span className="font-semibold">{order.ShippingFee}</span>
+                <span className="font-semibold">{order.DeliveryInformation && !order.DeliveryInformation.included_in_order_total ? "Confirmed separately" : order.ShippingFee}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-foreground/50">Discount</span>
                 <span className="font-semibold">{order.DiscountAmount}</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-foreground/50">Total</span>
+                <span className="text-foreground/50">{order.DeliveryInformation && !order.DeliveryInformation.included_in_order_total ? "Order total (excluding delivery)" : "Total"}</span>
                 <span className="font-bold text-foreground">
                   {order.TotalAmount} <span className="text-xs text-foreground/50">{order.Currency}</span>
                 </span>

@@ -1,3 +1,4 @@
+import { DeliveryInformation } from "@/features/delivery/DeliveryInformation";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -42,11 +43,11 @@ const FAQS: { category: string; items: { q: string; a: string }[] }[] = [
     items: [
       {
         q: "Do prices include shipping?",
-        a: "No. Shipping fees are calculated at checkout based on your delivery location. Nairobi CBD and nearby areas typically cost KSh 200. Delivery to other counties varies. The exact amount is shown before you confirm payment.",
+        a: "No. Delivery is confirmed separately and excluded from the order total. See the delivery information on this page; we will contact you to confirm the charge for your location.",
       },
       {
         q: "How long does delivery take?",
-        a: "Orders within Nairobi are usually delivered within 1–2 business days. Countrywide deliveries typically take 2–5 business days depending on your location. We dispatch Monday to Saturday.",
+        a: "Delivery timing depends on your location. We will contact you to confirm the delivery arrangements for your order.",
       },
       {
         q: "How do I track my order?",
@@ -58,7 +59,7 @@ const FAQS: { category: string; items: { q: string; a: string }[] }[] = [
       },
       {
         q: "Do you deliver outside Nairobi?",
-        a: "Yes, we ship countrywide across Kenya through trusted courier partners. Delivery to counties outside Nairobi typically takes 2–5 business days. Shipping costs vary by location and are shown at checkout.",
+        a: "Yes, we deliver across Kenya. Delivery charges and timing are confirmed separately based on your location. Delivery is excluded from the order total.",
       },
     ],
   },
@@ -227,6 +228,7 @@ const HelpCenterPage = () => {
 
   return (
     <MainLayout>
+      <div className="max-w-6xl mx-auto px-4 pt-6"><DeliveryInformation /></div>
       {/* ── SEO ── */}
       <Helmet>
         <title>Help Center | Zentora Kenya — FAQs, Orders &amp; Support</title>

@@ -53,6 +53,7 @@ export const AdminSidebar = () => {
   const sidebarCollapsed = useAdminUiStore((s) => s.sidebarCollapsed);
 
   const sections: NavSection[] = [
+    { label: "Delivery", items: [{ label: "Delivery settings", to: "/admin/delivery", icon: <span aria-hidden="true">?</span> }] },
     {
       label: "Dashboard",
       items: [

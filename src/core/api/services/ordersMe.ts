@@ -1,3 +1,4 @@
+import type { DeliverySnapshot } from "@/core/api/services/delivery";
 import { http } from "@/core/api";
 
 export type OrderShipping = {
@@ -43,6 +44,7 @@ export type OrderListRow = {
   TotalAmount: number;
   Currency: string;
   ShippingMethodID: number | null;
+  DeliveryInformation?: DeliverySnapshot | null;
   Shipping: OrderShipping;
   CreatedAt: string;
   UpdatedAt: string;

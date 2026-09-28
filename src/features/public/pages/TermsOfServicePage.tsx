@@ -278,11 +278,11 @@ const TermsOfServicePage = () => (
             {/* ── §6 Delivery ── */}
             <Section id="delivery" title="6. Delivery & shipping">
               <p>
-                Delivery terms are set out in full during checkout and on our product pages. Key
-                points:
+                Delivery information is shown during checkout and on our product pages.
+                Charges and arrangements are confirmed separately. Key points:
               </p>
               <ul className="space-y-1.5 mt-1">
-                <Bullet>Delivery is available within Kenya. Rates and timelines are shown at checkout based on your location.</Bullet>
+                <Bullet>Delivery is available within Kenya. Delivery charges and timelines are confirmed separately based on your location. Delivery charges are excluded from the order total.</Bullet>
                 <Bullet>Estimated delivery times are indicative, not guaranteed. We are not liable for delays caused by courier partners, weather, public holidays, or events outside our control.</Bullet>
                 <Bullet>Risk of loss and title for goods purchased from us transfers to you upon delivery to your specified address.</Bullet>
                 <Bullet>If no one is available to receive the delivery, the courier will attempt redelivery or leave instructions for collection. Repeated failed deliveries may result in the order being returned to us, and you may be charged for redelivery.</Bullet>

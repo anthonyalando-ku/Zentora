@@ -281,6 +281,7 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="px-4 py-3 text-sm">
                       {o.TotalAmount} <span className="text-xs text-foreground/50">{o.Currency}</span>
+                      {o.DeliveryInformation && !o.DeliveryInformation.included_in_order_total && <div className="text-xs text-foreground/50">Excluding delivery</div>}
                     </td>
                     <td className="px-4 py-3 text-sm">{new Date(o.CreatedAt).toLocaleString()}</td>
                     <td className="px-4 py-3 text-right">

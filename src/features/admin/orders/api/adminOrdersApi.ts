@@ -1,3 +1,4 @@
+import type { DeliverySnapshot } from "@/core/api/services/delivery";
 import { http } from "@/core/api";
 
 export type OrderStatus = "pending" | "completed" | "cancelled" | "shipped" | "delivered";
@@ -62,6 +63,7 @@ export type Order = {
   TotalAmount: number;
   Currency: string;
   ShippingMethodID: number | null;
+  DeliveryInformation?: DeliverySnapshot | null;
   Shipping: Shipping;
   CreatedAt: string;
   UpdatedAt: string;

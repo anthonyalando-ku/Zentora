@@ -1,3 +1,4 @@
+import type { DeliverySnapshot } from "@/core/api/services/delivery";
 import { http } from "@/core/api";
 
 export type OrderItemInput = {
@@ -21,6 +22,9 @@ export type GuestShippingInput = {
 export type PaymentMethod = "pay_on_delivery" | "mpesa";
 
 export type CreatedOrder = {
+  OrderNumber: string;
+  Items: { Quantity: number }[];
+  DeliveryInformation?: DeliverySnapshot | null;
   ID: number;
   TotalAmount: number;
   Currency: string;

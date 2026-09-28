@@ -1,3 +1,4 @@
+import { DeliveryInformation } from "@/features/delivery/DeliveryInformation";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
@@ -239,8 +240,7 @@ const CartPage = () => {
                   <span className="font-semibold text-foreground">
                     exclusive of shipping
                   </span>
-                  . Additional charges may apply at checkout depending on your
-                  delivery location and method.
+                  . We will contact you to confirm delivery charges separately.
                 </p>
               </div>
             </div>
@@ -257,7 +257,7 @@ const CartPage = () => {
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-semibold text-foreground">Cart Items</div>
                     <span className="text-xs text-foreground/60">
-                      Shipping calculated at checkout
+                      Delivery confirmed separately
                     </span>
                   </div>
                 </div>
@@ -439,7 +439,7 @@ const CartPage = () => {
                   <div className="flex justify-between">
                     <span className="text-foreground/60">Shipping</span>
                     <span className="font-medium text-foreground/70">
-                      Calculated at checkout
+                      Confirmed separately
                     </span>
                   </div>
                   <div className="text-xs text-foreground/60">
@@ -451,7 +451,7 @@ const CartPage = () => {
                 <div className="mt-5 pt-4 border-t border-border">
                   <div className="flex justify-between items-end">
                     <div>
-                      <div className="text-xs text-foreground/60">Estimated total</div>
+                      <div className="text-xs text-foreground/60">Order total (excluding delivery)</div>
                       <div className="text-xl font-bold text-primary">
                         KSh {total.toLocaleString()}
                       </div>
@@ -459,6 +459,7 @@ const CartPage = () => {
                   </div>
                 </div>
 
+                <div className="mt-4"><DeliveryInformation /></div>
                 <div className="mt-5 space-y-3">
                   <Link
                     to="/checkout"
@@ -490,7 +491,7 @@ const CartPage = () => {
           <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70 p-3">
             <div className="max-w-7xl mx-auto px-1 flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <div className="text-[11px] text-foreground/60">Estimated total</div>
+                <div className="text-[11px] text-foreground/60">Order total (excluding delivery)</div>
                 <div className="text-base font-semibold text-primary leading-tight">
                   KSh {total.toLocaleString()}
                 </div>
