@@ -70,7 +70,7 @@ export const HeaderSearch = () => {
 
   return (
     <div ref={boxRef} className="relative w-full">
-      <form onSubmit={onSubmit} className="flex items-stretch h-9">
+      <form onSubmit={onSubmit} className="flex items-stretch h-11">
 
         {/* Search input */}
         <div className="relative flex-1">
@@ -85,7 +85,8 @@ export const HeaderSearch = () => {
             onChange={(e) => { setValue(e.target.value); setActiveIndex(-1); }}
             onFocus={() => value.trim() && setOpen(true)}
             onKeyDown={onKeyDown}
-            placeholder="Search products…"
+            aria-label="Search products"
+            placeholder="Search products, brands and everyday finds…"
             className="h-full w-full pl-9 pr-3 text-sm border border-border border-r-0 rounded-l-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40 transition"
           />
         </div>

@@ -1,30 +1,14 @@
 import { SearchIcon } from "./icons";
 
 export const ProductsGridSkeleton = ({ count = 20 }: { count?: number }) => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+  <div className="catalogue-product-grid grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
     {Array.from({ length: count }).map((_, i) => (
       <div key={i} className="rounded-xl border border-border bg-background overflow-hidden" aria-hidden="true">
-        <div className="aspect-square bg-foreground/6 animate-pulse" />
+        <div className="aspect-square bg-slate-100 animate-pulse" />
         <div className="p-3 space-y-2">
-          <div className="h-3 w-4/5 bg-foreground/8 rounded animate-pulse" style={{ animationDelay: `${i * 30}ms` }} />
-          <div className="h-3 w-2/3 bg-foreground/8 rounded animate-pulse" style={{ animationDelay: `${i * 30 + 80}ms` }} />
-          <div className="h-4 w-1/2 bg-foreground/10 rounded animate-pulse" style={{ animationDelay: `${i * 30 + 160}ms` }} />
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-/** Smaller inline skeleton for the catalog blend section below a feed */
-export const InlineCatalogSkeleton = ({ count = 8 }: { count?: number }) => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-    {Array.from({ length: count }).map((_, i) => (
-      <div key={i} className="rounded-xl border border-border bg-background overflow-hidden" aria-hidden="true">
-        <div className="aspect-square bg-foreground/6 animate-pulse" style={{ animationDelay: `${i * 40}ms` }} />
-        <div className="p-3 space-y-2">
-          <div className="h-3 w-4/5 bg-foreground/8 rounded animate-pulse" style={{ animationDelay: `${i * 40 + 60}ms` }} />
-          <div className="h-3 w-2/3 bg-foreground/8 rounded animate-pulse" style={{ animationDelay: `${i * 40 + 120}ms` }} />
-          <div className="h-4 w-1/2 bg-foreground/10 rounded animate-pulse" style={{ animationDelay: `${i * 40 + 180}ms` }} />
+          <div className="h-3 w-4/5 bg-slate-100 rounded animate-pulse" style={{ animationDelay: `${i * 30}ms` }} />
+          <div className="h-3 w-2/3 bg-slate-100 rounded animate-pulse" style={{ animationDelay: `${i * 30 + 80}ms` }} />
+          <div className="h-4 w-1/2 bg-slate-200 rounded animate-pulse" style={{ animationDelay: `${i * 30 + 160}ms` }} />
         </div>
       </div>
     ))}

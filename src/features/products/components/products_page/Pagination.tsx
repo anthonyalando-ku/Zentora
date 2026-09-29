@@ -32,7 +32,7 @@ export const Pagination = ({
   }
 
   return (
-    <div className="flex items-center justify-center gap-1.5 py-5 border-t border-border">
+    <nav aria-label="Product pages" className="catalogue-pagination flex items-center justify-center gap-1.5 py-5">
       <button
         className="h-9 w-9 inline-flex items-center justify-center rounded-lg border border-border hover:bg-muted transition-colors disabled:opacity-30 disabled:pointer-events-none"
         onClick={onPrev}
@@ -55,6 +55,7 @@ export const Pagination = ({
                 : "border border-border hover:bg-muted text-foreground/70 hover:text-foreground"
             )}
             onClick={() => onSetPage(p as number)}
+            aria-label={"Page " + p}
             aria-current={page === p ? "page" : undefined}
           >
             {p}
@@ -70,6 +71,6 @@ export const Pagination = ({
       >
         <ChevronRightIcon />
       </button>
-    </div>
+    </nav>
   );
 };

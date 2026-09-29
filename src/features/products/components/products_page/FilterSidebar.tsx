@@ -1,6 +1,7 @@
-import { cn } from "@/shared/utils/cn";
+import { useId, useState } from "react";
+import { Search } from "lucide-react";
 import { FilterSection } from "./FilterSection";
-
+import "@/styles/catalogue.css";
 export type FilterSidebarProps = {
   disabled: boolean;
   categories: { id: string | number; name: string }[];
@@ -23,170 +24,43 @@ export type FilterSidebarProps = {
   }) => void;
 };
 
-export const FilterSidebar = ({
-  disabled,
-  categories,
-  brands,
-  selectedCategoryId,
-  selectedBrandId,
-  priceMin,
-  priceMax,
-  minRating,
-  discountOnly,
-  inStockOnly,
-  onChange,
-}: FilterSidebarProps) => {
-  return (
-    <div className={cn("divide-y divide-border", disabled && "opacity-50 pointer-events-none select-none")}>
 
-      {/* Category */}
-      <FilterSection title="Category">
-        <div className="space-y-0.5 max-h-52 overflow-y-auto pr-0.5 scrollbar-thin">
-          <button
-            className={cn(
-              "w-full text-left text-sm px-2.5 py-1.5 rounded-lg transition-colors",
-              !selectedCategoryId
-                ? "bg-primary text-white font-medium"
-                : "hover:bg-muted text-foreground/70 hover:text-foreground"
-            )}
-            onClick={() => onChange({ category_id: null })}
-            disabled={disabled}
-          >
-            All Categories
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={String(cat.id)}
-              className={cn(
-                "w-full text-left text-sm px-2.5 py-1.5 rounded-lg transition-colors",
-                String(selectedCategoryId) === String(cat.id)
-                  ? "bg-primary text-white font-medium"
-                  : "hover:bg-muted text-foreground/70 hover:text-foreground"
-              )}
-              onClick={() => onChange({ category_id: String(cat.id) })}
-              disabled={disabled}
-              title={cat.name}
-            >
-              <span className="line-clamp-1 text-xs">{cat.name}</span>
-            </button>
-          ))}
-        </div>
-      </FilterSection>
-
-      {/* Brand */}
-      {brands.length > 0 && (
-        <FilterSection title="Brand" defaultOpen={false}>
-          <div className="space-y-0.5 max-h-52 overflow-y-auto pr-0.5 scrollbar-thin">
-            <button
-              className={cn(
-                "w-full text-left text-sm px-2.5 py-1.5 rounded-lg transition-colors",
-                !selectedBrandId
-                  ? "bg-primary text-white font-medium"
-                  : "hover:bg-muted text-foreground/70 hover:text-foreground"
-              )}
-              onClick={() => onChange({ brand_id: null })}
-              disabled={disabled}
-            >
-              All Brands
-            </button>
-            {brands.map((b) => (
-              <button
-                key={String(b.id)}
-                className={cn(
-                  "w-full text-left text-sm px-2.5 py-1.5 rounded-lg transition-colors",
-                  String(selectedBrandId) === String(b.id)
-                    ? "bg-primary text-white font-medium"
-                    : "hover:bg-muted text-foreground/70 hover:text-foreground"
-                )}
-                onClick={() => onChange({ brand_id: String(b.id) })}
-                disabled={disabled}
-                title={b.name}
-              >
-                <span className="line-clamp-1 text-xs">{b.name}</span>
-              </button>
-            ))}
-          </div>
-        </FilterSection>
-      )}
-
-      {/* Price Range */}
-      <FilterSection title="Price (KSh)">
-        <div className="flex gap-2 items-center">
-          <input
-            type="number"
-            value={priceMin ?? ""}
-            onChange={(e) => onChange({ price_min: e.target.value || null })}
-            className="w-full text-xs border border-border rounded-lg px-2.5 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-foreground/30"
-            placeholder="Min"
-            disabled={disabled}
-          />
-          <span className="text-foreground/30 text-xs flex-shrink-0">–</span>
-          <input
-            type="number"
-            value={priceMax ?? ""}
-            onChange={(e) => onChange({ price_max: e.target.value || null })}
-            className="w-full text-xs border border-border rounded-lg px-2.5 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-foreground/30"
-            placeholder="Max"
-            disabled={disabled}
-          />
-        </div>
-      </FilterSection>
-
-      {/* Rating */}
-      <FilterSection title="Min Rating">
-        <div className="space-y-0.5">
-          {([null, 4.5, 4, 3.5, 3] as (number | null)[]).map((rating) => (
-            <button
-              key={String(rating)}
-              className={cn(
-                "w-full flex items-center gap-2 text-xs px-2.5 py-1.5 rounded-lg transition-colors",
-                (minRating ?? null) === rating
-                  ? "bg-primary text-white font-medium"
-                  : "hover:bg-muted text-foreground/70 hover:text-foreground"
-              )}
-              onClick={() => onChange({ min_rating: rating === null ? null : String(rating) })}
-              disabled={disabled}
-            >
-              {rating === null ? (
-                "Any Rating"
-              ) : (
-                <span className="flex items-center gap-1">
-                  <span className="text-amber-400">{"★".repeat(Math.floor(rating))}</span>
-                  {rating % 1 !== 0 && <span className="text-amber-400/50">½</span>}
-                  <span className="text-current opacity-60">& up</span>
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      </FilterSection>
-
-      {/* Toggles */}
-      <FilterSection title="Availability">
-        <div className="space-y-2 pt-0.5">
-          {[
-            { label: "Discount only", checked: discountOnly, key: "discount_only" as const },
-            { label: "In stock only", checked: inStockOnly, key: "in_stock_only" as const },
-          ].map(({ label, checked, key }) => (
-            <label key={key} className="flex items-center gap-2.5 cursor-pointer group">
-              <div
-                className={cn(
-                  "w-9 h-5 rounded-full relative transition-colors duration-200 flex-shrink-0",
-                  checked ? "bg-primary" : "bg-border"
-                )}
-                onClick={() => onChange({ [key]: !checked })}
-              >
-                <div className={cn(
-                  "absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all duration-200",
-                  checked ? "left-[18px]" : "left-0.5"
-                )} />
-              </div>
-              <span className="text-xs text-foreground/70 group-hover:text-foreground transition-colors">{label}</span>
-            </label>
-          ))}
-        </div>
-      </FilterSection>
-
+function ChoiceFilter({ title, items, selected, disabled, onSelect }: { title: string; items: {id: string | number; name: string}[]; selected: string | null; disabled: boolean; onSelect: (value: string | null) => void }) {
+  const [search, setSearch] = useState("");
+  const name = useId();
+  const visible = items.filter(item => item.name.toLowerCase().includes(search.trim().toLowerCase()));
+  return <FilterSection title={title}>
+    {items.length > 7 && <label className="catalogue-filter-search"><Search size={14} aria-hidden="true"/><input aria-label={"Search " + title.toLowerCase()} placeholder={"Search " + title.toLowerCase() + "…"} value={search} onChange={e => setSearch(e.target.value)} disabled={disabled}/></label>}
+    <div className="catalogue-choices" role="group" aria-label={title}>
+      <label><input type="radio" name={name} checked={!selected} onChange={() => onSelect(null)} disabled={disabled}/><span>All {title === "Category" ? "categories" : "brands"}</span></label>
+      {visible.map(item => <label key={item.id}><input type="radio" name={name} checked={String(item.id) === selected} onChange={() => onSelect(String(item.id))} disabled={disabled}/><span>{item.name}</span></label>)}
+      {!visible.length && <p className="catalogue-filter-note">No matches found.</p>}
     </div>
-  );
+  </FilterSection>;
+}
+function PriceFields({ priceMin, priceMax, disabled, onChange }: Pick<FilterSidebarProps, "priceMin" | "priceMax" | "disabled" | "onChange">) {
+  const [min, setMin] = useState(priceMin == null ? "" : String(priceMin));
+  const [max, setMax] = useState(priceMax == null ? "" : String(priceMax));
+  const invalid = min !== "" && max !== "" && Number(min) > Number(max);
+  const errorId = useId();
+  return <form onSubmit={e => { e.preventDefault(); if (!invalid) onChange({price_min: min || null, price_max: max || null}); }}>
+    <div className="catalogue-price-inputs"><label>Minimum<input type="number" min="0" step="any" value={min} onChange={e => setMin(e.target.value)} placeholder="Any" disabled={disabled} aria-invalid={invalid} aria-describedby={invalid ? errorId : undefined}/></label><span>–</span><label>Maximum<input type="number" min="0" step="any" value={max} onChange={e => setMax(e.target.value)} placeholder="Any" disabled={disabled} aria-invalid={invalid} aria-describedby={invalid ? errorId : undefined}/></label></div>
+    {invalid && <p id={errorId} className="catalogue-price-error" role="alert">Maximum must be at least the minimum.</p>}
+    <button type="submit" className="catalogue-price-apply" disabled={disabled || invalid}>Apply price</button>
+  </form>;
+}
+export const FilterSidebar = (props: FilterSidebarProps) => {
+  const {disabled, categories, brands, selectedCategoryId, selectedBrandId, minRating, discountOnly, inStockOnly, onChange} = props;
+  const ratingName = useId();
+  return <fieldset disabled={disabled} className="catalogue-filter-fields">
+    <legend className="sr-only">Product filters</legend>
+    <ChoiceFilter title="Category" items={categories} selected={selectedCategoryId} disabled={disabled} onSelect={value => onChange({category_id:value})}/>
+    {brands.length > 0 && <ChoiceFilter title="Brand" items={brands} selected={selectedBrandId} disabled={disabled} onSelect={value => onChange({brand_id:value})}/>}
+    <FilterSection title="Price (KSh)"><PriceFields key={String(props.priceMin) + ":" + String(props.priceMax)} {...props}/></FilterSection>
+    <FilterSection title="Availability"><div className="catalogue-choices">
+      <label><input type="checkbox" checked={inStockOnly} onChange={e => onChange({in_stock_only:e.target.checked})}/><span>In stock only</span></label>
+      <label><input type="checkbox" checked={discountOnly} onChange={e => onChange({discount_only:e.target.checked})}/><span>Discount only</span></label>
+    </div></FilterSection>
+    <FilterSection title="Minimum rating"><div className="catalogue-choices">{[null,4.5,4,3.5,3].map(rating => <label key={String(rating)}><input type="radio" name={ratingName} checked={minRating === rating} onChange={() => onChange({min_rating:rating == null ? null : String(rating)})}/><span>{rating == null ? "Any rating" : <><span className="catalogue-rating-star" aria-hidden="true">★</span> {rating} & up</>}</span></label>)}</div></FilterSection>
+  </fieldset>;
 };

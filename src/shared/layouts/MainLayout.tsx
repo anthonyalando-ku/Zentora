@@ -1,3 +1,4 @@
+import "@/styles/storefront.css";
 import { type ReactNode, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Header } from "./components/Header";
@@ -40,7 +41,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         onMenuToggle={() => setMenuOpen((v) => !v)}
         onOpenSearch={() => setSearchOpen(true)}
         pathname={location.pathname}
-        catalogCategories={categories?.slice(0, 10).map((c) => ({
+        catalogCategories={categories?.map((c) => ({
           id: c.id, name: c.name, slug: c.slug,
         }))}
       />
@@ -62,7 +63,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       */}
       <main className="flex-1 pb-16 md:pb-0">{children}</main>
 
-      <Footer catalogCategories={categories} />
+      <Footer />
 
       {/* Mobile bottom navigation — Shop / Categories / Search / Cart */}
       <BottomNav

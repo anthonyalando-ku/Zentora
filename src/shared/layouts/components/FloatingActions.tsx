@@ -42,7 +42,7 @@ export const FloatingActions = ({
       aria-label="Quick contact"
       className={cn(
         "fixed right-4 sm:right-5 z-30",
-        "flex flex-col items-end gap-2.5",
+        "flex flex-col items-end gap-2 md:gap-2.5",
         "pointer-events-none",
         // Lift above BottomNav (h-16 + safe-area) on mobile; standard offset on md+.
         "bottom-[calc(env(safe-area-inset-bottom,0px)+76px)] md:bottom-5",
@@ -116,7 +116,7 @@ const FAB = ({
       "rounded-full shadow-[0_12px_28px_-10px_rgba(15,23,31,.35)]",
       toneClass,
       // Compact (mobile + desktop idle)
-      "p-2.5 max-w-[52px]",
+      "p-1.5 max-w-[44px] md:p-2.5 md:max-w-[52px]",
       // Desktop hover expands
       "md:transition-[padding,max-width] md:duration-200 md:ease-out",
       "md:hover:pl-2.5 md:hover:pr-5 md:hover:max-w-[280px]",
@@ -124,7 +124,7 @@ const FAB = ({
       "overflow-hidden"
     )}
   >
-    <span className={cn("h-9 w-9 rounded-full grid place-items-center flex-shrink-0", ringToneClass)}>
+    <span className={cn("h-8 w-8 md:h-9 md:w-9 rounded-full grid place-items-center flex-shrink-0", ringToneClass)}>
       {children}
     </span>
     <span

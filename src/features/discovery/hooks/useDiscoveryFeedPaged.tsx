@@ -11,8 +11,8 @@ export const discoveryFeedPagedQueryKey = (
 /**
  * CollectionPage feed — supports filters passed directly to the discovery API.
  *
- * When filters are provided the backend re-ranks and narrows the feed in one
- * request; we don't fall back to the catalog here (that's CollectionPage's job).
+ * Filters are applied by the backend within the feed, so results always stay
+ * inside the collection. There is no fallback to the general catalogue.
  */
 export const useDiscoveryFeedPaged = (
   feedType: DiscoveryFeedType,

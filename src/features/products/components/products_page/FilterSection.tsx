@@ -16,7 +16,8 @@ export const FilterSection = ({
     <div>
       <button
         type="button"
-        className="w-full flex items-center justify-between py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground/50 hover:text-foreground transition-colors"
+        aria-expanded={open}
+        className="catalogue-filter-heading w-full flex items-center justify-between py-2.5 text-xs font-semibold text-foreground hover:text-primary transition-colors"
         onClick={() => setOpen((o) => !o)}
       >
         {title}

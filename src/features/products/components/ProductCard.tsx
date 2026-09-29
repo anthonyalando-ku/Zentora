@@ -1,3 +1,4 @@
+import { StorefrontImage } from "@/shared/components/StorefrontImage";
 import { Link } from "react-router-dom";
 import { Badge, Rating, Button } from "@/shared/components/ui";
 import { cn } from "@/shared/utils/cn";
@@ -5,6 +6,7 @@ import type { Product } from "@/shared/types/product";
 
 type ProductCardProps = {
   product: Product;
+  variant?: "default" | "storefront";
   className?: string;
   hideAddToCart?: boolean;
   showWishlist?: boolean;
@@ -34,6 +36,7 @@ export const ProductCard = ({
   className,
   hideAddToCart = false,
   showWishlist = false,
+  variant = "default",
 }: ProductCardProps) => {
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -42,9 +45,9 @@ export const ProductCard = ({
   return (
     // ─── Subtle 1px amber gradient border ─────────────────────────────────────
     <div
-      className={cn("p-px rounded-2xl", className)}
+      className={cn("p-px rounded-2xl", variant === "storefront" && "store-product-card", className)}
       style={{
-        background: "linear-gradient(135deg, #d4a84b 0%, #f0cb6a 50%, #c8973a 100%)",
+        background: variant === "storefront" ? undefined : "linear-gradient(135deg, #d4a84b 0%, #f0cb6a 50%, #c8973a 100%)",
       }}
     >
       <div className="group relative bg-background rounded-2xl overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full">
@@ -67,11 +70,7 @@ export const ProductCard = ({
           to={`/products/${product.slug}`}
           className="block overflow-hidden aspect-square bg-gray-50 relative"
         >
-          <img
-            src={product.thumbnail}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+          {variant === "storefront" ? <StorefrontImage src={product.thumbnail} alt={product.name} className="h-full" /> : <img src={product.thumbnail} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
           {showWishlist && (
             <button
               type="button"
@@ -93,7 +92,7 @@ export const ProductCard = ({
             </h3>
           </Link>
 
-          <Rating value={product.rating} showCount reviewCount={product.reviewCount} className="mb-1.5" />
+          {(variant !== "storefront" || (product.reviewCount > 0 && product.rating > 0)) && <Rating value={product.rating} showCount reviewCount={product.reviewCount} className="mb-1.5" />}
 
           <div className="flex items-baseline gap-2 mb-3">
             <span className="font-bold text-sm sm:text-base text-primary">
@@ -126,6 +125,7 @@ export const ProductCard = ({
               rel="noreferrer"
               className={cn(hideAddToCart ? "col-span-2" : "")}
             >
+              {variant === "storefront" ? <span className="store-chat-action"><WhatsAppIcon />Chat on WhatsApp</span> : (
               <Button
                 size="sm"
                 variant="outline"
@@ -136,6 +136,7 @@ export const ProductCard = ({
                 <span className="hidden xs:inline">WhatsApp</span>
                 <span className="xs:hidden">Chat</span>
               </Button>
+              )}
             </a>
           </div>
         </div>

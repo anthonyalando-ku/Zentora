@@ -1,61 +1,20 @@
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import type { DiscoveryFeedItem } from "@/core/api/services/discovery";
 import HeroCarousel, { type HeroSlide } from "./HeroCarousel";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Slide deck — all titles ~4 words, subtitles ~8–10 words for visual
-// consistency across slides at every breakpoint.
-// ─────────────────────────────────────────────────────────────────────────────
-const SLIDES: HeroSlide[] = [
-  {
-    id: "new-arrivals",
-    badge: "New Arrivals",
-    title: "Fresh Picks Just Landed",
-    subtitle: "Appliances, organisers & everyday essentials — just in.",
-    image: "https://ik.imagekit.io/anthonyalando/zentora/1779699654949217736_Heavy_Duty_Adjustable_Fridge___Washing_Machine_Stand_Base__3__YICZ1Xrbt.webp?updatedAt=1779699655532",
-    tone: "mint",
-    primary:   { label: "Shop now",      href: "/products?feed_type=new_arrivals" },
-    secondary: { label: "Explore deals", href: "/products?feed_type=deals" },
-  },
-  {
-    id: "electronics-sale",
-    badge: "Limited Time",
-    title: "Up to 40% Off Electronics",
-    subtitle: "Tablets, power banks & smart devices at great prices.",
-    image: "https://ik.imagekit.io/anthonyalando/zentora/1779697820394930023_Modio_M75_Kids_Tablet_7_Inch_WiFi_Edition_U7-pmRZ-S.webp?updatedAt=1779697820965",
-    tone: "sky",
-    primary:   { label: "Shop electronics", href: "/products?category_id=1" },
-    secondary: { label: "All deals",        href: "/products?feed_type=deals" },
-  },
-  {
-    id: "kitchen-home",
-    badge: "Home & Kitchen",
-    title: "Appliances for Every Home",
-    subtitle: "Upgrade your kitchen & living space affordably.",
-    image: "https://ik.imagekit.io/anthonyalando/zentora/1779699253944920236_Signature_SG-HS360D_Commercial_Blender_1800W___5L_Jar_LczYDG5VW.webp?updatedAt=1779699254572",
-    tone: "peach",
-    primary:   { label: "Shop kitchen",  href: "/products?category_id=12" },
-    secondary: { label: "Home & living", href: "/products?category_id=13" },
-  },
-  {
-    id: "car-accessories",
-    badge: "Top Picks",
-    title: "Car Accessories & Tools",
-    subtitle: "Jump starters, compressors & must-have driver gear.",
-    image: "https://ik.imagekit.io/anthonyalando/zentora/1778499696260723538_jump-starter-type-2-4_oICndqL8j.webp?updatedAt=1778499696849",
-    tone: "sand",
-    primary:   { label: "Shop car gear",  href: "/products?category_id=23" },
-    secondary: { label: "Best sellers",   href: "/products?feed_type=best_sellers" },
-  },
-];
-
-const HeroMarketplace = () => {
-  return (
-    <section
-      className="max-w-7xl mx-auto w-full overflow-hidden px-4 sm:px-6 lg:px-8 pt-4 md:pt-6"
-      aria-label="Featured"
-    >
-      <HeroCarousel slides={SLIDES} interval={6500} />
-    </section>
-  );
-};
-
-export default HeroMarketplace;
+import { StorefrontImage } from "@/shared/components/StorefrontImage";
+// Copy stays configured in the frontend; artwork follows the matching live collection.
+export default function HeroMarketplace({ featured = [], arrivals = [], bestSellers = [], loading, sideLoading = loading }: { featured?: DiscoveryFeedItem[]; arrivals?: DiscoveryFeedItem[]; bestSellers?: DiscoveryFeedItem[]; loading?: boolean; sideLoading?: boolean }) {
+  const campaigns = [
+    { id: "featured", badge: "Discover Zentora", title: "More finds. More possibilities.", subtitle: "For your home, your work and everything in between.", tone: "sand", items: featured, label: "Explore our picks" },
+    { id: "new_arrivals", badge: "New arrivals", title: "Fresh finds. Newly arrived.", subtitle: "Take a fresh look at what's just joined the store.", tone: "sky", items: arrivals, label: "Shop new arrivals" },
+    { id: "best_sellers", badge: "Best sellers", title: "Top picks. Chosen by shoppers.", subtitle: "Explore the products our customers are choosing.", tone: "mint", items: bestSellers, label: "Shop best sellers" },
+  ];
+  const slides: HeroSlide[] = campaigns.filter(c => c.items.length).map(c => ({ ...c, image: c.items.find(p => p.primary_image)?.primary_image, alt: c.items.find(p => p.primary_image)?.name, primary: { label: c.label, href: "/collections/" + c.id } }));
+  const side = [{ item: arrivals[1] || arrivals[0], label: "Just arrived" }, { item: bestSellers[1] || bestSellers[0], label: "Best sellers" }].filter(p => p.item);
+  return <div className={"store-hero-grid " + (!side.length && !sideLoading ? "store-hero-solo" : "")}>
+    <HeroCarousel slides={slides.length ? slides : [{ id: "browse", badge: "Welcome to Zentora", title: "More finds. More possibilities.", subtitle: "Discover products for your everyday life, all in one place.", primary: { label: "Explore the store", href: "/products" } }]} />
+    {/* Render side cards together once loaded; inserting one before the other shifts the mobile rail. */}
+    {!sideLoading && side.length > 0 ? <div className="store-hero-side">{side.map(({item: p, label}, i) => <Link key={label} to={"/products/" + p.slug} className={"store-mini-promo store-tone-" + (i ? "sky" : "rose")}><div><span className="store-eyebrow">{label}</span><h2>{p.name}</h2><span className="store-text-link">Take a look <ArrowRight size={15} /></span></div><StorefrontImage src={p.primary_image} alt={p.name} /></Link>)}</div> : sideLoading && <div className="store-hero-side" aria-label="Loading featured products" aria-busy="true"><div className="store-skeleton" /><div className="store-skeleton" /></div>}
+  </div>;
+}
