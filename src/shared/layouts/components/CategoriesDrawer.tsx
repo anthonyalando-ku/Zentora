@@ -1,210 +1,91 @@
-import { useEffect } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { cn } from "@/shared/utils/cn";
+import { ChevronRight, LayoutGrid, Search, X } from "lucide-react";
+import { CategoryArtwork } from "@/features/public/home/components/CategoryGrid";
+import { useDrawerBehavior } from "../hooks/useDrawerBehavior";
 
 type CatalogCategoryLink = {
   id: string | number;
   slug?: string;
   name: string;
+  image_url?: string | null;
 };
 
 type CategoriesDrawerProps = {
   open: boolean;
   onClose: () => void;
   catalogCategories?: CatalogCategoryLink[];
+  isLoading?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
 };
 
-/* -----------------------------
-   Accent colors (deterministic)
------------------------------- */
-const categoryAccents: string[] = [
-  "bg-blue-50 text-blue-700 border-blue-200",
-  "bg-violet-50 text-violet-700 border-violet-200",
-  "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "bg-amber-50 text-amber-700 border-amber-200",
-  "bg-rose-50 text-rose-700 border-rose-200",
-  "bg-cyan-50 text-cyan-700 border-cyan-200",
-];
+/**
+ * Category browser opened from the mobile bottom nav. Rows use the same artwork
+ * as the desktop category grid: backend image_url via CategoryImage, falling back
+ * to the storefront's tinted initials when the URL is missing, invalid or fails.
+ */
+export const CategoriesDrawer = ({ open, onClose, catalogCategories = [], isLoading, isError, onRetry }: CategoriesDrawerProps) => {
+  const panel = useRef<HTMLElement>(null);
+  const [query, setQuery] = useState("");
+  useDrawerBehavior(open, () => { setQuery(""); onClose(); }, panel);
 
-const getCategoryAccent = (name: string) => {
-  const idx =
-    Math.abs(name.split("").reduce((a, c) => a + c.charCodeAt(0), 0)) %
-    categoryAccents.length;
-
-  return categoryAccents[idx];
-};
-
-/* -----------------------------
-   Smart initials generator
------------------------------- */
-const getInitials = (name: string) => {
-  const words = name.split(" ").filter(Boolean);
-
-  const first = words[0]?.charAt(0) ?? "";
-
-  let second = "";
-
-  for (let i = 1; i < words.length; i++) {
-    const char = words[i].charAt(0);
-    if (/^[A-Za-z0-9]$/.test(char)) {
-      second = char;
-      break;
-    }
-  }
-
-  return (first + second).toUpperCase();
-};
-
-export const CategoriesDrawer = ({
-  open,
-  onClose,
-  catalogCategories = [],
-}: CategoriesDrawerProps) => {
-  /* Lock scroll */
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
-
-  /* Escape close */
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  // Local filter over the already-loaded categories; no request per keystroke.
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q ? catalogCategories.filter(c => c.name.toLowerCase().includes(q)) : catalogCategories;
+  }, [catalogCategories, query]);
 
   if (!open) return null;
+  const close = () => { setQuery(""); onClose(); };
+  const showSearch = catalogCategories.length > 0;
 
   return (
-    <div
-      className="fixed inset-0 z-[55]"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Categories"
-    >
-      {/* Backdrop */}
-      <button
-        type="button"
-        aria-label="Close categories"
-        onClick={onClose}
-        className="absolute inset-0 bg-foreground/40 backdrop-blur-[2px]"
-      />
-
-      {/* Drawer */}
-      <aside
-        className={cn(
-          "absolute left-0 top-0 bottom-0",
-          "w-[86%] max-w-[340px] bg-background shadow-2xl",
-          "flex flex-col",
-          "animate-in slide-in-from-left-12 duration-200"
-        )}
-      >
-        {/* Header */}
-        <div className="px-4 py-3 border-b border-border flex items-center justify-between flex-shrink-0">
+    <div className="store-drawer-root" role="dialog" aria-modal="true" aria-labelledby="categories-drawer-title">
+      <div aria-hidden="true" onClick={close} className="store-drawer-backdrop" />
+      <aside ref={panel} className="store-drawer store-drawer-left store-categories-drawer">
+        <div className="store-drawer-head">
           <div>
-            <div className="text-[10.5px] font-bold uppercase tracking-widest text-foreground/40">
-              Browse
-            </div>
-            <div className="text-[17px] font-bold text-foreground leading-tight">
-              All Categories
-            </div>
+            <span className="store-drawer-eyebrow">Browse</span>
+            <h2 id="categories-drawer-title">All Categories</h2>
           </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="h-9 w-9 inline-flex items-center justify-center rounded-lg bg-muted text-foreground/70 hover:bg-muted/70"
-          >
-            ✕
-          </button>
+          <button type="button" onClick={close} aria-label="Close categories" className="store-drawer-close" data-autofocus><X aria-hidden="true" /></button>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto py-1">
-          {catalogCategories.length === 0 ? (
-            <div className="px-4 py-8 text-center text-xs text-foreground/50">
-              No categories available.
-            </div>
+        {showSearch && (
+          <div className="store-drawer-search">
+            <Search aria-hidden="true" />
+            <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search categories…" aria-label="Search categories" enterKeyHint="search" />
+            {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear category search"><X aria-hidden="true" /></button>}
+          </div>
+        )}
+
+        <div className="store-drawer-body store-categories-list">
+          {isLoading && !catalogCategories.length ? (
+            <ul aria-busy="true" aria-label="Loading categories">{Array.from({ length: 7 }, (_, i) => <li key={i} className="store-drawer-cat-skeleton"><span /><span /></li>)}</ul>
+          ) : isError && !catalogCategories.length ? (
+            <div className="store-drawer-state" role="alert"><strong>Categories couldn't load</strong><span>Check your connection and try again.</span>{onRetry && <button type="button" onClick={onRetry}>Try again</button>}</div>
+          ) : !catalogCategories.length ? (
+            <div className="store-drawer-state"><strong>No categories yet</strong><span>Browse everything in the store instead.</span></div>
+          ) : !visible.length ? (
+            <div className="store-drawer-state" role="status"><Search aria-hidden="true" /><strong>No categories found</strong><span>Try a different search.</span></div>
           ) : (
-            catalogCategories.map((c) => {
-              const initials = getInitials(c.name);
-              const accent = getCategoryAccent(c.name);
-
-              return (
-                <Link
-                  key={String(c.id)}
-                  to={`/products?category_id=${c.id}`}
-                  onClick={onClose}
-                  className="flex items-center gap-3 px-4 py-3 border-b border-border/40 hover:bg-muted/60 transition-colors"
-                >
-                  {/* Icon */}
-                  <div
-                    className={cn(
-                      "h-10 w-10 rounded-xl border grid place-items-center",
-                      "text-xs font-bold shadow-sm",
-                      accent
-                    )}
-                  >
-                    {initials}
-                  </div>
-
-                  {/* Text */}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-foreground truncate">
-                      {c.name}
-                    </div>
-                  </div>
-
-                  {/* Arrow */}
-                  <svg
-                    className="w-4 h-4 text-foreground/30 flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 6l6 6-6 6"
-                    />
-                  </svg>
-                </Link>
-              );
-            })
+            <ul>
+              {visible.map(c => (
+                <li key={String(c.id)}>
+                  <Link to={`/products?category_id=${c.id}`} onClick={close} className="store-drawer-cat">
+                    <span className="store-drawer-cat-art" aria-hidden="true"><CategoryArtwork category={c} /></span>
+                    <span className="store-drawer-cat-name">{c.name}</span>
+                    <ChevronRight className="store-drawer-chevron" aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-border p-3 flex-shrink-0">
-          <Link
-            to="/products"
-            onClick={onClose}
-            className="w-full h-10 inline-flex items-center justify-center gap-1.5 rounded-lg bg-foreground text-background text-[13px] font-semibold"
-          >
-            View all departments
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.4}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 6l6 6-6 6"
-              />
-            </svg>
-          </Link>
+        <div className="store-drawer-foot">
+          <Link to="/products" onClick={close} className="store-drawer-cta"><LayoutGrid aria-hidden="true" />View all departments<ChevronRight aria-hidden="true" /></Link>
         </div>
       </aside>
     </div>

@@ -26,7 +26,8 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
   const location = useLocation();
-  const { data: categories } = useCategories();
+  const categoriesQuery = useCategories();
+  const categories = categoriesQuery.data;
   const cart = useCart();
   const user = useAuthStore((s) => s.user);
   const isAdmin = Boolean(user?.roles?.includes("admin") || user?.roles?.includes("super_admin"));
@@ -85,7 +86,10 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       <CategoriesDrawer
         open={categoriesOpen}
         onClose={() => setCategoriesOpen(false)}
-        catalogCategories={categories?.map((c) => ({ id: c.id, name: c.name, slug: c.slug }))}
+        catalogCategories={categories?.map((c) => ({ id: c.id, name: c.name, slug: c.slug, image_url: c.image_url }))}
+        isLoading={categoriesQuery.isLoading}
+        isError={categoriesQuery.isError}
+        onRetry={() => void categoriesQuery.refetch()}
       />
     </div>
   );

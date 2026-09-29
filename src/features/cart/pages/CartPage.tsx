@@ -1,516 +1,138 @@
-import { DeliveryInformation } from "@/features/delivery/DeliveryInformation";
-import { useMemo } from "react";
+import "@/styles/cart.css";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowLeft, ArrowRight, Flame, MessageCircle, RotateCcw, ShoppingBag } from "lucide-react";
 import { MainLayout } from "@/shared/layouts";
-import { useCart } from "@/features/cart/hooks/useCart";
+import { useCart, type UnifiedCartItem } from "@/features/cart/hooks/useCart";
 import { useDiscoveryFeed } from "@/features/discovery/hooks/useDiscoveryFeed";
 import { ProductCard } from "@/features/products/components/ProductCard";
+import { mapDiscoveryItemToProduct } from "@/features/public/home/utils/mapDiscoveryItem";
+import { CartDeliveryNotice } from "../components/CartDeliveryNotice";
+import { CartItemRow } from "../components/CartItemRow";
 
-import type { DiscoveryFeedItem } from "@/core/api/services/discovery";
-import type { Product } from "@/shared/types/product";
+const ksh = (n: number) => "KSh " + n.toLocaleString();
+const plural = (n: number) => `${n.toLocaleString()} item${n === 1 ? "" : "s"}`;
+const CLEAR_ALL = "__all";
 
-const inventoryStatusToInStock = (s: string | undefined) =>
-  s === "in_stock" || s === "low_stock";
-
-const mapDiscoveryItemToProduct = (item: DiscoveryFeedItem): Product => {
-  const discount = Number((item as any).discount ?? 0);
-  const originalPrice =
-    discount > 0 ? item.price / (1 - discount / 100) : undefined;
-  return {
-    id: String(item.product_id),
-    name: item.name,
-    slug: item.slug,
-    description: "",
-    price: item.price,
-    originalPrice: originalPrice ? Math.round(originalPrice) : undefined,
-    discount: discount || undefined,
-    category: "electronics",
-    images: [],
-    thumbnail:
-      (item as any).primary_image ??
-      "https://picsum.photos/seed/zentora-fallback/600/600",
-    rating: item.rating ?? 0,
-    reviewCount: (item as any).review_count ?? 0,
-    inStock: inventoryStatusToInStock((item as any).inventory_status),
-    tags: [],
-  };
-};
-
-// ─── Shared sub-components ────────────────────────────────────────────────────
-
-const EmptyCartIllustration = () => (
-  <div className="aspect-[4/3] rounded-xl bg-background border border-border flex items-center justify-center">
-    <div className="flex flex-col items-center gap-4 text-foreground/20 select-none">
-      <svg
-        className="w-28 h-28"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {/* Shopping bag body */}
-        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-        <line x1="3" y1="6" x2="21" y2="6" />
-        {/* Handle arc */}
-        <path d="M16 10a4 4 0 0 1-8 0" />
-      </svg>
-      <span className="text-sm font-medium tracking-wide text-foreground/25">
-        Nothing here yet
-      </span>
-    </div>
-  </div>
-);
-
-// Horizontal scroll row — cards fixed-width so they never compress
-const AlsoBuyingRow = ({ products }: { products: Product[] }) => (
-  <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none">
-    {products.map((p) => (
-      <div key={p.slug} className="shrink-0 w-[175px] sm:w-[195px]">
-        <ProductCard product={p} hideAddToCart />
+// Trending products from the discovery feed, excluding what is already in the cart.
+// Keyed on product ids so quantity changes don't rebuild the row.
+function TrendingPicks({ excludeIds }: { excludeIds: string }) {
+  const trending = useDiscoveryFeed("trending", 10);
+  const products = useMemo(() => {
+    const exclude = new Set(excludeIds.split(",").filter(Boolean));
+    return (trending.data?.items ?? []).filter(p => !exclude.has(String(p.product_id))).slice(0, 6).map(mapDiscoveryItemToProduct);
+  }, [trending.data, excludeIds]);
+  if (!products.length) return null;
+  return (
+    <section className="store-section cart-picks" aria-labelledby="cart-picks-heading">
+      <div className="store-section-heading">
+        <div><h2 id="cart-picks-heading"><Flame size={21} aria-hidden="true" />Trending now</h2><p>Popular with shoppers this week</p></div>
+        <Link to="/collections/trending">See all <ArrowRight size={16} aria-hidden="true" /></Link>
       </div>
-    ))}
-  </div>
-);
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+      <div className="store-product-grid">
+        {products.map(p => <ProductCard key={p.slug} product={p} hideAddToCart variant="storefront" />)}
+      </div>
+    </section>
+  );
+}
 
 const CartPage = () => {
   const cart = useCart();
+  // Lines with a change in flight; blocks repeat clicks until the cart settles.
+  const [pending, setPending] = useState<ReadonlySet<string>>(new Set());
+  const inFlight = useRef(new Set<string>()); // synchronous guard for clicks within one frame
+  const [error, setError] = useState<string | null>(null);
 
-  const trendingQ = useDiscoveryFeed("trending", 6);
-  const alsoBuying = useMemo(() => {
-    const items = trendingQ.data?.items ?? [];
-    return items.slice(0, 6).map(mapDiscoveryItemToProduct);
-  }, [trendingQ.data?.items]);
+  const run = async (key: string, action: () => Promise<void> | void) => {
+    if (inFlight.current.has(key) || inFlight.current.has(CLEAR_ALL)) return;
+    inFlight.current.add(key);
+    setError(null);
+    setPending(new Set(inFlight.current));
+    try {
+      await action();
+    } catch {
+      // Mutations roll back to the last server state on failure.
+      setError("We couldn't update your cart. Your previous cart has been restored — please try again.");
+    } finally {
+      inFlight.current.delete(key);
+      setPending(new Set(inFlight.current));
+    }
+  };
 
-  const subtotal = cart.subtotal;
-  const total = subtotal;
+  const setQuantity = (item: UnifiedCartItem, qty: number) => run(item.key, () => cart.setQuantity(item, qty));
+  const removeItem = (item: UnifiedCartItem) => run(item.key, () => cart.removeItem(item));
+  const clearAll = () => { if (confirm("Remove all items from your cart?")) void run(CLEAR_ALL, () => cart.clear()); };
 
-  // ── Loading ──
-  if (cart.isLoading) {
-    return (
-      <MainLayout>
-        <div className="bg-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div className="rounded-2xl border border-border bg-background shadow-sm p-6 sm:p-10">
-              <div className="flex items-center justify-center min-h-[240px]">
-                <div className="text-sm text-foreground/60">Loading your cart…</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </MainLayout>
-    );
+  const cartProductIds = cart.items.map(i => i.product_id).join(",");
+  const clearing = pending.has(CLEAR_ALL);
+
+  // Only block the page on the first load; background refetches keep the current cart visible.
+  if (cart.isLoading && cart.items.length === 0) {
+    return <MainLayout><div className="cart-page"><div className="store-shell">
+      <div className="cart-loading" aria-busy="true" aria-label="Loading your cart"><div className="store-skeleton" /><div className="store-skeleton" /></div>
+    </div></div></MainLayout>;
   }
 
-  // ── Empty cart ──
   if (cart.items.length === 0) {
-    return (
-      <MainLayout>
-        <div className="bg-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div className="rounded-2xl border border-border bg-background shadow-sm p-6 sm:p-10">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                {/* Left: copy + CTA */}
-                <div className="text-center lg:text-left">
-                  <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
-                    Your cart is empty
-                  </h1>
-                  <p className="text-sm sm:text-base text-foreground/60 mt-2 max-w-lg">
-                    Browse our marketplace and add items to your cart. Deals and
-                    best sellers update often.
-                  </p>
-                  <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                    <Link
-                      to="/products"
-                      className="inline-flex items-center justify-center rounded-xl font-medium transition h-11 px-6 text-sm bg-primary text-white hover:opacity-90"
-                    >
-                      Start Shopping
-                    </Link>
-                    <Link
-                      to="/products?feed_type=trending"
-                      className="inline-flex items-center justify-center rounded-xl font-medium transition h-11 px-6 text-sm border border-border hover:bg-secondary/10"
-                    >
-                      Browse Trending
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Right: cart icon illustration */}
-                <div className="flex justify-center lg:justify-end">
-                  <div className="w-full max-w-md rounded-2xl border border-border bg-primary/5 p-6 sm:p-8">
-                    <EmptyCartIllustration />
-                    <div className="mt-4 text-center">
-                      <div className="text-sm font-semibold text-foreground">
-                        No items yet
-                      </div>
-                      <div className="text-xs text-foreground/60 mt-1">
-                        Add products to see them here.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* People also buy */}
-              {alsoBuying.length > 0 && (
-                <div className="mt-10 border-t border-border pt-6">
-                  <div className="flex items-end justify-between gap-4 mb-4">
-                    <div>
-                      <h2 className="text-lg font-semibold text-foreground">
-                        People also buy
-                      </h2>
-                      <p className="text-sm text-foreground/60">
-                        Trending picks from the store
-                      </p>
-                    </div>
-                    <Link
-                      to="/products?feed_type=trending"
-                      className="text-sm font-medium text-primary hover:underline shrink-0"
-                    >
-                      View more
-                    </Link>
-                  </div>
-                  <AlsoBuyingRow products={alsoBuying} />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </MainLayout>
-    );
+    return <MainLayout><div className="cart-page"><div className="store-shell">
+      <nav className="cart-breadcrumb" aria-label="Breadcrumb"><Link to="/">Home</Link><span aria-hidden="true">/</span><span aria-current="page">Cart</span></nav>
+      <div className="cart-empty">
+        <span className="cart-empty-icon" aria-hidden="true"><ShoppingBag /></span>
+        <h1>Your cart is empty</h1>
+        <p>Looks like you haven't added anything yet.</p>
+        <Link to="/products" className="store-cta">Continue shopping <ArrowRight size={16} aria-hidden="true" /></Link>
+      </div>
+      <TrendingPicks excludeIds="" />
+    </div></div></MainLayout>;
   }
 
-  // ── Cart with items ──
   return (
     <MainLayout>
-      <div className="bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
-                Shopping Cart{" "}
-                <span className="text-foreground/60 text-base sm:text-lg font-medium">
-                  ({cart.items.length} item{cart.items.length !== 1 ? "s" : ""})
-                </span>
-              </h1>
-              <p className="text-sm text-foreground/60 mt-1">
-                Review items, adjust quantities, and proceed to checkout.
-              </p>
-            </div>
-            <button
-              className="text-sm text-destructive hover:underline self-start sm:self-auto"
-              onClick={() => cart.clear()}
-              aria-label="Clear all cart items"
-            >
-              Clear all
-            </button>
+      <div className="cart-page"><div className="store-shell">
+        <nav className="cart-breadcrumb" aria-label="Breadcrumb"><Link to="/">Home</Link><span aria-hidden="true">/</span><span aria-current="page">Cart</span></nav>
+        <header className="cart-header">
+          <div>
+            <h1>Shopping Cart <span>({plural(cart.itemCount)})</span></h1>
+            <p>Review your items before checkout.</p>
           </div>
+          <button type="button" className="cart-clear" onClick={clearAll} disabled={clearing}>Clear cart</button>
+        </header>
 
-          {/* Shipping notice */}
-          <div className="mb-6 rounded-2xl border border-border bg-secondary/5 px-4 sm:px-6 py-4">
-            <div className="flex items-start gap-3">
-              <span
-                className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-foreground/70 shrink-0"
-                aria-hidden="true"
-              >
-                <svg
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h13v10H3V7Z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 10h3l2 2v5h-5v-7Z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
-                </svg>
-              </span>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-foreground">
-                  Shipping & additional charges
-                </div>
-                <p className="text-sm text-foreground/60 mt-1">
-                  Prices shown in cart are{" "}
-                  <span className="font-semibold text-foreground">
-                    exclusive of shipping
-                  </span>
-                  . We will contact you to confirm delivery charges separately.
-                </p>
-              </div>
+        <CartDeliveryNotice />
+        {error && <p className="cart-error" role="alert">{error}</p>}
+
+        <div className="cart-layout">
+          <section className="cart-items" aria-labelledby="cart-items-heading">
+            <h2 id="cart-items-heading" className="cart-items-heading">Your items</h2>
+            <ul>
+              {cart.items.map(item => (
+                <CartItemRow key={item.key} item={item} busy={clearing || pending.has(item.key)}
+                  onQuantity={qty => void setQuantity(item, qty)} onRemove={() => void removeItem(item)} />
+              ))}
+            </ul>
+          </section>
+
+          <aside className="cart-summary" aria-labelledby="cart-summary-heading">
+            <h2 id="cart-summary-heading">Order Summary</h2>
+            <dl>
+              <div><dt>Subtotal ({plural(cart.itemCount)})</dt><dd>{ksh(cart.subtotal)}</dd></div>
+              <div><dt>Delivery</dt><dd className="cart-summary-muted">Confirmed separately</dd></div>
+            </dl>
+            <div className="cart-summary-total">
+              <span>Total (excluding delivery)</span>
+              <strong>{ksh(cart.subtotal)}</strong>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-            {/* ── LEFT: Items + people also buy ── */}
-            <div className="lg:col-span-8 space-y-6">
-
-              {/* Cart items */}
-              <div className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
-                <div className="px-4 sm:px-6 py-4 border-b border-border">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-semibold text-foreground">Cart Items</div>
-                    <span className="text-xs text-foreground/60">
-                      Delivery confirmed separately
-                    </span>
-                  </div>
-                </div>
-
-                <div className="divide-y divide-border">
-                  {cart.items.map((item) => {
-                    const lineTotal = item.unit_price * item.quantity;
-                    return (
-                      <div key={item.key} className="p-4 sm:p-5">
-                        <div className="flex gap-4">
-                          <Link
-                            to={item.slug ? `/products/${item.slug}` : "/products"}
-                            className="shrink-0 w-24 sm:w-28"
-                            aria-label={`Open ${item.name}`}
-                          >
-                            <div className="aspect-[4/5] rounded-xl border border-border bg-gray-50 overflow-hidden">
-                              <img
-                                src={item.thumbnail}
-                                alt={item.name}
-                                className="w-full h-full object-contain"
-                                loading="lazy"
-                              />
-                            </div>
-                          </Link>
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="min-w-0">
-                                <Link
-                                  to={item.slug ? `/products/${item.slug}` : "/products"}
-                                  className="font-semibold text-sm sm:text-base hover:text-primary transition-colors line-clamp-2"
-                                >
-                                  {item.name}
-                                </Link>
-                                <div className="mt-1 text-xs text-foreground/50">
-                                  {item.brand ? `${item.brand} • ` : ""}
-                                  {item.category ? `${item.category} • ` : ""}
-                                  Variant ID: {item.variant_id}
-                                </div>
-                              </div>
-
-                              <button
-                                className="shrink-0 w-10 h-10 inline-flex items-center justify-center rounded-xl border border-border hover:bg-secondary/10 transition-colors text-foreground/60 hover:text-destructive"
-                                onClick={() => cart.removeItem(item)}
-                                aria-label={`Remove ${item.name} from cart`}
-                              >
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-
-                            <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                              <div className="flex items-center gap-3">
-                                <div className="inline-flex items-center rounded-xl border border-border overflow-hidden bg-background">
-                                  <button
-                                    className="w-11 h-11 inline-flex items-center justify-center hover:bg-secondary/10 transition-colors disabled:opacity-50"
-                                    onClick={() =>
-                                      cart.setQuantity(item, item.quantity - 1)
-                                    }
-                                    disabled={item.quantity <= 1}
-                                    aria-label={`Decrease quantity of ${item.name}`}
-                                  >
-                                    <span className="text-lg leading-none">−</span>
-                                  </button>
-                                  <span className="w-12 text-center text-sm font-semibold">
-                                    {item.quantity}
-                                  </span>
-                                  <button
-                                    className="w-11 h-11 inline-flex items-center justify-center hover:bg-secondary/10 transition-colors"
-                                    onClick={() =>
-                                      cart.setQuantity(item, item.quantity + 1)
-                                    }
-                                    aria-label={`Increase quantity of ${item.name}`}
-                                  >
-                                    <span className="text-lg leading-none">+</span>
-                                  </button>
-                                </div>
-
-                                {item.quantity > 1 && (
-                                  <div className="text-xs text-foreground/60">
-                                    Unit:{" "}
-                                    <span className="font-medium text-foreground">
-                                      KSh {item.unit_price.toLocaleString()}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="text-right">
-                                <div className="text-xs text-foreground/50">Line total</div>
-                                <div className="text-base sm:text-lg font-bold text-primary">
-                                  KSh {lineTotal.toLocaleString()}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="px-4 sm:px-6 py-4 border-t border-border">
-                  <Link
-                    to="/products"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-secondary transition-colors"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                    Continue Shopping
-                  </Link>
-                </div>
-              </div>
-
-              {/* People also buy */}
-              {alsoBuying.length > 0 && (
-                <section className="rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
-                  <div className="px-4 sm:px-6 py-4 border-b border-border">
-                    <div className="flex items-end justify-between gap-4">
-                      <div>
-                        <h2 className="text-sm sm:text-base font-semibold text-foreground">
-                          People also buy
-                        </h2>
-                        <p className="text-xs text-foreground/60 mt-0.5">
-                          Trending picks from the store
-                        </p>
-                      </div>
-                      <Link
-                        to="/products?feed_type=trending"
-                        className="text-sm font-medium text-primary hover:underline shrink-0"
-                      >
-                        Show more
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="p-4 sm:p-5">
-                    <AlsoBuyingRow products={alsoBuying} />
-                  </div>
-                </section>
-              )}
-            </div>
-
-            {/* ── RIGHT: Order summary (desktop) ── */}
-            <div className="lg:col-span-4">
-              <div className="rounded-2xl border border-border bg-background shadow-sm p-5 sm:p-6 sticky top-24 hidden lg:block">
-                <h2 className="text-base font-semibold text-foreground">Order Summary</h2>
-
-                <div className="mt-4 space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-foreground/60">Subtotal</span>
-                    <span className="font-medium">KSh {subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground/60">Discounts</span>
-                    <span className="font-medium text-foreground/60">KSh 0</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-foreground/60">Shipping</span>
-                    <span className="font-medium text-foreground/70">
-                      Confirmed separately
-                    </span>
-                  </div>
-                  <div className="text-xs text-foreground/60">
-                    Additional charges may include shipping fees depending on
-                    delivery location and method.
-                  </div>
-                </div>
-
-                <div className="mt-5 pt-4 border-t border-border">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <div className="text-xs text-foreground/60">Order total (excluding delivery)</div>
-                      <div className="text-xl font-bold text-primary">
-                        KSh {total.toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4"><DeliveryInformation /></div>
-                <div className="mt-5 space-y-3">
-                  <Link
-                    to="/checkout"
-                    className="w-full inline-flex items-center justify-center rounded-xl font-medium transition h-11 px-6 text-sm bg-primary text-white hover:opacity-90"
-                  >
-                    Proceed to Checkout
-                  </Link>
-                  <Link
-                    to="/products"
-                    className="w-full inline-flex items-center justify-center rounded-xl font-medium transition h-11 px-6 text-sm border border-border hover:bg-secondary/10"
-                  >
-                    Continue Shopping
-                  </Link>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-border text-sm text-foreground/70 space-y-2">
-                  {["Secure payment", "Fast delivery", "Easy returns"].map((text) => (
-                    <div key={text} className="flex items-center gap-2">
-                      <span className="text-green-600 font-bold">✓</span>
-                      <span>{text}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile sticky bottom bar */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70 p-3">
-            <div className="max-w-7xl mx-auto px-1 flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-[11px] text-foreground/60">Order total (excluding delivery)</div>
-                <div className="text-base font-semibold text-primary leading-tight">
-                  KSh {total.toLocaleString()}
-                </div>
-                <div className="text-[11px] text-foreground/60">
-                  Excl. shipping
-                </div>
-              </div>
-              <Link
-                to="/checkout"
-                className="shrink-0 inline-flex items-center justify-center rounded-xl font-medium transition h-11 px-5 text-sm bg-primary text-white hover:opacity-90"
-              >
-                Checkout
-              </Link>
-            </div>
-          </div>
-
-          <div className="h-20 lg:hidden" />
+            <Link to="/checkout" className="store-cta cart-checkout">Proceed to Checkout <ArrowRight size={17} aria-hidden="true" /></Link>
+            <Link to="/products" className="cart-continue"><ArrowLeft size={15} aria-hidden="true" />Continue shopping</Link>
+            <ul className="cart-assurance">
+              <li><Link to="/returns"><RotateCcw aria-hidden="true" />7-day returns · see policy</Link></li>
+              <li><Link to="/contact"><MessageCircle aria-hidden="true" />Questions? Talk to our team</Link></li>
+            </ul>
+          </aside>
         </div>
-      </div>
+
+        <TrendingPicks excludeIds={cartProductIds} />
+      </div></div>
     </MainLayout>
   );
 };

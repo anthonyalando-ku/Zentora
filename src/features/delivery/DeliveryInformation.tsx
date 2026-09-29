@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { deliveryApi, deliveryPolicyKey, type DeliverySnapshot } from "@/core/api/services/delivery";
 
-const fallbackDeliveryNotice =
+export const fallbackDeliveryNotice =
   "Delivery charges are confirmed separately and are not included in the order total.";
 
 export function DeliveryInformation() {
