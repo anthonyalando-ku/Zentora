@@ -1,12 +1,15 @@
+import type { AdminCategory } from "@/features/admin/catalog/shared/adminCatalogApi";
 import { useMemo, useState } from "react";
 import { AdminPageHeader } from "@/features/admin/shared/components/AdminPageHeader";
 import { AdminModal } from "@/features/admin/shared/components/AdminModal";
 import { CategoriesTable } from "@/features/admin/catalog/categories/components/CategoriesTable";
 import { CreateCategoryForm } from "@/features/admin/catalog/categories/components/CreateCategoryForm";
-import { useCategories, useCreateCategory, useDeleteCategory } from "@/features/admin/catalog/categories/hooks/useCategories";
+import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from "@/features/admin/catalog/categories/hooks/useCategories";
 
 const AdminCategoriesPage = () => {
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<AdminCategory | null>(null);
+  const update = useUpdateCategory();
 
   const query = useCategories();
   const create = useCreateCategory();
@@ -52,10 +55,10 @@ const AdminCategoriesPage = () => {
           </button>
         </div>
       ) : (
-        <CategoriesTable rows={rows} deleting={del.isPending} onDelete={(id) => del.mutateAsync(id)} />
+        <CategoriesTable onEdit={setEditing} rows={rows} deleting={del.isPending} onDelete={(id) => del.mutateAsync(id)} />
       )}
 
-      <AdminModal open={open} title="New Category" subtitle="Add a category to your catalog." onClose={() => setOpen(false)}>
+      <AdminModal open={open} title="New Category" subtitle="Add a category to your catalog." onClose={() => { if (!create.isPending) setOpen(false); }}>
         <CreateCategoryForm
           isSubmitting={create.isPending}
           onSubmit={async (values) => {
@@ -63,10 +66,15 @@ const AdminCategoriesPage = () => {
               name: values.name,
               slug: values.slug || undefined,
               parent_id: values.parent_id || undefined,
+              image_url: values.image_url,
+              image: values.image,
             });
             setOpen(false);
           }}
         />
+      </AdminModal>
+      <AdminModal open={editing !== null} title="Edit Category" onClose={() => { if (!update.isPending) setEditing(null); }}>
+        {editing && <CreateCategoryForm key={editing.id} initialCategory={editing} isSubmitting={update.isPending} onSubmit={async (input) => { await update.mutateAsync({id: editing.id, input}); setEditing(null); }} />}
       </AdminModal>
     </div>
   );

@@ -1,3 +1,4 @@
+import { CategoryImage } from "@/features/catalog/CategoryImage";
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { Skeleton } from "@/shared/components/ui";
@@ -5,6 +6,7 @@ import { Skeleton } from "@/shared/components/ui";
 type Category = {
   id: string | number;
   name: string;
+  image_url?: string | null;
   subcategories?: Array<{ id: string | number; name: string }>;
 };
 
@@ -90,12 +92,12 @@ const CategoryMarketplaceSection = ({
                   title={category.name}
                   className="flex flex-col items-center justify-center text-center gap-2.5 rounded-xl border border-border bg-background hover:border-primary/30 hover:bg-muted/30 hover:shadow-sm transition-all h-[88px] px-2"
                 >
-                  {/* Two-letter monogram */}
+                  <CategoryImage src={category.image_url} alt={category.name} fallback={
                   <div
                     className={`w-9 h-9 rounded-lg border flex items-center justify-center text-xs font-bold tracking-wide flex-shrink-0 ${accent}`}
                   >
                     {initials}
-                  </div>
+                  </div>} />
                   <span className="text-[11px] font-medium text-foreground/75 truncate w-full leading-none">
                     {category.name}
                   </span>

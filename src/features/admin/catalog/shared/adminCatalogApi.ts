@@ -35,14 +35,30 @@ export type AdminAttributeValue = {
   sort_order?: number | null;
 };
 
+export type CategoryInput = { name: string; slug?: string; parent_id?: number; image_url?: string; image?: File };
+function categoryBody(input: CategoryInput) {
+  const { image, ...data } = input;
+  if (!image) return { body: data, config: undefined };
+  const body = new FormData();
+  body.append("data", JSON.stringify(data));
+  body.append("image", image);
+  return { body, config: { headers: { "Content-Type": "multipart/form-data" } } };
+}
+
 export const adminCatalogApi = {
   // Categories
   listCategories: async (): Promise<AdminCategory[]> => {
     const { data } = await http.get("/catalog/categories");
     return data;
   },
-  createCategory: async (body: { name: string; slug?: string; parent_id?: number }): Promise<AdminCategory> => {
-    const { data } = await http.post("/admin/catalog/categories", body);
+  createCategory: async (input: CategoryInput): Promise<AdminCategory> => {
+    const { body, config } = categoryBody(input);
+    const { data } = await http.post("/admin/catalog/categories", body, config);
+    return data;
+  },
+  updateCategory: async (id: number, input: CategoryInput): Promise<AdminCategory> => {
+    const { body, config } = categoryBody(input);
+    const { data } = await http.put("/admin/catalog/categories/" + id, body, config);
     return data;
   },
   deleteCategory: async (id: number): Promise<void> => {
