@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { MainLayout } from "@/shared/layouts";
+import { AccountGateway } from "@/features/account/components/AccountGateway";
 import { useAuthStore } from "@/features/auth/store/authStore";
 
 import { useProfile } from "@/features/account/hooks/useProfile";
@@ -60,13 +60,6 @@ const AccountDashboardPage = () => {
   const deleteAddress = useDeleteAddress();
   const setDefault = useSetDefaultAddress();
 
-  // Redirect when unauthenticated (logout triggers this)
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/auth/login", { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
   const profile = profileQuery.data;
 
   const fullNameValue = profile?.full_name?.Valid ? profile.full_name.String : "";
@@ -109,7 +102,7 @@ const AccountDashboardPage = () => {
   const [activeTab, setActiveTab] = useState<AccountTabKey>(() => getTabFromHash(location.hash));
 
   useEffect(() => {
-    if (!location.hash) {
+    if (isAuthenticated && !location.hash) {
       navigate({ pathname: location.pathname, hash: "#profile" }, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,62 +122,11 @@ const AccountDashboardPage = () => {
     }
   };
 
-  // Render a stable placeholder while redirecting (hooks already ran)
+  // Logged-out visitors get the account gateway (sign in / create account).
+  // Logout navigates home itself, so no redirect is needed here.
   if (!isAuthenticated) {
-  return (
-    <MainLayout>
-      <div className="bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="rounded-2xl border border-border bg-background shadow-sm p-6 sm:p-10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
-                  Sign in to view your account
-                </h1>
-                <p className="text-sm text-foreground/60 mt-2 max-w-xl">
-                  Access your profile, orders, addresses, and security settings by logging in or creating an account.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-2 shrink-0">
-                <Link
-                  to="/auth/login"
-                  replace
-                  className="h-11 px-5 rounded-xl bg-primary text-white hover:opacity-90 transition text-sm font-semibold inline-flex items-center justify-center"
-                >
-                  Login
-                </Link>
-
-                <Link
-                  to="/auth/register"
-                  replace
-                  className="h-11 px-5 rounded-xl border border-border hover:bg-secondary/10 transition text-sm font-semibold inline-flex items-center justify-center"
-                >
-                  Create account
-                </Link>
-              </div>
-            </div>
-
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="rounded-xl border border-border bg-secondary/5 p-4">
-                <div className="text-sm font-semibold">Track orders</div>
-                <div className="text-xs text-foreground/60 mt-1">See delivery status and order history.</div>
-              </div>
-              <div className="rounded-xl border border-border bg-secondary/5 p-4">
-                <div className="text-sm font-semibold">Manage addresses</div>
-                <div className="text-xs text-foreground/60 mt-1">Set defaults and edit shipping info.</div>
-              </div>
-              <div className="rounded-xl border border-border bg-secondary/5 p-4">
-                <div className="text-sm font-semibold">Secure account</div>
-                <div className="text-xs text-foreground/60 mt-1">Change password and protect access.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </MainLayout>
-  );
-}
+    return <MainLayout><AccountGateway /></MainLayout>;
+  }
 
   return (
     <MainLayout>

@@ -67,7 +67,7 @@ const LONG = 'Extremely Long Category Name For Layout Testing Across Narrow Phon
     assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('aria-label')), 'Close menu', 'focus moves into the drawer');
     assert.equal(await bodyOverflow(), 'hidden');
     const links = await menu.locator('a').evaluateAll(as => as.map(a => [a.textContent.trim(), a.getAttribute('href')]));
-    assert.deepEqual(links, [['Zentora' + 'Everyday finds. All in one place.', '/'], ['Sign inSign in to continue', '/login'], ['Home', '/'], ['Products', '/products'], ['Deals', '/collections/deals'], ['Help Center', '/help'], ['Contact Us', '/contact'], ['Call +254 795 974591', 'tel:+254795974591']]);
+    assert.deepEqual(links, [['Zentora' + 'Everyday finds. All in one place.', '/'], ['Sign inSign in to continue', '/auth/login'], ['Home', '/'], ['Products', '/products'], ['Deals', '/collections/deals'], ['Help Center', '/help'], ['Contact Us', '/contact'], ['Call +254 795 974591', 'tel:+254795974591']]);
     assert.equal(await menu.getByRole('link', { name: 'Home', exact: true }).getAttribute('aria-current'), 'page');
     for (const banned of ['Admin Console', 'Wishlist', 'wallet', 'Orders', 'Cart']) assert.equal(await menu.getByText(banned).count(), 0, 'no ' + banned + ' for guests');
     if (shots) await page.screenshot({ path: path.join(shots, 'menu-guest-390.png') });
@@ -134,6 +134,8 @@ const LONG = 'Extremely Long Category Name For Layout Testing Across Narrow Phon
     await page.waitForURL(u => u.pathname === '/products' && u.searchParams.get('category_id') === String(target.id));
     await cats.waitFor({ state: 'detached' });
     assert.equal(await bodyOverflow(), '');
+    // Each page mounts its own layout; wait for the Products page before reopening.
+    await page.locator('.catalogue-toolbar').waitFor({ timeout: 60000 });
     await catsTrigger.click(); await cats.waitFor();
     await cats.getByRole('link', { name: /View all departments/ }).click();
     await page.waitForURL(u => u.pathname === '/products' && !u.searchParams.has('category_id'));

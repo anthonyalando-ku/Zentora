@@ -57,7 +57,7 @@ export const MobileMenu = ({ open, navLinks, pathname, onClose, isLogin = false,
         </div>
 
         <div className="store-drawer-body">
-          <Link to={isLogin ? "/account" : "/login"} onClick={onClose} className="store-drawer-account" aria-current={pathname.startsWith("/account") ? "page" : undefined}>
+          <Link to={isLogin ? "/account" : "/auth/login"} onClick={onClose} className="store-drawer-account" aria-current={pathname.startsWith("/account") ? "page" : undefined}>
             <span className="store-drawer-avatar" aria-hidden="true">{isLogin ? <UserRound /> : <LogIn />}</span>
             <span className="min-w-0">
               <strong>{isLogin ? fullName || "My Account" : "Sign in"}</strong>

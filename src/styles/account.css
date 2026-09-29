@@ -1,0 +1,44 @@
+/* Logged-out /account gateway — storefront palette, borders and breakpoints. */
+.acct-page { background: #f8fafc; color: #11243d; padding: 14px 0 48px; min-height: min(78vh, 760px); }
+.acct-page :focus-visible { outline: 3px solid hsl(var(--color-primary)); outline-offset: 3px; }
+.acct-breadcrumb { display: flex; align-items: center; gap: 9px; font-size: 11px; color: #63758c; min-height: 24px; }
+.acct-breadcrumb a:hover { color: hsl(var(--color-primary)); }
+
+.acct-gateway { max-width: 760px; margin: 28px auto 0; display: flex; flex-direction: column; align-items: center; }
+.acct-intro { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 520px; }
+.acct-icon { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: #eef5fc; color: hsl(var(--color-primary)); border: 1px solid #dce8f4; }
+.acct-icon svg { width: 28px; height: 28px; }
+.acct-intro h1 { font-size: clamp(24px, 2.6vw, 30px); font-weight: 800; letter-spacing: -.035em; line-height: 1.15; margin-top: 16px; }
+.acct-intro p { font-size: 14px; line-height: 1.6; color: #506781; margin-top: 8px; text-wrap: balance; }
+.acct-actions { display: flex; gap: 10px; margin-top: 22px; }
+.acct-actions .store-cta { min-width: 150px; font-size: 14px; min-height: 46px; }
+.acct-secondary { display: inline-flex; align-items: center; justify-content: center; min-width: 150px; min-height: 46px; padding: 12px 18px; border: 1px solid #c9d7e6; border-radius: 8px; background: #fff; color: hsl(var(--color-primary)); font-size: 14px; font-weight: 650; }
+.acct-secondary:hover { border-color: hsl(var(--color-primary)); background: #f6faff; }
+
+.acct-benefits { width: 100%; margin-top: 40px; padding-top: 28px; border-top: 1px solid #e5ebf2; }
+.acct-benefits h2 { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #63758c; text-align: center; }
+.acct-benefits ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 20px; }
+.acct-benefits li { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.acct-benefit-icon { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: #fff; border: 1px solid #e5ebf2; color: hsl(var(--color-primary)); flex-shrink: 0; }
+.acct-benefit-icon svg { width: 19px; height: 19px; }
+.acct-benefits h3 { font-size: 14px; font-weight: 700; }
+.acct-benefits li p { font-size: 12.5px; line-height: 1.55; color: #506781; margin-top: 3px; text-wrap: balance; }
+
+.acct-continue { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin-top: 30px; font-size: 13px; font-weight: 600; color: #506781; }
+.acct-continue:hover { color: hsl(var(--color-primary)); }
+.acct-continue svg { width: 15px; height: 15px; }
+
+@media (max-width: 767px) {
+  .acct-page { min-height: 0; padding: 8px 0 32px; }
+  .acct-gateway { margin-top: 18px; }
+  .acct-icon { width: 56px; height: 56px; }
+  .acct-intro h1 { font-size: 24px; margin-top: 14px; }
+  .acct-intro p { font-size: 13px; }
+  .acct-actions { flex-direction: column; align-self: stretch; margin-top: 20px; }
+  .acct-actions .store-cta, .acct-secondary { width: 100%; min-height: 48px; }
+  .acct-benefits { margin-top: 30px; padding-top: 20px; }
+  .acct-benefits ul { grid-template-columns: 1fr; gap: 0; margin-top: 10px; }
+  .acct-benefits li { flex-direction: row; align-items: flex-start; text-align: left; gap: 14px; padding: 14px 0; }
+  .acct-benefits li + li { border-top: 1px solid #e5ebf2; }
+  .acct-continue { margin-top: 14px; }
+}
